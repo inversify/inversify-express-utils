@@ -1,0 +1,43 @@
+{
+  "name": "inversify-express-utils",
+  "version": "1.0.0-alpha.0",
+  "description": "Some utilities for the development of express applications with Inversify",
+  "main": "lib/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tsc && mocha lib/test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inversify/inversify-express-utils.git"
+  },
+  "keywords": [
+    "InversifyJS",
+    "express"
+  ],
+  "author": "Cody Simms",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/inversify/inversify-express-utils/issues"
+  },
+  "homepage": "https://github.com/inversify/inversify-express-utils#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^2.2.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-typescript": "^2.13.4",
+    "mocha": "^2.4.5",
+    "sinon": "^1.17.4",
+    "source-map-support": "^0.4.0",
+    "supertest": "^1.2.0"
+  },
+  "dependencies": {
+    "express": "^4.13.4",
+    "inversify": "^2.0.0-beta.5",
+    "inversify-dts": "^1.0.0",
+    "reflect-metadata": "^0.1.3"
+  }
+}
