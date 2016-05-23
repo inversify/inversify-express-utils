@@ -1,6 +1,6 @@
-import { IKernel, Kernel } from 'inversify';
+import { IKernel, Kernel } from "inversify";
 
-var kernel: IKernel = new Kernel();
+let kernel: IKernel = new Kernel();
 
 export function getKernel() {
     return kernel;
