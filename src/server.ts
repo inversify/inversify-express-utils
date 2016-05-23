@@ -27,7 +27,7 @@ export class InversifyExpressServer  {
      * 
      * @param fn Function in which app-level middleware can be registered.
      */
-    setConfig(fn: IConfigFunction): InversifyExpressServer {
+    public setConfig(fn: IConfigFunction): InversifyExpressServer {
         this.configFn = fn;
         return this;
     }
@@ -36,7 +36,7 @@ export class InversifyExpressServer  {
      * Applies the configuration function and all controller routes to the server, in that order.
      * 
      */
-    build(): express.Application {
+    public build(): express.Application {
         if (this.configFn) {
             this.configFn.apply(undefined, [this.app]);
         }

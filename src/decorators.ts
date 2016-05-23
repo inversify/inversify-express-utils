@@ -8,20 +8,36 @@ export function Controller(path: string, ...middleware: express.RequestHandler[]
     };
 }
 
-export function All   (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator { return Method("all",    path, ...middleware); }
-export function Get   (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator { return Method("get",    path, ...middleware); }
-export function Post  (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator { return Method("post",   path, ...middleware); }
-export function Put   (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator { return Method("put",    path, ...middleware); }
-export function Patch (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator { return Method("patch",  path, ...middleware); }
-export function Head  (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator { return Method("head",   path, ...middleware); }
-export function Delete(path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator { return Method("delete", path, ...middleware); }
+export function All   (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
+    return Method("all",    path, ...middleware);
+}
+export function Get   (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
+    return Method("get",    path, ...middleware);
+}
+export function Post  (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
+    return Method("post",   path, ...middleware);
+}
+export function Put   (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
+    return Method("put",    path, ...middleware);
+}
+export function Patch (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
+    return Method("patch",  path, ...middleware);
+}
+export function Head  (path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
+    return Method("head",   path, ...middleware);
+}
+export function Delete(path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
+    return Method("delete", path, ...middleware);
+}
 
 export function Method(method: string, path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
     return function (target: any, key: string, value: any) {
 
         let handler: express.RequestHandler = (req: express.Request, res: express.Response, next: any) => {
             let result = getKernel().get(target.constructor.name)[key](req, res, next);
-            if (result || !res.headersSent) res.send(result);
+            if (result || !res.headersSent) {
+                res.send(result);
+            }
         };
 
         getContainer().registerHandler(method, path, target, middleware, handler);

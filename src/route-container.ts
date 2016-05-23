@@ -8,19 +8,22 @@ export function refreshContainer() {
 }
 
 export function getContainer() {
-    if (!controllerContainer) refreshContainer();
+    if (!controllerContainer) {
+        refreshContainer();
+    }
     return controllerContainer;
 }
 
 export class RouteContainer {
     private container: { [s: string]: IContainerRoute }  = {};
 
-    public registerHandler(httpMethod: string, path: string, target: any, middleware: express.RequestHandler[], callback: express.RequestHandler) {
+    public registerHandler(httpMethod: string, path: string, target: any, middleware: express.RequestHandler[],
+        callback: express.RequestHandler) {
         if (!this.container[target.constructor]) {
             this.container[target.constructor] = {
+                middleware: undefined,
                 path: undefined,
-                router: express.Router(),
-                middleware: undefined
+                router: express.Router()
             };
         }
 
@@ -50,7 +53,7 @@ export class RouteContainer {
 }
 
 interface IContainerRoute {
+    middleware: express.RequestHandler[];
     path: string;
     router: express.Router;
-    middleware: express.RequestHandler[];
 }
