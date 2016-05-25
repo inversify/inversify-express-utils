@@ -70,7 +70,7 @@ export class RouteContainer implements IRouteContainer {
     }
 }
 
-interface IContainerRoute {
+export interface IContainerRoute {
     middleware: express.RequestHandler[];
     path: string;
     router: express.Router;

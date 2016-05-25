@@ -16,7 +16,7 @@ import { InversifyExpressServer } from "../src/server";
 import { RouteContainer } from "../src/route-container";
 import { Controller, Method, Get, Post, Put, Patch, Head, Delete } from "../src/decorators";
 
-describe("Framework Integration Tests:", () => {
+describe("Integration Tests:", () => {
     let server: InversifyExpressServer;
     let kernel: IKernel;
 
