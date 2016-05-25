@@ -1,14 +1,14 @@
 import * as express from "express";
 import { IKernel } from "inversify";
-import { setKernel } from "./kernel";
-import { getContainer } from "./route-container";
+import { IRouteContainer, RouteContainer } from "./route-container";
 
 /**
  * Wrapper for the express server.
  */
 export class InversifyExpressServer  {
     private app: express.Application = express();
-    private configFn: Function;
+    private routeContainer: IRouteContainer;
+    private configFn: IConfigFunction;
 
     /**
      * Wrapper for the express server.
@@ -16,7 +16,8 @@ export class InversifyExpressServer  {
      * @param kernel Kernel loaded with all controllers and their dependencies.
      */
     constructor(kernel: IKernel) {
-        setKernel(kernel);
+        this.routeContainer = RouteContainer.getInstance();
+        this.routeContainer.setKernel(kernel);
     }
 
     /**
@@ -34,7 +35,6 @@ export class InversifyExpressServer  {
 
     /**
      * Applies the configuration function and all controller routes to the server, in that order.
-     * 
      */
     public build(): express.Application {
         if (this.configFn) {
@@ -45,7 +45,7 @@ export class InversifyExpressServer  {
     }
 
     private useRoutes() {
-        getContainer().getRoutes().forEach((route) => {
+        this.routeContainer.getRoutes().forEach((route) => {
             this.app.use(route.path, ...route.middleware, route.router);
         });
     }

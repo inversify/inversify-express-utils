@@ -1,10 +1,9 @@
-import { getKernel } from "./kernel";
-import { getContainer } from "./route-container";
+import { RouteContainer } from "./route-container";
 import * as express from "express";
 
 export function Controller(path: string, ...middleware: express.RequestHandler[]) {
     return function (target: any) {
-        getContainer().registerController(path, middleware, target);
+        RouteContainer.getInstance().registerController(path, middleware, target);
     };
 }
 
@@ -32,15 +31,7 @@ export function Delete(path: string, ...middleware: express.RequestHandler[]): I
 
 export function Method(method: string, path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
     return function (target: any, key: string, value: any) {
-
-        let handler: express.RequestHandler = (req: express.Request, res: express.Response, next: any) => {
-            let result = getKernel().get(target.constructor.name)[key](req, res, next);
-            if (result || !res.headersSent) {
-                res.send(result);
-            }
-        };
-
-        getContainer().registerHandler(method, path, target, middleware, handler);
+        RouteContainer.getInstance().registerHandler(method, path, middleware, target, key);
     };
 }
 
