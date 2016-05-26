@@ -3,11 +3,10 @@
   "version": "1.0.0-alpha.0",
   "description": "Some utilities for the development of express applications with Inversify",
   "main": "lib/index.js",
-  "directories": {
-    "test": "test"
-  },
+  "jsnext:main": "es/index.js",
   "scripts": {
-    "test": "tsc && mocha lib/test"
+    "test": "gulp",
+    "prepublish": "gulp build && gulp test"
   },
   "repository": {
     "type": "git",
@@ -24,15 +23,28 @@
   },
   "homepage": "https://github.com/inversify/inversify-express-utils#readme",
   "devDependencies": {
+    "browserify": "^13.0.1",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
+    "gulp-codecov": "^2.0.1",
+    "gulp-header": "^1.8.2",
+    "gulp-istanbul": "^0.10.4",
     "gulp-mocha": "^2.2.0",
+    "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.6.0",
+    "gulp-tslint": "^5.0.0",
     "gulp-typescript": "^2.13.4",
+    "gulp-uglify": "^1.5.3",
     "mocha": "^2.4.5",
+    "run-sequence": "^1.2.0",
     "sinon": "^1.17.4",
     "source-map-support": "^0.4.0",
-    "supertest": "^1.2.0"
+    "supertest": "^1.2.0",
+    "tsify": "^0.16.0",
+    "tslint": "^3.10.2",
+    "typescript": "^1.8.10",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {
     "express": "^4.13.4",

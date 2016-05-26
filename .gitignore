@@ -32,4 +32,33 @@ node_modules
 # Optional REPL history
 .node_repl_history
 
+build
+node_modules
+bower_components
+docs
+bundled
+
 typings
+.typingsrc
+dist
+lib
+es
+
+type_definitions/inversify/*.js
+
+src/*.js
+src/**/*.js
+
+src/*.js.map
+src/**/*.js.map
+
+src/*.d.ts
+src/decorator/*.d.ts
+src/factory/*.d.ts
+src/syntax/*.d.ts
+
+test/*.js
+test/**/*.js
+
+type_definitions/**/*.js
+type_definitions/*.js
