@@ -7,10 +7,10 @@ import "reflect-metadata";
 // test libraries
 import * as sinon from "sinon";
 import * as request from "supertest";
-import * as express from "express";
 import { expect } from "chai";
 
 // dependencies
+import * as express from "express";
 import { injectable, IKernel, Kernel } from "inversify";
 import { InversifyExpressServer } from "../src/server";
 import { RouteContainer } from "../src/route-container";

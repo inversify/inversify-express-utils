@@ -101,18 +101,16 @@ server
     .listen(3000, 'localhost', callback);
 ```
 
-The constructor
-
 ## Decorators
 
-* `@Controller(path, [middleware, ...])`
+### `@Controller(path, [middleware, ...])`
 
 Registers the decorated class as a controller with a root path, and optionally registers any global middleware for this controller.
 
-* `@Method(method, path, [middleware, ...])`
+### `@Method(method, path, [middleware, ...])`
 
-Registers the decorated method as a request handler for a particular path and method, where the method name is a valid express routing method.
+Registers the decorated controller method as a request handler for a particular path and method, where the method name is a valid express routing method.
 
-* `@SHORTCUT(path, [middleware, ...])`
+### `@SHORTCUT(path, [middleware, ...])`
 
 Shortcut decorators which are simply wrappers for `@Method`. Right now these include `@Get`, `@Post`, `@Put`, `@Patch`, `@Head`, `@Delete`, and `@All`. For anything more obscure, use `@Method` (Or make a PR :smile:).

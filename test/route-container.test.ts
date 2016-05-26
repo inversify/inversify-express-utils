@@ -1,8 +1,8 @@
 // test libraries
-import * as express from "express";
 import { expect } from "chai";
 
 // dependencies
+import * as express from "express";
 import { RouteContainer } from "../src/route-container";
 
 describe("Unit Test: RouteContainer", () => {
