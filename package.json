@@ -1,6 +1,6 @@
 {
   "name": "inversify-express-utils",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "Some utilities for the development of express applications with Inversify",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
@@ -50,8 +50,8 @@
   },
   "dependencies": {
     "express": "^4.13.4",
-    "inversify": "^2.0.0-beta.5",
-    "inversify-dts": "^1.0.0",
+    "inversify": "^2.0.0-beta.8",
+    "inversify-dts": "^1.0.3",
     "reflect-metadata": "^0.1.3"
   }
 }

@@ -15,7 +15,11 @@
 Some utilities for the development of express applications with Inversify.
 
 ## Installation
-Coming soon to npm!
+The package is available on npm:
+```
+$ npm install --save inversify-express-utils
+```
+The type definitions are available in the inversify-dts npm package. Please refer to the inversify docs to learn more about the installation process.
 
 ## The Basics
 
