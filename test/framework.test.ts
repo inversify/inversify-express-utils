@@ -12,8 +12,8 @@ import { expect } from "chai";
 // dependencies
 import * as express from "express";
 import { injectable, IKernel, Kernel } from "inversify";
+import { IController } from "../src/interfaces";
 import { InversifyExpressServer } from "../src/server";
-import { RouteContainer } from "../src/route-container";
 import { Controller, Method, Get, Post, Put, Patch, Head, Delete } from "../src/decorators";
 
 describe("Integration Tests:", () => {
@@ -22,7 +22,6 @@ describe("Integration Tests:", () => {
 
     beforeEach((done) => {
         // refresh container and kernel
-        RouteContainer.setInstance(undefined);
         kernel = new Kernel();
         done();
     });
@@ -33,11 +32,6 @@ describe("Integration Tests:", () => {
             @injectable()
             @Controller("/")
             class TestController { @Get("/") public getTest(req: express.Request, res: express.Response) { return "GET"; } }
-            let routes = RouteContainer.getInstance().getRoutes();
-
-            expect(routes.length).to.equal(1);
-            expect(routes[0].router).to.not.be.undefined;
-            expect(routes[0].path).to.equal("/");
             done();
         });
 
@@ -53,7 +47,7 @@ describe("Integration Tests:", () => {
                 @Head("/") public headTest(req: express.Request, res: express.Response) { res.send("HEAD"); }
                 @Delete("/") public deleteTest(req: express.Request, res: express.Response) { res.send("DELETE"); }
             }
-            kernel.bind<TestController>("TestController").to(TestController);
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(kernel);
             let agent = request(server.build());
@@ -75,7 +69,7 @@ describe("Integration Tests:", () => {
             class TestController {
                 @Method("propfind", "/") public getTest(req: express.Request, res: express.Response) { res.send("PROPFIND"); }
             }
-            kernel.bind<TestController>("TestController").to(TestController);
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(kernel);
             request(server.build())
@@ -92,7 +86,7 @@ describe("Integration Tests:", () => {
             class TestController {
                 @Get("/") public getTest(req: express.Request, res: express.Response) { return result; }
             }
-            kernel.bind<TestController>("TestController").to(TestController);
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(kernel);
             request(server.build())
@@ -136,7 +130,7 @@ describe("Integration Tests:", () => {
             class TestController {
                 @Get("/", spyA, spyB, spyC) public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            kernel.bind<TestController>("TestController").to(TestController);
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(kernel);
             request(server.build())
@@ -157,7 +151,7 @@ describe("Integration Tests:", () => {
             class TestController {
                 @Get("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            kernel.bind<TestController>("TestController").to(TestController);
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(kernel);
             request(server.build())
@@ -178,7 +172,7 @@ describe("Integration Tests:", () => {
             class TestController {
                 @Get("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            kernel.bind<TestController>("TestController").to(TestController);
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(kernel);
 
@@ -206,7 +200,7 @@ describe("Integration Tests:", () => {
             class TestController {
                 @Get("/", spyC) public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            kernel.bind<TestController>("TestController").to(TestController);
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(kernel);
 

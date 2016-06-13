@@ -1,13 +1,13 @@
 import * as express from "express";
 import { IKernel } from "inversify";
-import { IRouteContainer, RouteContainer } from "./route-container";
+import { IController, IControllerMetadata, IControllerMethodMetadata } from "./interfaces";
 
 /**
  * Wrapper for the express server.
  */
 export class InversifyExpressServer  {
+    private kernel: IKernel;
     private app: express.Application = express();
-    private routeContainer: IRouteContainer;
     private configFn: IConfigFunction;
 
     /**
@@ -16,8 +16,7 @@ export class InversifyExpressServer  {
      * @param kernel Kernel loaded with all controllers and their dependencies.
      */
     constructor(kernel: IKernel) {
-        this.routeContainer = RouteContainer.getInstance();
-        this.routeContainer.setKernel(kernel);
+        this.kernel = kernel;
     }
 
     /**
@@ -45,11 +44,35 @@ export class InversifyExpressServer  {
     }
 
     private useRoutes() {
-        this.routeContainer.getRoutes().forEach((route) => {
-            this.app.use(route.path, ...route.middleware, route.router);
+        let controllers: IController[] = this.kernel.getAll<IController>("IController");
+
+        controllers.forEach((controller: IController) => {
+            let controllerMetadata: IControllerMetadata = Reflect.getOwnMetadata("_controller", controller.constructor);
+            let methodMetadataList: IControllerMethodMetadata[] = Reflect.getOwnMetadata("_controller-method", controller.constructor);
+
+            if (controllerMetadata && methodMetadataList) {
+                let router: express.Router = express.Router();
+                console.log(methodMetadataList);
+                methodMetadataList.forEach((methodMetadata: IControllerMethodMetadata) => {
+                    let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, methodMetadata.key);
+                    router[methodMetadata.method](methodMetadata.path, ...methodMetadata.middleware, handler);
+                });
+
+                this.app.use(controllerMetadata.path, ...controllerMetadata.middleware, router);
+            }
         });
     }
-}
+
+    private handlerFactory(controllerName: any, key: string): express.RequestHandler {
+        return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+            let result: any = this.kernel.getNamed("IController", controllerName)[key](req, res);
+                console.log(`called method ${key}`);
+                if (!res.headersSent) {
+                    res.send(result);
+                }
+            };
+        }
+    }
 
 interface IConfigFunction {
     (app: express.Application): void;
