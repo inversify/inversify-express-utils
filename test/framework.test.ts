@@ -32,11 +32,11 @@ describe("Integration Tests:", () => {
             @injectable()
             @Controller("/")
             class TestController {
-                @Get("/") public getTest(req: express.Request, res: express.Response) { 
+                @Get("/") public getTest(req: express.Request, res: express.Response) {
                     return new Promise(((resolve) => {
                         setTimeout(resolve, 100, "GET");
-                    })); 
-                } 
+                    }));
+                }
             }
             kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
 
@@ -45,16 +45,16 @@ describe("Integration Tests:", () => {
                 .get("/")
                 .expect(200, "GET", done);
         });
-        
-        
+
+
         it ("should work for methods which call next()", (done) => {
             @injectable()
             @Controller("/")
             class TestController {
-                @Get("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) { 
+                @Get("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) {
                     next();
                 }
-                
+
                 @Get("/") public getTest2(req: express.Request, res: express.Response) {
                     return "GET";
                 }
@@ -66,18 +66,21 @@ describe("Integration Tests:", () => {
                 .get("/")
                 .expect(200, "GET", done);
         });
-        
-        
+
+
         it ("should work for async methods which call next()", (done) => {
             @injectable()
             @Controller("/")
             class TestController {
-                @Get("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) { 
+                @Get("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) {
                     return new Promise(((resolve) => {
-                        setTimeout(() => {next(); resolve();}, 100, "GET");
+                        setTimeout(() => {
+                            next();
+                            resolve();
+                        }, 100, "GET");
                     }));
                 }
-                
+
                 @Get("/") public getTest2(req: express.Request, res: express.Response) {
                     return "GET";
                 }
@@ -95,14 +98,14 @@ describe("Integration Tests:", () => {
             @injectable()
             @Controller("/")
             class TestController {
-                @Get("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) { 
+                @Get("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) {
                     next();
                 }
-                
+
                 @Get("/") public getTest2(req: express.Request, res: express.Response) {
                     return new Promise(((resolve) => {
                         setTimeout(resolve, 100, "GET");
-                    })); 
+                    }));
                 }
             }
             kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");

@@ -74,10 +74,10 @@ export class InversifyExpressServer  {
 
             if (controllerMetadata && methodMetadata) {
                 let router: express.Router = express.Router();
-                
-                methodMetadata.forEach((methodMetadata: IControllerMethodMetadata) => {
-                    let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, methodMetadata.key);
-                    router[methodMetadata.method](methodMetadata.path, ...methodMetadata.middleware, handler);
+
+                methodMetadata.forEach((metadata: IControllerMethodMetadata) => {
+                    let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, metadata.key);
+                    router[metadata.method](metadata.path, ...metadata.middleware, handler);
                 });
 
                 this.app.use(controllerMetadata.path, ...controllerMetadata.middleware, router);

@@ -1,12 +1,9 @@
 // test libraries
 import { expect } from "chai";
-import * as sinon from "sinon";
 
 // dependencies
-import * as express from "express";
-import { Controller, Method, Get, Put, All, Delete, Head, Patch, Post } from "../src/decorators";
+import { Controller, Method } from "../src/decorators";
 import { IControllerMetadata, IControllerMethodMetadata } from "../src/interfaces";
-import { Kernel, injectable } from "inversify";
 
 describe("Unit Test: Controller Decorators", () => {
 
@@ -33,17 +30,17 @@ describe("Unit Test: Controller Decorators", () => {
 
         class TestController {
             @Method(method, path, ...middleware)
-            test() { return; }
+            public test() { return; }
 
-            @Method('foo', 'bar')
-            test2() { return; }
+            @Method("foo", "bar")
+            public test2() { return; }
 
-            @Method('bar', 'foo')
-            test3() { return; }
+            @Method("bar", "foo")
+            public test3() { return; }
         }
 
         let methodMetadata: IControllerMethodMetadata[] = Reflect.getMetadata("_controller-method", TestController);
-        
+
         expect(methodMetadata.length).eql(3);
 
         let metadata: IControllerMethodMetadata = methodMetadata[0];
