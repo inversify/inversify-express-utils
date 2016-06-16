@@ -28,11 +28,89 @@ describe("Integration Tests:", () => {
 
     describe("Routing & Request Handling:", () => {
 
-        it("should add a router to routeContainer", (done) => {
+        it("should work for async controller methods", (done) => {
             @injectable()
             @Controller("/")
-            class TestController { @Get("/") public getTest(req: express.Request, res: express.Response) { return "GET"; } }
-            done();
+            class TestController {
+                @Get("/") public getTest(req: express.Request, res: express.Response) { 
+                    return new Promise(((resolve) => {
+                        setTimeout(resolve, 100, "GET");
+                    })); 
+                } 
+            }
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(kernel);
+            request(server.build())
+                .get("/")
+                .expect(200, "GET", done);
+        });
+        
+        
+        it ("should work for methods which call next()", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Get("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) { 
+                    next();
+                }
+                
+                @Get("/") public getTest2(req: express.Request, res: express.Response) {
+                    return "GET";
+                }
+            }
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(kernel);
+            request(server.build())
+                .get("/")
+                .expect(200, "GET", done);
+        });
+        
+        
+        it ("should work for async methods which call next()", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Get("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) { 
+                    return new Promise(((resolve) => {
+                        setTimeout(() => {next(); resolve();}, 100, "GET");
+                    }));
+                }
+                
+                @Get("/") public getTest2(req: express.Request, res: express.Response) {
+                    return "GET";
+                }
+            }
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(kernel);
+            request(server.build())
+                .get("/")
+                .expect(200, "GET", done);
+        });
+
+
+        it ("should work for async methods called by next()", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Get("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) { 
+                    next();
+                }
+                
+                @Get("/") public getTest2(req: express.Request, res: express.Response) {
+                    return new Promise(((resolve) => {
+                        setTimeout(resolve, 100, "GET");
+                    })); 
+                }
+            }
+            kernel.bind<IController>("IController").to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(kernel);
+            request(server.build())
+                .get("/")
+                .expect(200, "GET", done);
         });
 
 

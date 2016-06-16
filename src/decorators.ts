@@ -42,7 +42,6 @@ export function Method(method: string, path: string, ...middleware: express.Requ
         }
 
         metadataList.push(metadata);
-        console.log(metadataList.map((metadata: any) => metadata.key));
     };
 }
 
