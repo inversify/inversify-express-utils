@@ -1,12 +1,13 @@
 {
   "name": "inversify-express-utils",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.3",
   "description": "Some utilities for the development of express applications with Inversify",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
   "scripts": {
     "test": "gulp",
-    "prepublish": "gulp build && gulp test"
+    "publish-please": "publish-please",
+    "prepublish": "publish-please guard"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
     "gulp-typescript": "^2.13.4",
     "gulp-uglify": "^1.5.3",
     "mocha": "^2.4.5",
+    "publish-please": "^2.1.3",
     "run-sequence": "^1.2.0",
     "sinon": "^1.17.4",
     "source-map-support": "^0.4.0",
@@ -48,8 +50,8 @@
   },
   "dependencies": {
     "express": "^4.13.4",
-    "inversify": "^2.0.0-beta.5",
-    "inversify-dts": "^1.0.0",
+    "inversify": "^2.0.0-beta.8",
+    "inversify-dts": "^1.0.3",
     "reflect-metadata": "^0.1.3"
   }
 }
