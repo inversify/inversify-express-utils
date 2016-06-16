@@ -5,22 +5,33 @@ import * as sinon from "sinon";
 // dependencies
 import * as express from "express";
 import { InversifyExpressServer } from "../src/server";
+import { Kernel, injectable } from "inversify";
 
 describe("Unit Test: InversifyExpressServer", () => {
 
-    it("should not call the server config function until after a call to build()", (done) => {
+    it("should call the configFn before the errorConfigFn", (done) => {
         let middleware = function(req: express.Request, res: express.Response, next: express.NextFunction) { return; };
-        let fn = sinon.spy((app: express.Application) => { app.use(middleware); });
-        let server = new InversifyExpressServer(null);
+        let configFn = sinon.spy((app: express.Application) => { app.use(middleware); });
+        let errorConfigFn = sinon.spy((app: express.Application) => { app.use(middleware); });
+        let kernel = new Kernel();
 
-        server.setConfig(fn);
-        expect(fn.calledOnce).to.be.false;
+        @injectable()
+        class TestController {}
+
+        kernel.bind("IController").to(TestController);
+        let server = new InversifyExpressServer(kernel);
+
+        server.setConfig(configFn)
+            .setErrorConfig(errorConfigFn);
+
+        expect(configFn.called).to.be.false;
+        expect(errorConfigFn.called).to.be.false;
+
         server.build();
-        expect(fn.calledOnce).to.be.true;
-        done();
-    });
 
-    it("should use the routes provided to register server routes", (done) => {
+        expect(configFn.calledOnce).to.be.true;
+        expect(errorConfigFn.calledOnce).to.be.true;
+        expect(configFn.calledBefore(errorConfigFn)).to.be.true;
         done();
     });
 });

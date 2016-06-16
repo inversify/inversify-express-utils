@@ -29,31 +29,18 @@ The following example will declare a controller that responds to `GET /foo'.
 
 ```ts
 import * as express from 'express';
-import { Controller, Get } from 'inversify-express-utils';
+import { Controller, IController, Get } from 'inversify-express-utils';
 import { injectable, inject } from 'inversify';
 
 @Controller('/foo')
 @injectable()
-export class FooController {
+export class FooController implements IController {
     
     constructor( @inject('FooService') private fooService: FooService ) {}
     
     @Get('/')
     private index(req: express.Request): string {
         return this.fooService.get(req.query.id);
-    }
-}
-
-@injectable()
-export class FooService {
-    
-    private data = {
-      1: 'Foo',
-      2: 'Bar'  
-    };
-    
-    public get(id: number): string {
-        return this.data[id];
     }
 }
 ```
@@ -64,30 +51,25 @@ Configure the inversify kernel in your composition root as usual.
 Then, pass the kernel to the InversifyExpressServer constructor. This will allow it to register all controllers and their dependencies from your kernel and attach them to the express app.
 Then just call server.build() to prepare your app.
 
-```ts
-import 'reflect-metadata';
-import * as express from 'express';
-import { Kernel } from 'inversify';
-import { InversifyExpressServer } from 'inversify-express-utils';
+In order for the InversifyExpressServer to find your controllers, you must bind them to the "IController" service identifier and tag the binding with the controller's name.
+The `IController` interface exported by inversify-express-utils is empty and solely for convenience, so feel free to implement your own if you want.
 
-import { FooController } from './controllers/foo-controller';
-import { FooService } from './services/foo-service';
+```ts
+import { Kernel } from 'inversify';
+import { InversifyExpressServer, IController } from 'inversify-express-utils';
 
 // set up kernel
 let kernel = new Kernel();
+
+// note that you *must* bind your controllers to IController 
+kernel.bind<IController>('IController').to(FooController).whenTargetNamed('FooController');
 kernel.bind<FooService>('FooService').to(FooService);
-kernel.bind<FooController>('FooController').to(FooController);
 
 // create server
 let server = new InversifyExpressServer(kernel);
 
-server
-    .build()
-    .listen(3000, 'localhost', callback);
-
-function callback() {
-    console.log('listening on http://localhost:3000');
-}
+let app = server.build();
+app.listen(3000);
 ```
 
 ## InversifyExpressServer
@@ -106,6 +88,17 @@ server.setConfig((app) => {
 });
 ```
 
+### `.setErrorConfig(errorConfigFn)`
+Optional - like `.setConfig()`, except this function is applied after registering all app middleware and controller routes.
+
+```ts
+let server = new InversifyExpressServer(kernel);
+server.setErrorConfig((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+```
+
 ### `.build()`
 Attaches all registered controllers and middleware to the express application. Returns the application instance.
 
@@ -114,6 +107,7 @@ Attaches all registered controllers and middleware to the express application. R
 let server = new InversifyExpressServer(kernel);
 server
     .setConfig(configFn)
+    .setErrorConfig(errorConfigFn)
     .build()
     .listen(3000, 'localhost', callback);
 ```

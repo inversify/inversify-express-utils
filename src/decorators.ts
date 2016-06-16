@@ -1,9 +1,10 @@
-import { RouteContainer } from "./route-container";
 import * as express from "express";
+import { IControllerMetadata, IControllerMethodMetadata } from "./interfaces";
 
 export function Controller(path: string, ...middleware: express.RequestHandler[]) {
     return function (target: any) {
-        RouteContainer.getInstance().registerController(path, middleware, target);
+        let metadata: IControllerMetadata = {path, middleware, target};
+        Reflect.defineMetadata("_controller", metadata, target);
     };
 }
 
@@ -31,7 +32,16 @@ export function Delete(path: string, ...middleware: express.RequestHandler[]): I
 
 export function Method(method: string, path: string, ...middleware: express.RequestHandler[]): IHandlerDecorator {
     return function (target: any, key: string, value: any) {
-        RouteContainer.getInstance().registerHandler(method, path, middleware, target, key);
+        let metadata: IControllerMethodMetadata = {path, middleware, method, target, key};
+        let metadataList: IControllerMethodMetadata[] = [];
+
+        if (!Reflect.hasOwnMetadata("_controller-method", target.constructor)) {
+            Reflect.defineMetadata("_controller-method", metadataList, target.constructor);
+        } else {
+            metadataList = Reflect.getOwnMetadata("_controller-method", target.constructor);
+        }
+
+        metadataList.push(metadata);
     };
 }
 
