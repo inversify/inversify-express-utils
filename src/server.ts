@@ -68,8 +68,16 @@ export class InversifyExpressServer  {
         let controllers: interfaces.Controller[] = this.kernel.getAll<interfaces.Controller>("Controller");
 
         controllers.forEach((controller: interfaces.Controller) => {
-            let controllerMetadata: interfaces.ControllerMetadata = Reflect.getOwnMetadata("_controller", controller.constructor);
-            let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getOwnMetadata("_controller-method", controller.constructor);
+
+            let controllerMetadata: interfaces.ControllerMetadata = Reflect.getOwnMetadata(
+                "_controller",
+                controller.constructor
+            );
+
+            let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getOwnMetadata(
+                "_controller-method",
+                controller.constructor
+            );
 
             if (controllerMetadata && methodMetadata) {
                 let router: express.Router = express.Router();
