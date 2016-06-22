@@ -1,5 +1,5 @@
 import * as express from "express";
-import { IController, IControllerMetadata, IControllerMethodMetadata } from "./interfaces";
+import interfaces from "./interfaces";
 
 /**
  * Wrapper for the express server.
@@ -7,8 +7,8 @@ import { IController, IControllerMetadata, IControllerMethodMetadata } from "./i
 export class InversifyExpressServer  {
     private kernel: inversify.interfaces.Kernel;
     private app: express.Application = express();
-    private configFn: IConfigFunction;
-    private errorConfigFn: IConfigFunction;
+    private configFn: interfaces.ConfigFunction;
+    private errorConfigFn: interfaces.ConfigFunction;
 
     /**
      * Wrapper for the express server.
@@ -27,7 +27,7 @@ export class InversifyExpressServer  {
      * 
      * @param fn Function in which app-level middleware can be registered.
      */
-    public setConfig(fn: IConfigFunction): InversifyExpressServer {
+    public setConfig(fn: interfaces.ConfigFunction): InversifyExpressServer {
         this.configFn = fn;
         return this;
     }
@@ -40,7 +40,7 @@ export class InversifyExpressServer  {
      * 
      * @param fn Function in which app-level error handlers can be registered.
      */
-    public setErrorConfig(fn: IConfigFunction): InversifyExpressServer {
+    public setErrorConfig(fn: interfaces.ConfigFunction): InversifyExpressServer {
         this.errorConfigFn = fn;
         return this;
     }
@@ -65,16 +65,16 @@ export class InversifyExpressServer  {
     }
 
     private registerControllers() {
-        let controllers: IController[] = this.kernel.getAll<IController>("IController");
+        let controllers: interfaces.Controller[] = this.kernel.getAll<interfaces.Controller>("Controller");
 
-        controllers.forEach((controller: IController) => {
-            let controllerMetadata: IControllerMetadata = Reflect.getOwnMetadata("_controller", controller.constructor);
-            let methodMetadata: IControllerMethodMetadata[] = Reflect.getOwnMetadata("_controller-method", controller.constructor);
+        controllers.forEach((controller: interfaces.Controller) => {
+            let controllerMetadata: interfaces.ControllerMetadata = Reflect.getOwnMetadata("_controller", controller.constructor);
+            let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getOwnMetadata("_controller-method", controller.constructor);
 
             if (controllerMetadata && methodMetadata) {
                 let router: express.Router = express.Router();
 
-                methodMetadata.forEach((metadata: IControllerMethodMetadata) => {
+                methodMetadata.forEach((metadata: interfaces.ControllerMethodMetadata) => {
                     let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, metadata.key);
                     router[metadata.method](metadata.path, ...metadata.middleware, handler);
                 });
@@ -86,7 +86,7 @@ export class InversifyExpressServer  {
 
     private handlerFactory(controllerName: any, key: string): express.RequestHandler {
         return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            let result: any = this.kernel.getNamed("IController", controllerName)[key](req, res, next);
+            let result: any = this.kernel.getNamed("Controller", controllerName)[key](req, res, next);
             // try to resolve promise
             if (result && result instanceof Promise) {
 
@@ -101,8 +101,4 @@ export class InversifyExpressServer  {
             }
         };
     }
-}
-
-interface IConfigFunction {
-    (app: express.Application): void;
 }

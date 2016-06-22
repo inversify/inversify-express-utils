@@ -15,9 +15,10 @@
         "suppressImplicitAnyIndexErrors": true,
         "outDir": "lib"
     },
-    "exclude": [
-        "node_modules",
-        "type_definitions",
-        "typings"
+    "files": [
+        "typings/index.d.ts",
+        "node_modules/inversify-dts/inversify/inversify.d.ts",
+        "node_modules/reflect-metadata/reflect-metadata.d.ts",
+        "src/index.ts"
     ]
 }

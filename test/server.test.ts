@@ -18,7 +18,7 @@ describe("Unit Test: InversifyExpressServer", () => {
         @injectable()
         class TestController {}
 
-        kernel.bind("IController").to(TestController);
+        kernel.bind("Controller").to(TestController);
         let server = new InversifyExpressServer(kernel);
 
         server.setConfig(configFn)

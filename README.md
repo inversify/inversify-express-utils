@@ -16,9 +16,11 @@ Some utilities for the development of express applications with Inversify.
 
 ## Installation
 The package is available on npm:
+
 ```
 $ npm install --save inversify-express-utils
 ```
+
 The type definitions are available in the inversify-dts npm package. Please refer to the inversify docs to learn more about the installation process.
 
 ## The Basics
@@ -29,12 +31,12 @@ The following example will declare a controller that responds to `GET /foo'.
 
 ```ts
 import * as express from 'express';
-import { Controller, IController, Get } from 'inversify-express-utils';
+import { Controller, Get } from 'inversify-express-utils';
 import { injectable, inject } from 'inversify';
 
 @Controller('/foo')
 @injectable()
-export class FooController implements IController {
+export class FooController implements Controller {
     
     constructor( @inject('FooService') private fooService: FooService ) {}
     
@@ -51,18 +53,18 @@ Configure the inversify kernel in your composition root as usual.
 Then, pass the kernel to the InversifyExpressServer constructor. This will allow it to register all controllers and their dependencies from your kernel and attach them to the express app.
 Then just call server.build() to prepare your app.
 
-In order for the InversifyExpressServer to find your controllers, you must bind them to the "IController" service identifier and tag the binding with the controller's name.
-The `IController` interface exported by inversify-express-utils is empty and solely for convenience, so feel free to implement your own if you want.
+In order for the InversifyExpressServer to find your controllers, you must bind them to the "Controller" service identifier and tag the binding with the controller's name.
+The `Controller` interface exported by inversify-express-utils is empty and solely for convenience, so feel free to implement your own if you want.
 
 ```ts
 import { Kernel } from 'inversify';
-import { InversifyExpressServer, IController } from 'inversify-express-utils';
+import { InversifyExpressServer } from 'inversify-express-utils';
 
 // set up kernel
 let kernel = new Kernel();
 
-// note that you *must* bind your controllers to IController 
-kernel.bind<IController>('IController').to(FooController).whenTargetNamed('FooController');
+// note that you *must* bind your controllers to Controller 
+kernel.bind<Controller>('Controller').to(FooController).whenTargetNamed('FooController');
 kernel.bind<FooService>('FooService').to(FooService);
 
 // create server
