@@ -1,12 +1,11 @@
 import * as express from "express";
-import { IKernel } from "inversify";
 import { IController, IControllerMetadata, IControllerMethodMetadata } from "./interfaces";
 
 /**
  * Wrapper for the express server.
  */
 export class InversifyExpressServer  {
-    private kernel: IKernel;
+    private kernel: inversify.interfaces.Kernel;
     private app: express.Application = express();
     private configFn: IConfigFunction;
     private errorConfigFn: IConfigFunction;
@@ -16,7 +15,7 @@ export class InversifyExpressServer  {
      * 
      * @param kernel Kernel loaded with all controllers and their dependencies.
      */
-    constructor(kernel: IKernel) {
+    constructor(kernel: inversify.interfaces.Kernel) {
         this.kernel = kernel;
     }
 

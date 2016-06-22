@@ -11,14 +11,14 @@ import { expect } from "chai";
 
 // dependencies
 import * as express from "express";
-import { injectable, IKernel, Kernel } from "inversify";
+import { injectable, Kernel } from "inversify";
 import { IController } from "../src/interfaces";
 import { InversifyExpressServer } from "../src/server";
 import { Controller, Method, Get, Post, Put, Patch, Head, Delete } from "../src/decorators";
 
 describe("Integration Tests:", () => {
     let server: InversifyExpressServer;
-    let kernel: IKernel;
+    let kernel: inversify.interfaces.Kernel;
 
     beforeEach((done) => {
         // refresh container and kernel
