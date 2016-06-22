@@ -1,14 +1,28 @@
 import * as express from "express";
 
-export interface IControllerMetadata {
-    path: string;
-    middleware: express.RequestHandler[];
-    target: any;
+namespace interfaces {
+
+    export interface ControllerMetadata {
+        path: string;
+        middleware: express.RequestHandler[];
+        target: any;
+    }
+
+    export interface ControllerMethodMetadata extends ControllerMetadata {
+        method: string;
+        key: string;
+    }
+
+    export interface Controller {}
+
+    export interface HandlerDecorator {
+        (target: any, key: string, value: any): void;
+    }
+
+    export interface ConfigFunction {
+        (app: express.Application): void;
+    }
+
 }
 
-export interface IControllerMethodMetadata extends IControllerMetadata {
-    method: string;
-    key: string;
-}
-
-export interface IController {}
+export default interfaces;

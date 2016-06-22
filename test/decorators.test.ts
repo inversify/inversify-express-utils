@@ -3,7 +3,7 @@ import { expect } from "chai";
 
 // dependencies
 import { Controller, Method } from "../src/decorators";
-import { IControllerMetadata, IControllerMethodMetadata } from "../src/interfaces";
+import interfaces from "../src/interfaces";
 
 describe("Unit Test: Controller Decorators", () => {
 
@@ -14,7 +14,7 @@ describe("Unit Test: Controller Decorators", () => {
         @Controller(path, ...middleware)
         class TestController {}
 
-        let controllerMetadata: IControllerMetadata = Reflect.getMetadata("_controller", TestController);
+        let controllerMetadata: interfaces.ControllerMetadata = Reflect.getMetadata("_controller", TestController);
 
         expect(controllerMetadata.middleware).eql(middleware);
         expect(controllerMetadata.path).eql(path);
@@ -39,11 +39,11 @@ describe("Unit Test: Controller Decorators", () => {
             public test3() { return; }
         }
 
-        let methodMetadata: IControllerMethodMetadata[] = Reflect.getMetadata("_controller-method", TestController);
+        let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getMetadata("_controller-method", TestController);
 
         expect(methodMetadata.length).eql(3);
 
-        let metadata: IControllerMethodMetadata = methodMetadata[0];
+        let metadata: interfaces.ControllerMethodMetadata = methodMetadata[0];
 
         expect(metadata.middleware).eql(middleware);
         expect(metadata.path).eql(path);
