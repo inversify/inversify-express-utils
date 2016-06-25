@@ -1,6 +1,6 @@
 {
   "name": "inversify-express-utils",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-rc.1",
   "description": "Some utilities for the development of express applications with Inversify",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
@@ -43,15 +43,15 @@
     "source-map-support": "^0.4.0",
     "supertest": "^1.2.0",
     "tsify": "^0.16.0",
-    "tslint": "^3.10.2",
+    "tslint": "^3.12.0",
     "typescript": "^1.8.10",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "inversify-dts": "^1.0.6"
+    "inversify-dts": "^1.1.0"
   },
   "dependencies": {
     "express": "^4.13.4",
-    "inversify": "^2.0.0-beta.10",
+    "inversify": "^2.0.0-rc.1",
     "reflect-metadata": "^0.1.3"
   }
 }
