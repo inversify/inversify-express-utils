@@ -95,9 +95,11 @@ Optional - like `.setConfig()`, except this function is applied after registerin
 
 ```ts
 let server = new InversifyExpressServer(kernel);
-server.setErrorConfig((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
+server.setErrorConfig((app) => {
+    app.use((err, req, res, next) => {
+        console.error(err.stack);
+        res.status(500).send('Something broke!');
+    });
 });
 ```
 
