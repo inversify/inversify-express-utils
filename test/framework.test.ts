@@ -46,6 +46,24 @@ describe("Integration Tests:", () => {
                 .expect(200, "GET", done);
         });
 
+        it("should work for async controller methods that fails", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Get("/") public getTest(req: express.Request, res: express.Response) {
+                    return new Promise(((resolve, reject) => {
+                        setTimeout(reject, 100, "GET");
+                    }));
+                }
+            }
+            kernel.bind<interfaces.Controller>("Controller").to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(kernel);
+            request(server.build())
+                .get("/")
+                .expect(500, done);
+        });
+
 
         it ("should work for methods which call next()", (done) => {
             @injectable()

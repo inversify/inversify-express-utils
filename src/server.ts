@@ -102,7 +102,10 @@ export class InversifyExpressServer  {
                     if (value && !res.headersSent) {
                         res.send(value);
                     }
-                });
+                })
+                    .catch((error: any) => {
+                        next(error);
+                    });
 
             } else if (result && !res.headersSent) {
                 res.send(result);
