@@ -6,6 +6,7 @@ import * as sinon from "sinon";
 import * as express from "express";
 import { InversifyExpressServer } from "../src/server";
 import { Kernel, injectable } from "inversify";
+import { TYPE } from "../src/constants";
 
 describe("Unit Test: InversifyExpressServer", () => {
 
@@ -18,7 +19,7 @@ describe("Unit Test: InversifyExpressServer", () => {
         @injectable()
         class TestController {}
 
-        kernel.bind("Controller").to(TestController);
+        kernel.bind(TYPE.Controller).to(TestController);
         let server = new InversifyExpressServer(kernel);
 
         server.setConfig(configFn)

@@ -1,10 +1,11 @@
 import * as express from "express";
 import interfaces from "./interfaces";
+import { METADATA_KEY } from "./constants";
 
 export function Controller(path: string, ...middleware: express.RequestHandler[]) {
     return function (target: any) {
         let metadata: interfaces.ControllerMetadata = {path, middleware, target};
-        Reflect.defineMetadata("_controller", metadata, target);
+        Reflect.defineMetadata(METADATA_KEY.controller, metadata, target);
     };
 }
 
@@ -41,10 +42,10 @@ export function Method(method: string, path: string, ...middleware: express.Requ
         let metadata: interfaces.ControllerMethodMetadata = {path, middleware, method, target, key};
         let metadataList: interfaces.ControllerMethodMetadata[] = [];
 
-        if (!Reflect.hasOwnMetadata("_controller-method", target.constructor)) {
-            Reflect.defineMetadata("_controller-method", metadataList, target.constructor);
+        if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
+            Reflect.defineMetadata(METADATA_KEY.controllerMethod, metadataList, target.constructor);
         } else {
-            metadataList = Reflect.getOwnMetadata("_controller-method", target.constructor);
+            metadataList = Reflect.getOwnMetadata(METADATA_KEY.controllerMethod, target.constructor);
         }
 
         metadataList.push(metadata);

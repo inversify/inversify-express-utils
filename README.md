@@ -53,18 +53,18 @@ Configure the inversify kernel in your composition root as usual.
 Then, pass the kernel to the InversifyExpressServer constructor. This will allow it to register all controllers and their dependencies from your kernel and attach them to the express app.
 Then just call server.build() to prepare your app.
 
-In order for the InversifyExpressServer to find your controllers, you must bind them to the "Controller" service identifier and tag the binding with the controller's name.
+In order for the InversifyExpressServer to find your controllers, you must bind them to the `TYPE.Controller` service identifier and tag the binding with the controller's name.
 The `Controller` interface exported by inversify-express-utils is empty and solely for convenience, so feel free to implement your own if you want.
 
 ```ts
 import { Kernel } from 'inversify';
-import { InversifyExpressServer } from 'inversify-express-utils';
+import { InversifyExpressServer, TYPE } from 'inversify-express-utils';
 
 // set up kernel
 let kernel = new Kernel();
 
 // note that you *must* bind your controllers to Controller 
-kernel.bind<Controller>('Controller').to(FooController).whenTargetNamed('FooController');
+kernel.bind<Controller>(TYPE.Controller).to(FooController).whenTargetNamed('FooController');
 kernel.bind<FooService>('FooService').to(FooService);
 
 // create server

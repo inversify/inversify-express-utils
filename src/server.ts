@@ -1,5 +1,6 @@
 import * as express from "express";
 import interfaces from "./interfaces";
+import { TYPE, METADATA_KEY } from "./constants";
 
 /**
  * Wrapper for the express server.
@@ -65,17 +66,18 @@ export class InversifyExpressServer  {
     }
 
     private registerControllers() {
-        let controllers: interfaces.Controller[] = this.kernel.getAll<interfaces.Controller>("Controller");
+
+        let controllers: interfaces.Controller[] = this.kernel.getAll<interfaces.Controller>(TYPE.Controller);
 
         controllers.forEach((controller: interfaces.Controller) => {
 
             let controllerMetadata: interfaces.ControllerMetadata = Reflect.getOwnMetadata(
-                "_controller",
+                METADATA_KEY.controller,
                 controller.constructor
             );
 
             let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getOwnMetadata(
-                "_controller-method",
+                METADATA_KEY.controllerMethod,
                 controller.constructor
             );
 
@@ -94,7 +96,7 @@ export class InversifyExpressServer  {
 
     private handlerFactory(controllerName: any, key: string): express.RequestHandler {
         return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            let result: any = this.kernel.getNamed("Controller", controllerName)[key](req, res, next);
+            let result: any = this.kernel.getNamed(TYPE.Controller, controllerName)[key](req, res, next);
             // try to resolve promise
             if (result && result instanceof Promise) {
 
