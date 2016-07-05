@@ -1,6 +1,6 @@
 {
   "name": "inversify-express-utils",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Some utilities for the development of express applications with Inversify",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
