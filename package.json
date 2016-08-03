@@ -41,7 +41,7 @@
     "sinon": "^1.17.4",
     "source-map-support": "^0.4.0",
     "supertest": "^2.0.0",
-    "tsify": "^1.0.2",
+    "tsify": "^1.0.3",
     "tslint": "^3.12.0",
     "typescript": "^1.8.10",
     "vinyl-buffer": "^1.0.0",
