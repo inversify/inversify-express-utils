@@ -46,8 +46,8 @@
     "typescript": "^1.8.10",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "inversify-dts": "^1.1.0",
-    "inversify": "^2.0.0-rc.1",
+    "inversify-dts": "^1.6.0",
+    "inversify": "^2.0.0-rc.5",
     "reflect-metadata": "^0.1.3"
   },
   "dependencies": {
