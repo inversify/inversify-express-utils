@@ -1,24 +1,17 @@
 {
     "compilerOptions": {
         "target": "es5",
+        "lib": ["es6", "dom"],
+        "types": ["express", "inversify", "mocha", "reflect-metadata"],
         "module": "commonjs",
         "moduleResolution": "node",
         "isolatedModules": false,
         "jsx": "react",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "declaration": false,
         "noImplicitAny": true,
-        "removeComments": true,
-        "noLib": false,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
         "outDir": "lib"
-    },
-    "files": [
-        "typings/index.d.ts",
-        "node_modules/inversify-dts/inversify/inversify.d.ts",
-        "node_modules/reflect-metadata/reflect-metadata.d.ts",
-        "src/index.ts"
-    ]
+    }
 }

@@ -1,7 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-/// <reference path="../node_modules/inversify-dts/inversify/inversify.d.ts" />
-/// <reference path="../node_modules/reflect-metadata/reflect-metadata.d.ts" />
-
 import "reflect-metadata";
 
 // test libraries
@@ -10,6 +6,7 @@ import * as request from "supertest";
 import { expect } from "chai";
 
 // dependencies
+import * as inversify from "inversify";
 import * as express from "express";
 import { injectable, Kernel } from "inversify";
 import interfaces from "../src/interfaces";
