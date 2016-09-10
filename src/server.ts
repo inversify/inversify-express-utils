@@ -1,4 +1,5 @@
 import * as express from "express";
+import * as inversify from "inversify";
 import interfaces from "./interfaces";
 import { TYPE, METADATA_KEY } from "./constants";
 
@@ -13,7 +14,7 @@ export class InversifyExpressServer  {
 
     /**
      * Wrapper for the express server.
-     * 
+     *
      * @param kernel Kernel loaded with all controllers and their dependencies.
      */
     constructor(kernel: inversify.interfaces.Kernel) {
@@ -21,11 +22,11 @@ export class InversifyExpressServer  {
     }
 
     /**
-     * Sets the configuration function to be applied to the application. 
+     * Sets the configuration function to be applied to the application.
      * Note that the config function is not actually executed until a call to InversifyExpresServer.build().
-     * 
+     *
      * This method is chainable.
-     * 
+     *
      * @param fn Function in which app-level middleware can be registered.
      */
     public setConfig(fn: interfaces.ConfigFunction): InversifyExpressServer {
@@ -36,9 +37,9 @@ export class InversifyExpressServer  {
     /**
      * Sets the error handler configuration function to be applied to the application.
      * Note that the error config function is not actually executed until a call to InversifyExpresServer.build().
-     * 
+     *
      * This method is chainable.
-     * 
+     *
      * @param fn Function in which app-level error handlers can be registered.
      */
     public setErrorConfig(fn: interfaces.ConfigFunction): InversifyExpressServer {

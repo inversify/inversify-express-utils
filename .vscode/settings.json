@@ -7,6 +7,7 @@
 		"test/**/*.js": true,
         "**/es": true,
         "**/lib": true,
+        "**/dts": true,
         "**/coverage": true,
         "**/dist": true,
         "**/docs": true,
