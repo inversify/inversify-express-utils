@@ -15,13 +15,14 @@
 Some utilities for the development of express applications with Inversify.
 
 ## Installation
-The package is available on npm:
+You can install `inversify-express-utils` using npm:
 
 ```
-$ npm install --save inversify-express-utils
+$ npm install inversify inversify-express-utils reflect-metadata --save
 ```
 
-The type definitions are available in the inversify-dts npm package. Please refer to the inversify docs to learn more about the installation process.
+The `inversify-express-utils` type definitions are included in the npm module and require TypeScript 2.0.
+Please refer to the [InversifyJS documentation](https://github.com/inversify/InversifyJS#installation) to learn more about the installation process.
 
 ## The Basics
 
