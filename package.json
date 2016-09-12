@@ -4,7 +4,7 @@
   "description": "Some utilities for the development of express applications with Inversify",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
-  "typings": "./dts/inversify.d.ts",
+  "typings": "./dts/index.d.ts",
   "scripts": {
     "test": "gulp",
     "publish-please": "publish-please",
