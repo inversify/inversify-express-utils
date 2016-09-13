@@ -32,12 +32,12 @@ The following example will declare a controller that responds to `GET /foo'.
 
 ```ts
 import * as express from 'express';
-import { Controller, Get } from 'inversify-express-utils';
+import { interfaces, Controller, Get } from 'inversify-express-utils';
 import { injectable, inject } from 'inversify';
 
 @Controller('/foo')
 @injectable()
-export class FooController implements Controller {
+export class FooController implements interfaces.Controller {
     
     constructor( @inject('FooService') private fooService: FooService ) {}
     
@@ -59,13 +59,13 @@ The `Controller` interface exported by inversify-express-utils is empty and sole
 
 ```ts
 import { Kernel } from 'inversify';
-import { InversifyExpressServer, TYPE } from 'inversify-express-utils';
+import { interfaces, InversifyExpressServer, TYPE } from 'inversify-express-utils';
 
 // set up kernel
 let kernel = new Kernel();
 
 // note that you *must* bind your controllers to Controller 
-kernel.bind<Controller>(TYPE.Controller).to(FooController).whenTargetNamed('FooController');
+kernel.bind<interfaces.Controller>(TYPE.Controller).to(FooController).whenTargetNamed('FooController');
 kernel.bind<FooService>('FooService').to(FooService);
 
 // create server
@@ -85,6 +85,7 @@ Optional - exposes the express application object for convenient loading of serv
 import * as morgan from 'morgan';
 // ...
 let server = new InversifyExpressServer(kernel);
+
 server.setConfig((app) => {
     var logger = morgan('combined')
     app.use(logger);
