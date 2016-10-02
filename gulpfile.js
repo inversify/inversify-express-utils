@@ -32,15 +32,14 @@ gulp.task("lint", function() {
 //* SOURCE
 //******************************************************************************
 var tsLibProject = tsc.createProject("tsconfig.json", {
-    module: "commonjs",
-    typescript: require("typescript")
+    module: "commonjs"
 });
 
 gulp.task("build-lib", function() {
     return gulp.src([
             "src/**/*.ts"
         ])
-        .pipe(tsc(tsLibProject))
+        .pipe(tsLibProject())
         .on("error", function(err) {
             process.exit(1);
         })
@@ -48,15 +47,14 @@ gulp.task("build-lib", function() {
 });
 
 var tsEsProject = tsc.createProject("tsconfig.json", {
-    module: "es2015",
-    typescript: require("typescript")
+    module: "es2015"
 });
 
 gulp.task("build-es", function() {
     return gulp.src([
             "src/**/*.ts"
         ])
-        .pipe(tsc(tsEsProject))
+        .pipe(tsEsProject())
         .on("error", function(err) {
             process.exit(1);
         })
@@ -65,15 +63,14 @@ gulp.task("build-es", function() {
 
 var tsDtsProject = tsc.createProject("tsconfig.json", {
     declaration: true,
-    noExternalResolve: false,
-    typescript: require("typescript")
+    noExternalResolve: false
 });
 
 gulp.task("build-dts", function() {
     return gulp.src([
             "src/**/*.ts"
         ])
-        .pipe(tsc(tsDtsProject))
+        .pipe(tsDtsProject())
         .on("error", function(err) {
             process.exit(1);
         })
@@ -84,30 +81,26 @@ gulp.task("build-dts", function() {
 //******************************************************************************
 //* TESTS
 //******************************************************************************
-var tstProject = tsc.createProject("tsconfig.json", {
-    typescript: require("typescript")
-});
+var tstProject = tsc.createProject("tsconfig.json");
 
 gulp.task("build-src", function() {
     return gulp.src([
             "src/**/*.ts"
         ])
-        .pipe(tsc(tstProject))
+        .pipe(tstProject())
         .on("error", function(err) {
             process.exit(1);
         })
         .js.pipe(gulp.dest("src/"));
 });
 
-var tsTestProject = tsc.createProject("tsconfig.json", {
-    typescript: require("typescript")
-});
+var tsTestProject = tsc.createProject("tsconfig.json");
 
 gulp.task("build-test", function() {
     return gulp.src([
             "test/**/*.ts"
         ])
-        .pipe(tsc(tsTestProject))
+        .pipe(tsTestProject())
         .on("error", function(err) {
             process.exit(1);
         })
