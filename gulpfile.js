@@ -63,7 +63,7 @@ gulp.task("build-es", function() {
 
 var tsDtsProject = tsc.createProject("tsconfig.json", {
     declaration: true,
-    noExternalResolve: false
+    noResolve: false
 });
 
 gulp.task("build-dts", function() {
