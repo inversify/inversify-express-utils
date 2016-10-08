@@ -94,7 +94,7 @@ gulp.task("build-src", function() {
         .js.pipe(gulp.dest("src/"));
 });
 
-var tsTestProject = tsc.createProject("tsconfig.json");
+var tsTestProject = tsc.createProject("tsconfig.json", { rootDir: "./" });
 
 gulp.task("build-test", function() {
     return gulp.src([
