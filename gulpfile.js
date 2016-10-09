@@ -104,7 +104,7 @@ gulp.task("build-test", function() {
         .on("error", function(err) {
             process.exit(1);
         })
-        .js.pipe(gulp.dest("."));
+        .js.pipe(gulp.dest("./test/"));
 });
 
 gulp.task("mocha", function() {
