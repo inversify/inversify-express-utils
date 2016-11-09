@@ -7,7 +7,7 @@ import { TYPE, METADATA_KEY } from "./constants";
  * Wrapper for the express server.
  */
 export class InversifyExpressServer  {
-    private kernel: inversify.interfaces.Kernel;
+    private container: inversify.interfaces.Container;
     private app: express.Application = express();
     private configFn: interfaces.ConfigFunction;
     private errorConfigFn: interfaces.ConfigFunction;
@@ -15,10 +15,10 @@ export class InversifyExpressServer  {
     /**
      * Wrapper for the express server.
      *
-     * @param kernel Kernel loaded with all controllers and their dependencies.
+     * @param container Container loaded with all controllers and their dependencies.
      */
-    constructor(kernel: inversify.interfaces.Kernel) {
-        this.kernel = kernel;
+    constructor(container: inversify.interfaces.Container) {
+        this.container = container;
     }
 
     /**
@@ -68,7 +68,7 @@ export class InversifyExpressServer  {
 
     private registerControllers() {
 
-        let controllers: interfaces.Controller[] = this.kernel.getAll<interfaces.Controller>(TYPE.Controller);
+        let controllers: interfaces.Controller[] = this.container.getAll<interfaces.Controller>(TYPE.Controller);
 
         controllers.forEach((controller: interfaces.Controller) => {
 
@@ -97,7 +97,7 @@ export class InversifyExpressServer  {
 
     private handlerFactory(controllerName: any, key: string): express.RequestHandler {
         return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            let result: any = this.kernel.getNamed(TYPE.Controller, controllerName)[key](req, res, next);
+            let result: any = this.container.getNamed(TYPE.Controller, controllerName)[key](req, res, next);
             // try to resolve promise
             if (result && result instanceof Promise) {
 
