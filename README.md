@@ -27,7 +27,7 @@ Please refer to the [InversifyJS documentation](https://github.com/inversify/Inv
 ## The Basics
 
 ### Step 1: Decorate your controllers
-To use a class as a "controller" for your express app, simply add the `@Controller` decorator to the class. Similarly, decorate methods of the class to serve as request handlers. 
+To use a class as a "controller" for your express app, simply add the `@Controller` decorator to the class. Similarly, decorate methods of the class to serve as request handlers.
 The following example will declare a controller that responds to `GET /foo'.
 
 ```ts
@@ -38,9 +38,9 @@ import { injectable, inject } from 'inversify';
 @Controller('/foo')
 @injectable()
 export class FooController implements interfaces.Controller {
-    
+
     constructor( @inject('FooService') private fooService: FooService ) {}
-    
+
     @Get('/')
     private index(req: express.Request): string {
         return this.fooService.get(req.query.id);
@@ -48,28 +48,28 @@ export class FooController implements interfaces.Controller {
 }
 ```
 
-### Step 2: Configure kernel and server
-Configure the inversify kernel in your composition root as usual.
+### Step 2: Configure container and server
+Configure the inversify container in your composition root as usual.
 
-Then, pass the kernel to the InversifyExpressServer constructor. This will allow it to register all controllers and their dependencies from your kernel and attach them to the express app.
+Then, pass the container to the InversifyExpressServer constructor. This will allow it to register all controllers and their dependencies from your container and attach them to the express app.
 Then just call server.build() to prepare your app.
 
 In order for the InversifyExpressServer to find your controllers, you must bind them to the `TYPE.Controller` service identifier and tag the binding with the controller's name.
 The `Controller` interface exported by inversify-express-utils is empty and solely for convenience, so feel free to implement your own if you want.
 
 ```ts
-import { Kernel } from 'inversify';
+import { Container } from 'inversify';
 import { interfaces, InversifyExpressServer, TYPE } from 'inversify-express-utils';
 
-// set up kernel
-let kernel = new Kernel();
+// set up container
+let container = new Container();
 
-// note that you *must* bind your controllers to Controller 
-kernel.bind<interfaces.Controller>(TYPE.Controller).to(FooController).whenTargetNamed('FooController');
-kernel.bind<FooService>('FooService').to(FooService);
+// note that you *must* bind your controllers to Controller
+container.bind<interfaces.Controller>(TYPE.Controller).to(FooController).whenTargetNamed('FooController');
+container.bind<FooService>('FooService').to(FooService);
 
 // create server
-let server = new InversifyExpressServer(kernel);
+let server = new InversifyExpressServer(container);
 
 let app = server.build();
 app.listen(3000);
@@ -84,7 +84,7 @@ Optional - exposes the express application object for convenient loading of serv
 ```ts
 import * as morgan from 'morgan';
 // ...
-let server = new InversifyExpressServer(kernel);
+let server = new InversifyExpressServer(container);
 
 server.setConfig((app) => {
     var logger = morgan('combined')
@@ -96,7 +96,7 @@ server.setConfig((app) => {
 Optional - like `.setConfig()`, except this function is applied after registering all app middleware and controller routes.
 
 ```ts
-let server = new InversifyExpressServer(kernel);
+let server = new InversifyExpressServer(container);
 server.setErrorConfig((app) => {
     app.use((err, req, res, next) => {
         console.error(err.stack);
@@ -110,7 +110,7 @@ Attaches all registered controllers and middleware to the express application. R
 
 ```ts
 // ...
-let server = new InversifyExpressServer(kernel);
+let server = new InversifyExpressServer(container);
 server
     .setConfig(configFn)
     .setErrorConfig(errorConfigFn)
@@ -145,6 +145,6 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
