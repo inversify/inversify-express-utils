@@ -9,7 +9,7 @@ import { expect } from "chai";
 import * as inversify from "inversify";
 import * as express from "express";
 import { injectable, Container } from "inversify";
-import interfaces from "../src/interfaces";
+import { interfaces } from "../src/interfaces";
 import { InversifyExpressServer } from "../src/server";
 import { Controller, Method, Get, Post, Put, Patch, Head, Delete } from "../src/decorators";
 import { TYPE } from "../src/constants";
