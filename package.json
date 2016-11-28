@@ -30,7 +30,7 @@
     "@types/inversify": "^2.0.30",
     "@types/mocha": "^2.2.31",
     "@types/sinon": "^1.16.29",
-    "@types/supertest": "^1.1.30",
+    "@types/supertest": "^2.0.0",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
     "gulp-istanbul": "^1.0.0",
