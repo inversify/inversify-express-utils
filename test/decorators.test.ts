@@ -1,9 +1,6 @@
-// test libraries
 import { expect } from "chai";
-
-// dependencies
 import { Controller, Method } from "../src/decorators";
-import interfaces from "../src/interfaces";
+import { interfaces } from "../src/interfaces";
 
 describe("Unit Test: Controller Decorators", () => {
 
