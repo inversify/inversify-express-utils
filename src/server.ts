@@ -1,6 +1,6 @@
 import * as express from "express";
 import * as inversify from "inversify";
-import interfaces from "./interfaces";
+import { interfaces } from "./interfaces";
 import { TYPE, METADATA_KEY } from "./constants";
 
 /**
