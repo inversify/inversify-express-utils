@@ -7,7 +7,7 @@ import * as express from "express";
 import { injectable, Container } from "inversify";
 import { interfaces } from "../src/interfaces";
 import { InversifyExpressServer } from "../src/server";
-import { Controller, Method, Get, Post, Put, Patch, Head, Delete } from "../src/decorators";
+import { Controller, Method, All, Get, Post, Put, Patch, Head, Delete } from "../src/decorators";
 import { TYPE } from "../src/constants";
 
 describe("Integration Tests:", () => {
@@ -217,7 +217,7 @@ describe("Integration Tests:", () => {
             done();
         });
 
-        it("should call method-level middleware correctly", (done) => {
+        it("should call method-level middleware correctly (GET)", (done) => {
             @injectable()
             @Controller("/")
             class TestController {
@@ -226,9 +226,136 @@ describe("Integration Tests:", () => {
             container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
-            request(server.build())
-                .get("/")
+            let agent = request(server.build());
+
+            agent.get("/")
                 .expect(200, "GET", function () {
+                    expect(spyA.calledOnce).to.be.true;
+                    expect(spyB.calledOnce).to.be.true;
+                    expect(spyC.calledOnce).to.be.true;
+                    expect(result).to.equal("abc");
+                    done();
+                });
+        });
+
+        it("should call method-level middleware correctly (POST)", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Post("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("POST"); }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container);
+            let agent = request(server.build());
+
+            agent.post("/")
+                .expect(200, "POST", function () {
+                    expect(spyA.calledOnce).to.be.true;
+                    expect(spyB.calledOnce).to.be.true;
+                    expect(spyC.calledOnce).to.be.true;
+                    expect(result).to.equal("abc");
+                    done();
+                });
+        });
+
+        it("should call method-level middleware correctly (PUT)", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Put("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("PUT"); }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container);
+            let agent = request(server.build());
+
+            agent.put("/")
+                .expect(200, "PUT", function () {
+                    expect(spyA.calledOnce).to.be.true;
+                    expect(spyB.calledOnce).to.be.true;
+                    expect(spyC.calledOnce).to.be.true;
+                    expect(result).to.equal("abc");
+                    done();
+                });
+        });
+
+        it("should call method-level middleware correctly (PATCH)", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Patch("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("PATCH"); }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container);
+            let agent = request(server.build());
+
+            agent.patch("/")
+                .expect(200, "PATCH", function () {
+                    expect(spyA.calledOnce).to.be.true;
+                    expect(spyB.calledOnce).to.be.true;
+                    expect(spyC.calledOnce).to.be.true;
+                    expect(result).to.equal("abc");
+                    done();
+                });
+        });
+
+        it("should call method-level middleware correctly (HEAD)", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Head("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("HEAD"); }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container);
+            let agent = request(server.build());
+
+            agent.head("/")
+                .expect(200, "HEAD", function () {
+                    expect(spyA.calledOnce).to.be.true;
+                    expect(spyB.calledOnce).to.be.true;
+                    expect(spyC.calledOnce).to.be.true;
+                    expect(result).to.equal("abc");
+                    done();
+                });
+        });
+
+        it("should call method-level middleware correctly (DELETE)", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Delete("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("DELETE"); }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container);
+            let agent = request(server.build());
+
+            agent.delete("/")
+                .expect(200, "DELETE", function () {
+                    expect(spyA.calledOnce).to.be.true;
+                    expect(spyB.calledOnce).to.be.true;
+                    expect(spyC.calledOnce).to.be.true;
+                    expect(result).to.equal("abc");
+                    done();
+                });
+        });
+
+        it("should call method-level middleware correctly (ALL)", (done) => {
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @All("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("ALL"); }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container);
+            let agent = request(server.build());
+
+            agent.get("/")
+                .expect(200, "ALL", function () {
                     expect(spyA.calledOnce).to.be.true;
                     expect(spyB.calledOnce).to.be.true;
                     expect(spyC.calledOnce).to.be.true;
