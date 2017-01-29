@@ -35,4 +35,23 @@ describe("Unit Test: InversifyExpressServer", () => {
         expect(configFn.calledBefore(errorConfigFn)).to.be.true;
         done();
     });
+
+    it("Should allow to pass a custom Router instance as config", () => {
+
+        let container = new Container();
+
+        let customRouter = express.Router({
+            caseSensitive: false,
+            mergeParams: false,
+            strict: false
+        });
+
+        let serverWithDefaultRouter = new InversifyExpressServer(container);
+        let serverWithCustomRouter = new InversifyExpressServer(container, customRouter);
+
+        expect((serverWithDefaultRouter as any)._router === customRouter).to.be.false;
+        expect((serverWithCustomRouter as any)._router === customRouter).to.be.true;
+
+    });
+
 });

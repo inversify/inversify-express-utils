@@ -118,6 +118,21 @@ server
     .listen(3000, 'localhost', callback);
 ```
 
+## Using a custom Router
+It is possible to pass a custom `Router` instance to `InversifyExpressServer`:
+
+```ts
+let container = new Container();
+
+let router = express.Router({
+    caseSensitive: false,
+    mergeParams: false,
+    strict: false
+});
+
+let server = new InversifyExpressServer(container, router);
+```
+
 ## Decorators
 
 ### `@Controller(path, [middleware, ...])`
