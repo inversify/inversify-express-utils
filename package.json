@@ -43,7 +43,7 @@
     "run-sequence": "^1.2.2",
     "sinon": "^1.17.6",
     "source-map-support": "^0.4.6",
-    "supertest": "^2.0.1",
+    "supertest": "^3.0.0",
     "tslint": "^4.0.2",
     "typescript": "^2.1.1"
   },
