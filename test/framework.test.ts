@@ -223,6 +223,23 @@ describe("Integration Tests:", () => {
             ]);
 
         });
+
+        it("should use custom routing configuration", () => {
+            @injectable()
+            @Controller("/ping")
+            class TestController {
+                @Get("/endpoint") public get() {
+                    return "pong";
+                }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container, null, { rootPath: "/api/v1" });
+
+            return request(server.build())
+                .get("/api/v1/ping/endpoint")
+                .expect(200, "pong");
+        });
     });
 
 

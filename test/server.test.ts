@@ -54,4 +54,22 @@ describe("Unit Test: InversifyExpressServer", () => {
 
     });
 
+    it("Should allow to provide custom routing configuration", () => {
+
+        let container = new Container();
+
+        let routingConfig = {
+            rootPath: "/such/root/path"
+        };
+
+        let serverWithDefaultConfig = new InversifyExpressServer(container);
+        let serverWithCustomConfig = new InversifyExpressServer(container, null, routingConfig);
+
+        expect((serverWithCustomConfig as any)._routingConfig).to.eq(routingConfig);
+        expect((serverWithDefaultConfig as any)._routingConfig).to.not.eql(
+            (serverWithCustomConfig as any)._routingConfig
+        );
+
+    });
+
 });
