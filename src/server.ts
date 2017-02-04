@@ -93,12 +93,17 @@ export class InversifyExpressServer  {
 
                 methodMetadata.forEach((metadata: interfaces.ControllerMethodMetadata) => {
                     let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, metadata.key);
-                    router[metadata.method](metadata.path, ...metadata.middleware, handler);
+                    this._router[metadata.method](
+                        `${controllerMetadata.path}${metadata.path}`,
+                        ...controllerMetadata.middleware,
+                        ...metadata.middleware,
+                        handler
+                    );
                 });
-
-                this._app.use(controllerMetadata.path, ...controllerMetadata.middleware, router);
             }
         });
+
+        this._app.use("/", this._router);
     }
 
     private handlerFactory(controllerName: any, key: string): express.RequestHandler {
