@@ -186,6 +186,60 @@ describe("Integration Tests:", () => {
                 .get("/")
                 .expect(200, JSON.stringify(result), done);
         });
+
+        it("should use custom router passed from configuration", () => {
+            @injectable()
+            @Controller("/CaseSensitive")
+            class TestController {
+                @Get("/Endpoint") public get() {
+                    return "Such Text";
+                }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            const customRouter = express.Router({
+                caseSensitive: true
+            });
+
+            server = new InversifyExpressServer(container, customRouter);
+            const app = server.build();
+
+            const expectedSuccess = request(app)
+                .get("/CaseSensitive/Endpoint")
+                .expect(200, "Such Text");
+
+            const expectedNotFound1 = request(app)
+                .get("/casesensitive/endpoint")
+                .expect(404);
+
+            const expectedNotFound2 = request(app)
+                .get("/CaseSensitive/endpoint")
+                .expect(404);
+
+            return Promise.all([
+                expectedSuccess,
+                expectedNotFound1,
+                expectedNotFound2
+            ]);
+
+        });
+
+        it("should use custom routing configuration", () => {
+            @injectable()
+            @Controller("/ping")
+            class TestController {
+                @Get("/endpoint") public get() {
+                    return "pong";
+                }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container, null, { rootPath: "/api/v1" });
+
+            return request(server.build())
+                .get("/api/v1/ping/endpoint")
+                .expect(200, "pong");
+        });
     });
 
 

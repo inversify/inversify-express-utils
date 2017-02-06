@@ -7,4 +7,6 @@ const METADATA_KEY = {
     controllerMethod: "_controller-method"
 };
 
-export { TYPE, METADATA_KEY };
+const DEFAULT_ROUTING_ROOT_PATH = "/";
+
+export { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH };

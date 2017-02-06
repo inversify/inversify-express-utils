@@ -23,6 +23,10 @@ namespace interfaces {
         (app: express.Application): void;
     }
 
+    export interface RoutingConfig {
+        rootPath: string;
+    }
+
 }
 
 export { interfaces };

@@ -1,7 +1,7 @@
 import * as express from "express";
 import * as inversify from "inversify";
 import { interfaces } from "./interfaces";
-import { TYPE, METADATA_KEY } from "./constants";
+import { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH } from "./constants";
 
 /**
  * Wrapper for the express server.
@@ -13,6 +13,7 @@ export class InversifyExpressServer  {
     private _app: express.Application = express();
     private _configFn: interfaces.ConfigFunction;
     private _errorConfigFn: interfaces.ConfigFunction;
+    private _routingConfig: interfaces.RoutingConfig;
 
     /**
      * Wrapper for the express server.
@@ -21,10 +22,14 @@ export class InversifyExpressServer  {
      */
     constructor(
         container: inversify.interfaces.Container,
-        customRouter?: express.Router
+        customRouter?: express.Router,
+        routingConfig?: interfaces.RoutingConfig
     ) {
         this._container = container;
         this._router = customRouter || express.Router();
+        this._routingConfig = routingConfig || {
+            rootPath: DEFAULT_ROUTING_ROOT_PATH
+        };
     }
 
     /**
@@ -93,12 +98,17 @@ export class InversifyExpressServer  {
 
                 methodMetadata.forEach((metadata: interfaces.ControllerMethodMetadata) => {
                     let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, metadata.key);
-                    router[metadata.method](metadata.path, ...metadata.middleware, handler);
+                    this._router[metadata.method](
+                        `${controllerMetadata.path}${metadata.path}`,
+                        ...controllerMetadata.middleware,
+                        ...metadata.middleware,
+                        handler
+                    );
                 });
-
-                this._app.use(controllerMetadata.path, ...controllerMetadata.middleware, router);
             }
         });
+
+        this._app.use(this._routingConfig.rootPath, this._router);
     }
 
     private handlerFactory(controllerName: any, key: string): express.RequestHandler {

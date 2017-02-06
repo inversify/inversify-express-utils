@@ -133,6 +133,16 @@ let router = express.Router({
 let server = new InversifyExpressServer(container, router);
 ```
 
+By default server will serve the API at `/` path, but sometimes you might need to use different root namespace, for
+example all routes should start with `/api/v1`. It is possible to pass this setting via routing configuration to
+`InversifyExpressServer`
+
+```ts
+let container = new Container();
+
+let server = new InversifyExpressServer(container, null, { rootPath: "/api/v1" });
+```
+
 ## Decorators
 
 ### `@Controller(path, [middleware, ...])`
