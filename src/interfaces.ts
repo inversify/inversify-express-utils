@@ -1,10 +1,13 @@
 import * as express from "express";
+import { interfaces as inversifyInterfaces } from "inversify";
 
 namespace interfaces {
 
+    export type Middleware = (inversifyInterfaces.ServiceIdentifier<any> | express.RequestHandler);
+
     export interface ControllerMetadata {
         path: string;
-        middleware: express.RequestHandler[];
+        middleware: Middleware[];
         target: any;
     }
 

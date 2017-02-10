@@ -5,7 +5,7 @@ import { interfaces } from "../src/interfaces";
 describe("Unit Test: Controller Decorators", () => {
 
     it("should add controller metadata to a class when decorated with @Controller", (done) => {
-        let middleware = [function() { return; }];
+        let middleware = [function() { return; }, "foo", Symbol("bar")];
         let path = "foo";
 
         @Controller(path, ...middleware)
@@ -21,7 +21,7 @@ describe("Unit Test: Controller Decorators", () => {
 
 
     it("should add method metadata to a class when decorated with @Method", (done) => {
-        let middleware = [function() { return; }];
+        let middleware = [function() { return; }, "bar", Symbol("baz")];
         let path = "foo";
         let method = "get";
 
