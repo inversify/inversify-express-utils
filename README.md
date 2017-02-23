@@ -52,7 +52,7 @@ export class FooController implements interfaces.Controller {
         res.sendStatus(201)
     }
 
-    @Delete('/')
+    @Delete('/:id')
     private delete(req: express.Request, res: express.Response): Promise<void> {
         return this.fooService.delete(req.params.id)
             .then(() => res.sendStatus(204))
