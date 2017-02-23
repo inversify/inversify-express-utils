@@ -45,6 +45,25 @@ export class FooController implements interfaces.Controller {
     private index(req: express.Request): string {
         return this.fooService.get(req.query.id);
     }
+
+    @Post('/')
+    private async create(req: express.Request, res: express.Response) {
+        try {
+            await this.fooService.create(req.body)
+            res.sendStatus(201)
+        } catch (err) {
+            res.status(400).json({ error: err.message })
+        }
+    }
+
+    @Delete('/:id')
+    private delete(req: express.Request, res: express.Response): Promise<void> {
+        return this.fooService.delete(req.params.id)
+            .then(() => res.sendStatus(204))
+            .catch((err) => {
+                res.status(400).json({ error: err.message })
+            })
+    }
 }
 ```
 
