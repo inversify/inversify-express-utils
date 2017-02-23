@@ -51,6 +51,12 @@ export class FooController implements interfaces.Controller {
         await this.fooService.create(req.body)
         res.sendStatus(201)
     }
+
+    @Delete('/')
+    private delete(req: express.Request, res: express.Response): Promise<void> {
+        return this.fooService.delete(req.params.id)
+            .then(() => res.sendStatus(204))
+    }
 }
 ```
 
