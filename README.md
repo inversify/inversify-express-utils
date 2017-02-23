@@ -52,7 +52,7 @@ export class FooController implements interfaces.Controller {
             await this.fooService.create(req.body)
             res.sendStatus(201)
         } catch (err) {
-            // handle error
+            res.status(400).json({ error: err.message })
         }
     }
 
@@ -61,7 +61,7 @@ export class FooController implements interfaces.Controller {
         return this.fooService.delete(req.params.id)
             .then(() => res.sendStatus(204))
             .catch((err) => {
-                // handle error
+                res.status(400).json({ error: err.message })
             })
     }
 }
