@@ -45,6 +45,12 @@ export class FooController implements interfaces.Controller {
     private index(req: express.Request): string {
         return this.fooService.get(req.query.id);
     }
+
+    @Post('/')
+    private async create(req: express.Request, res: express.Response) {
+        await this.fooService.create(req.body)
+        res.sendStatus(201)
+    }
 }
 ```
 
