@@ -48,14 +48,21 @@ export class FooController implements interfaces.Controller {
 
     @Post('/')
     private async create(req: express.Request, res: express.Response) {
-        await this.fooService.create(req.body)
-        res.sendStatus(201)
+        try {
+            await this.fooService.create(req.body)
+            res.sendStatus(201)
+        } catch (err) {
+            // handle error
+        }
     }
 
     @Delete('/:id')
     private delete(req: express.Request, res: express.Response): Promise<void> {
         return this.fooService.delete(req.params.id)
             .then(() => res.sendStatus(204))
+            .catch((err) => {
+                // handle error
+            })
     }
 }
 ```
