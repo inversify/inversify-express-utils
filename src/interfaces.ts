@@ -4,7 +4,7 @@ namespace interfaces {
 
     export interface ControllerMetadata {
         path: string;
-        middleware: express.RequestHandler[];
+        middleware: express.Handler[];
         target: any;
     }
 
