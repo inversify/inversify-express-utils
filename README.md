@@ -32,7 +32,7 @@ The following example will declare a controller that responds to `GET /foo'.
 
 ```ts
 import * as express from 'express';
-import { interfaces, Controller, Get } from 'inversify-express-utils';
+import { interfaces, Controller, Get, Post, Delete } from 'inversify-express-utils';
 import { injectable, inject } from 'inversify';
 
 @Controller('/foo')
