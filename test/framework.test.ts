@@ -492,5 +492,88 @@ describe("Integration Tests:", () => {
                     done();
                 });
         });
+
+        it("should resolve controller-level middleware", () => {
+            const symbolId = Symbol("spyA");
+            const strId = "spyB";
+
+            @injectable()
+            @Controller("/", symbolId, strId)
+            class TestController {
+                @Get("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
+            }
+
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+            container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
+            container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
+
+            server = new InversifyExpressServer(container);
+
+            let agent = request(server.build());
+
+            return agent.get("/")
+                .expect(200, "GET")
+                .then(() => {
+                    expect(spyA.calledOnce).to.be.true;
+                    expect(spyB.calledOnce).to.be.true;
+                    expect(result).to.equal("ab");
+                });
+        });
+
+        it("should resolve method-level middleware", () => {
+            const symbolId = Symbol("spyA");
+            const strId = "spyB";
+
+            @injectable()
+            @Controller("/")
+            class TestController {
+                @Get("/", symbolId, strId)
+                public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
+            }
+
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+            container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
+            container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
+
+            server = new InversifyExpressServer(container);
+
+            let agent = request(server.build());
+
+            return agent.get("/")
+                .expect(200, "GET")
+                .then(() => {
+                    expect(spyA.calledOnce).to.be.true;
+                    expect(spyB.calledOnce).to.be.true;
+                    expect(result).to.equal("ab");
+                });
+        });
+
+        it("should compose controller- and method-level middleware", () => {
+            const symbolId = Symbol("spyA");
+            const strId = "spyB";
+
+            @injectable()
+            @Controller("/", symbolId)
+            class TestController {
+                @Get("/", strId)
+                public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
+            }
+
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+            container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
+            container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
+
+            server = new InversifyExpressServer(container);
+
+            let agent = request(server.build());
+
+            return agent.get("/")
+                .expect(200, "GET")
+                .then(() => {
+                    expect(spyA.calledOnce).to.be.true;
+                    expect(spyB.calledOnce).to.be.true;
+                    expect(result).to.equal("ab");
+                });
+        });
     });
 });

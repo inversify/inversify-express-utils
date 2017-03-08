@@ -95,13 +95,15 @@ export class InversifyExpressServer  {
 
             if (controllerMetadata && methodMetadata) {
                 let router: express.Router = express.Router();
+                let controllerMiddleware = this.resolveMidleware(...controllerMetadata.middleware);
 
                 methodMetadata.forEach((metadata: interfaces.ControllerMethodMetadata) => {
                     let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, metadata.key);
+                    let routeMiddleware = this.resolveMidleware(...metadata.middleware);
                     this._router[metadata.method](
                         `${controllerMetadata.path}${metadata.path}`,
-                        ...controllerMetadata.middleware,
-                        ...metadata.middleware,
+                        ...controllerMiddleware,
+                        ...routeMiddleware,
                         handler
                     );
                 });
@@ -109,6 +111,16 @@ export class InversifyExpressServer  {
         });
 
         this._app.use(this._routingConfig.rootPath, this._router);
+    }
+
+    private resolveMidleware(...middleware: interfaces.Middleware[]): express.RequestHandler[] {
+        return middleware.map(middlewareItem => {
+            try {
+                return this._container.get<express.RequestHandler>(middlewareItem);
+            } catch (_) {
+                return middlewareItem as express.RequestHandler;
+            }
+        });
     }
 
     private handlerFactory(controllerName: any, key: string): express.RequestHandler {
