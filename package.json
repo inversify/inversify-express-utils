@@ -41,7 +41,7 @@
     "publish-please": "^2.2.0",
     "reflect-metadata": "^0.1.8",
     "run-sequence": "^1.2.2",
-    "sinon": "^1.17.6",
+    "sinon": "^2.0.0",
     "source-map-support": "^0.4.6",
     "supertest": "^3.0.0",
     "tslint": "^4.0.2",
