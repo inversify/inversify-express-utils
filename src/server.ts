@@ -10,7 +10,7 @@ export class InversifyExpressServer  {
 
     private _router: express.Router;
     private _container: inversify.interfaces.Container;
-    private _app: express.Application = express();
+    private _app: express.Application;
     private _configFn: interfaces.ConfigFunction;
     private _errorConfigFn: interfaces.ConfigFunction;
     private _routingConfig: interfaces.RoutingConfig;
@@ -23,13 +23,15 @@ export class InversifyExpressServer  {
     constructor(
         container: inversify.interfaces.Container,
         customRouter?: express.Router,
-        routingConfig?: interfaces.RoutingConfig
+        routingConfig?: interfaces.RoutingConfig,
+        customApp?: express.Application
     ) {
         this._container = container;
         this._router = customRouter || express.Router();
         this._routingConfig = routingConfig || {
             rootPath: DEFAULT_ROUTING_ROOT_PATH
         };
+        this._app = customApp || express();
     }
 
     /**
