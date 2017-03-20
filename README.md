@@ -162,6 +162,18 @@ let container = new Container();
 let server = new InversifyExpressServer(container, null, { rootPath: "/api/v1" });
 ```
 
+## Using a custom express application
+It is possible to pass a custom `express.Application` instance to `InversifyExpressServer`:
+
+```ts
+let container = new Container();
+
+let app = express();
+//Do stuff with app
+
+let server = new InversifyExpressServer(container, null, null, app);
+```
+
 ## Decorators
 
 ### `@Controller(path, [middleware, ...])`
