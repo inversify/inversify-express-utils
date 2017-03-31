@@ -1,10 +1,10 @@
 import * as express from "express";
 import { interfaces } from "./interfaces";
-import { METADATA_KEY } from "./constants";
+import { METADATA_KEY, ParameterType } from "./constants";
 
 export function Controller(path: string, ...middleware: interfaces.Middleware[]) {
     return function (target: any) {
-        let metadata: interfaces.ControllerMetadata = {path, middleware, target};
+        let metadata: interfaces.ControllerMetadata = { path, middleware, target };
         Reflect.defineMetadata(METADATA_KEY.controller, metadata, target);
     };
 }
@@ -39,7 +39,7 @@ export function Delete(path: string, ...middleware: interfaces.Middleware[]): in
 
 export function Method(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return function (target: any, key: string, value: any) {
-        let metadata: interfaces.ControllerMethodMetadata = {path, middleware, method, target, key};
+        let metadata: interfaces.ControllerMethodMetadata = { path, middleware, method, target, key };
         let metadataList: interfaces.ControllerMethodMetadata[] = [];
 
         if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
@@ -51,3 +51,59 @@ export function Method(method: string, path: string, ...middleware: interfaces.M
         metadataList.push(metadata);
     };
 }
+
+export function Parameter(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+    return function (target: any, key: string, value: any) {
+        let metadata: interfaces.ControllerMethodMetadata = { path, middleware, method, target, key };
+        let metadataList: interfaces.ControllerMethodMetadata[] = [];
+
+        if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
+            Reflect.defineMetadata(METADATA_KEY.controllerMethod, metadataList, target.constructor);
+        } else {
+            metadataList = Reflect.getOwnMetadata(METADATA_KEY.controllerMethod, target.constructor);
+        }
+
+        metadataList.push(metadata);
+    };
+}
+
+export const Request = paramDecoratorFactory(ParameterType.REQUEST);
+export const Response = paramDecoratorFactory(ParameterType.RESPONSE);
+export const RequestParam = paramDecoratorFactory(ParameterType.PARAMS);
+export const QueryParam = paramDecoratorFactory(ParameterType.QUERY);
+export const RequestBody = paramDecoratorFactory(ParameterType.BODY);
+export const RequestHeaders = paramDecoratorFactory(ParameterType.HEADERS);
+export const Cookies = paramDecoratorFactory(ParameterType.COOKIES);
+export const Next = paramDecoratorFactory(ParameterType.NEXT);
+
+function paramDecoratorFactory(parameterType: ParameterType): (name?: string) => ParameterDecorator {
+    return function (name?: string): ParameterDecorator {
+        name = name || "default";
+        return Params(parameterType, name);
+    };
+}
+
+export function Params(type: ParameterType, parameterName: string) {
+    return function (target: Object, methodName: string, index: number) {
+
+        let metadataList: interfaces.ControllerParameterMetadata = {};
+        let parameterMetadataList: interfaces.ParameterMetadata[] = [];
+        let parameterMetadata: interfaces.ParameterMetadata = {
+            index: index,
+            parameterName: parameterName,
+            type: type
+        };
+        if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerParameter, target.constructor)) {
+            parameterMetadataList.unshift(parameterMetadata);
+            metadataList[methodName] = parameterMetadataList;
+            Reflect.defineMetadata(METADATA_KEY.controllerParameter, metadataList, target.constructor);
+        } else {
+            metadataList = Reflect.getOwnMetadata(METADATA_KEY.controllerParameter, target.constructor);
+            if (metadataList.hasOwnProperty(methodName)) {
+                parameterMetadataList = metadataList[methodName];
+            }
+            parameterMetadataList.unshift(parameterMetadata);
+        }
+
+    };
+};
