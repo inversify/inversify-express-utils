@@ -194,28 +194,28 @@ Registers the decorated controller method as a request handler for a particular 
 Shortcut decorators which are simply wrappers for `@Method`. Right now these include `@Get`, `@Post`, `@Put`, `@Patch`, `@Head`, `@Delete`, and `@All`. For anything more obscure, use `@Method` (Or make a PR :smile:).
 
 ### `@Request()`
-    Binds a method parameter to the request object
+    Binds a method parameter to the request object.
 
 ### `@Response()`
-    Binds a method parameter to the response object
+    Binds a method parameter to the response object.
 
 ### `@RequestParam(name?: string)`
-    Binds a method parameter to request.params object or to a specific parameter if a name is passed
+    Binds a method parameter to request.params object or to a specific parameter if a name is passed.
     
 ### `@QueryParam(name?: string)`
-    binds a method parameter to request.query or to a specific query parameter if a name is passed
+    Binds a method parameter to request.query or to a specific query parameter if a name is passed.
 
 ### `@RequestBody(name?: string)`
-    binds a method parameter to request.body or to a specific body property if a name is passed-']'ok89im.jo;iuh:'
+    Binds a method parameter to request.body or to a specific body property if a name is passed.
 
 ### `@RequestHeaders(name?: string)`
-    binds a method parameter to the request headers
+    Binds a method parameter to the request headers.
 
 ### `@Cookies()`
-    binds a method parameter to the request cookies
+    Binds a method parameter to the request cookies.
 
 ### `@Next()`
-    binds a method parameter to the next() function
+    Binds a method parameter to the next() function.
 
 ## Examples
 Some examples can be found at the [inversify-express-example](https://github.com/inversify/inversify-express-example) repository.

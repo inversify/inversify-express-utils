@@ -1,12 +1,12 @@
 import * as express from "express";
 import * as inversify from "inversify";
 import { interfaces } from "./interfaces";
-import { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH, ParameterType } from "./constants";
+import { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH, PARAMETER_TYPE } from "./constants";
 
 /**
  * Wrapper for the express server.
  */
-export class InversifyExpressServer {
+export class InversifyExpressServer  {
 
     private _router: express.Router;
     private _container: inversify.interfaces.Container;
@@ -166,13 +166,13 @@ export class InversifyExpressServer {
 
             switch (item.type) {
                 default: args[item.index] = res; break; // response
-                case ParameterType.REQUEST: args[item.index] = this.getParam(req, null, item.parameterName); break;
-                case ParameterType.NEXT: args[item.index] = next; break;
-                case ParameterType.PARAMS: args[item.index] = this.getParam(req, "params", item.parameterName); break;
-                case ParameterType.QUERY: args[item.index] = this.getParam(req, "query", item.parameterName); break;
-                case ParameterType.BODY: args[item.index] = this.getParam(req, "body", item.parameterName); break;
-                case ParameterType.HEADERS: args[item.index] = this.getParam(req, "headers", item.parameterName); break;
-                case ParameterType.COOKIES: args[item.index] = this.getParam(req, "cookies", item.parameterName); break;
+                case PARAMETER_TYPE.REQUEST: args[item.index] = this.getParam(req, null, item.parameterName); break;
+                case PARAMETER_TYPE.NEXT: args[item.index] = next; break;
+                case PARAMETER_TYPE.PARAMS: args[item.index] = this.getParam(req, "params", item.parameterName); break;
+                case PARAMETER_TYPE.QUERY: args[item.index] = this.getParam(req, "query", item.parameterName); break;
+                case PARAMETER_TYPE.BODY: args[item.index] = this.getParam(req, "body", item.parameterName); break;
+                case PARAMETER_TYPE.HEADERS: args[item.index] = this.getParam(req, "headers", item.parameterName); break;
+                case PARAMETER_TYPE.COOKIES: args[item.index] = this.getParam(req, "cookies", item.parameterName); break;
             }
 
         }

@@ -11,7 +11,7 @@ import { interfaces } from "../src/interfaces";
 import { InversifyExpressServer } from "../src/server";
 import { Controller, Method, All, Get, Post, Put, Patch, Head, Delete, Request, Response, Params,
         RequestParam, RequestBody, QueryParam, RequestHeaders, Cookies, Next } from "../src/decorators";
-import { TYPE, ParameterType } from "../src/constants";
+import { TYPE, PARAMETER_TYPE } from "../src/constants";
 
 describe("Integration Tests:", () => {
     let server: InversifyExpressServer;
@@ -175,7 +175,7 @@ describe("Integration Tests:", () => {
 
 
         it("should use returned values as response", (done) => {
-            let result = { "hello": "world" };
+            let result = {"hello": "world"};
 
             @injectable()
             @Controller("/")
@@ -454,9 +454,9 @@ describe("Integration Tests:", () => {
             server = new InversifyExpressServer(container);
 
             server.setConfig((app) => {
-                app.use(spyA);
-                app.use(spyB);
-                app.use(spyC);
+               app.use(spyA);
+               app.use(spyB);
+               app.use(spyC);
             });
 
             request(server.build())
@@ -482,7 +482,7 @@ describe("Integration Tests:", () => {
             server = new InversifyExpressServer(container);
 
             server.setConfig((app) => {
-                app.use(spyA);
+               app.use(spyA);
             });
 
             request(server.build())

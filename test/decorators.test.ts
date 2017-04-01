@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { Controller, Method, Params } from "../src/decorators";
 import { interfaces } from "../src/interfaces";
-import { METADATA_KEY, ParameterType } from "../src/constants";
+import { METADATA_KEY, PARAMETER_TYPE } from "../src/constants";
 
 describe("Unit Test: Controller Decorators", () => {
 
@@ -59,10 +59,10 @@ describe("Unit Test: Controller Decorators", () => {
 
         class TestController {
             @Method(method, path, ...middleware)
-            public test(@Params(ParameterType.PARAMS, "id") id: any, @Params(ParameterType.PARAMS, "cat") cat: any) { return; }
+            public test(@Params(PARAMETER_TYPE.PARAMS, "id") id: any, @Params(PARAMETER_TYPE.PARAMS, "cat") cat: any) { return; }
 
             @Method("foo", "bar")
-            public test2(@Params(ParameterType.PARAMS, "dog")dog: any) { return; }
+            public test2(@Params(PARAMETER_TYPE.PARAMS, "dog")dog: any) { return; }
 
             @Method("bar", "foo")
             public test3() { return; }

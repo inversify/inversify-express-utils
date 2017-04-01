@@ -1,6 +1,6 @@
 import * as express from "express";
 import { interfaces as inversifyInterfaces } from "inversify";
-import { ParameterType } from "./constants";
+import { PARAMETER_TYPE } from "./constants";
 
 namespace interfaces {
 
@@ -24,7 +24,7 @@ namespace interfaces {
     export interface ParameterMetadata {
         parameterName: string;
         index: number;
-        type: ParameterType;
+        type: PARAMETER_TYPE;
     }
 
     export interface Controller {}

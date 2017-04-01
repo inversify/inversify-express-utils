@@ -8,7 +8,7 @@ const METADATA_KEY = {
     controllerParameter: "_controller-parameter"
 };
 
-export enum ParameterType {
+export enum PARAMETER_TYPE {
     REQUEST,
     RESPONSE,
     PARAMS,

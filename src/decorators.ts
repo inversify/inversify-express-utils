@@ -1,10 +1,10 @@
 import * as express from "express";
 import { interfaces } from "./interfaces";
-import { METADATA_KEY, ParameterType } from "./constants";
+import { METADATA_KEY, PARAMETER_TYPE } from "./constants";
 
 export function Controller(path: string, ...middleware: interfaces.Middleware[]) {
     return function (target: any) {
-        let metadata: interfaces.ControllerMetadata = { path, middleware, target };
+        let metadata: interfaces.ControllerMetadata = {path, middleware, target};
         Reflect.defineMetadata(METADATA_KEY.controller, metadata, target);
     };
 }
@@ -39,7 +39,7 @@ export function Delete(path: string, ...middleware: interfaces.Middleware[]): in
 
 export function Method(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return function (target: any, key: string, value: any) {
-        let metadata: interfaces.ControllerMethodMetadata = { path, middleware, method, target, key };
+        let metadata: interfaces.ControllerMethodMetadata = {path, middleware, method, target, key};
         let metadataList: interfaces.ControllerMethodMetadata[] = [];
 
         if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
@@ -67,23 +67,23 @@ export function Parameter(method: string, path: string, ...middleware: interface
     };
 }
 
-export const Request = paramDecoratorFactory(ParameterType.REQUEST);
-export const Response = paramDecoratorFactory(ParameterType.RESPONSE);
-export const RequestParam = paramDecoratorFactory(ParameterType.PARAMS);
-export const QueryParam = paramDecoratorFactory(ParameterType.QUERY);
-export const RequestBody = paramDecoratorFactory(ParameterType.BODY);
-export const RequestHeaders = paramDecoratorFactory(ParameterType.HEADERS);
-export const Cookies = paramDecoratorFactory(ParameterType.COOKIES);
-export const Next = paramDecoratorFactory(ParameterType.NEXT);
+export const Request = paramDecoratorFactory(PARAMETER_TYPE.REQUEST);
+export const Response = paramDecoratorFactory(PARAMETER_TYPE.RESPONSE);
+export const RequestParam = paramDecoratorFactory(PARAMETER_TYPE.PARAMS);
+export const QueryParam = paramDecoratorFactory(PARAMETER_TYPE.QUERY);
+export const RequestBody = paramDecoratorFactory(PARAMETER_TYPE.BODY);
+export const RequestHeaders = paramDecoratorFactory(PARAMETER_TYPE.HEADERS);
+export const Cookies = paramDecoratorFactory(PARAMETER_TYPE.COOKIES);
+export const Next = paramDecoratorFactory(PARAMETER_TYPE.NEXT);
 
-function paramDecoratorFactory(parameterType: ParameterType): (name?: string) => ParameterDecorator {
+function paramDecoratorFactory(parameterType: PARAMETER_TYPE): (name?: string) => ParameterDecorator {
     return function (name?: string): ParameterDecorator {
         name = name || "default";
         return Params(parameterType, name);
     };
 }
 
-export function Params(type: ParameterType, parameterName: string) {
+export function Params(type: PARAMETER_TYPE, parameterName: string) {
     return function (target: Object, methodName: string, index: number) {
 
         let metadataList: interfaces.ControllerParameterMetadata = {};
