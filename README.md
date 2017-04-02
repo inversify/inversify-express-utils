@@ -42,12 +42,17 @@ export class FooController implements interfaces.Controller {
     constructor( @inject('FooService') private fooService: FooService ) {}
 
     @Get('/')
-    private index(req: express.Request): string {
+    private index(req: express.Request, res: express.Response, next: express.NextFunction): string {
         return this.fooService.get(req.query.id);
     }
 
+    @Get('/')
+    private list(@QueryParams('start') start: number, @QueryParams('count') cound: number): string {
+        return this.fooService.get(start, count);
+    }
+
     @Post('/')
-    private async create(req: express.Request, res: express.Response) {
+    private async create(@Response() res: express.Response) {
         try {
             await this.fooService.create(req.body)
             res.sendStatus(201)
@@ -57,8 +62,8 @@ export class FooController implements interfaces.Controller {
     }
 
     @Delete('/:id')
-    private delete(req: express.Request, res: express.Response): Promise<void> {
-        return this.fooService.delete(req.params.id)
+    private delete(@RequestParams("id") id: string, @Response() res: express.Response): Promise<void> {
+        return this.fooService.delete(id)
             .then(() => res.sendStatus(204))
             .catch((err) => {
                 res.status(400).json({ error: err.message })
@@ -187,6 +192,30 @@ Registers the decorated controller method as a request handler for a particular 
 ### `@SHORTCUT(path, [middleware, ...])`
 
 Shortcut decorators which are simply wrappers for `@Method`. Right now these include `@Get`, `@Post`, `@Put`, `@Patch`, `@Head`, `@Delete`, and `@All`. For anything more obscure, use `@Method` (Or make a PR :smile:).
+
+### `@Request()`
+    Binds a method parameter to the request object.
+
+### `@Response()`
+    Binds a method parameter to the response object.
+
+### `@RequestParam(name?: string)`
+    Binds a method parameter to request.params object or to a specific parameter if a name is passed.
+    
+### `@QueryParam(name?: string)`
+    Binds a method parameter to request.query or to a specific query parameter if a name is passed.
+
+### `@RequestBody(name?: string)`
+    Binds a method parameter to request.body or to a specific body property if a name is passed.
+
+### `@RequestHeaders(name?: string)`
+    Binds a method parameter to the request headers.
+
+### `@Cookies()`
+    Binds a method parameter to the request cookies.
+
+### `@Next()`
+    Binds a method parameter to the next() function.
 
 ## Examples
 Some examples can be found at the [inversify-express-example](https://github.com/inversify/inversify-express-example) repository.
