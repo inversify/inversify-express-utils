@@ -688,14 +688,9 @@ describe("Integration Tests:", () => {
             @injectable()
             @Controller("/")
             class TestController {
-                @Get("/") public getTest(req: express.Request, res: express.Response) {
-                    res.cookie("cookie", "hey");
-                    res.send();
-                }
-
-                @Get("/cookie") public getCookie(req: express.Request, res: express.Response) {
-                    if (req.cookies.cookie) {
-                        res.send(req.cookies.cookie);
+                @Get("/") public getCookie(@Cookies("cookie") cookie: any, req: express.Request, res: express.Response) {
+                    if (cookie) {
+                        res.send(cookie);
                     } else {
                         res.send(":(");
                     }
@@ -706,6 +701,10 @@ describe("Integration Tests:", () => {
             server = new InversifyExpressServer(container);
             server.setConfig((app) => {
                 app.use(cookieParser());
+                app.use(function (req, res, next) {
+                    res.cookie("cookie", "hey");
+                    next();
+                });
             });
             request(server.build())
                 .get("/")
