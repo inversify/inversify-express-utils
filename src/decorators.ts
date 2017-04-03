@@ -52,21 +52,6 @@ export function Method(method: string, path: string, ...middleware: interfaces.M
     };
 }
 
-export function Parameter(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return function (target: any, key: string, value: any) {
-        let metadata: interfaces.ControllerMethodMetadata = { path, middleware, method, target, key };
-        let metadataList: interfaces.ControllerMethodMetadata[] = [];
-
-        if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
-            Reflect.defineMetadata(METADATA_KEY.controllerMethod, metadataList, target.constructor);
-        } else {
-            metadataList = Reflect.getOwnMetadata(METADATA_KEY.controllerMethod, target.constructor);
-        }
-
-        metadataList.push(metadata);
-    };
-}
-
 export const Request = paramDecoratorFactory(PARAMETER_TYPE.REQUEST);
 export const Response = paramDecoratorFactory(PARAMETER_TYPE.RESPONSE);
 export const RequestParam = paramDecoratorFactory(PARAMETER_TYPE.PARAMS);
