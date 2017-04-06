@@ -80,8 +80,6 @@ export function Params(type: PARAMETER_TYPE, parameterName: string) {
         };
         if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerParameter, target.constructor)) {
             parameterMetadataList.unshift(parameterMetadata);
-            metadataList[methodName] = parameterMetadataList;
-            Reflect.defineMetadata(METADATA_KEY.controllerParameter, metadataList, target.constructor);
         } else {
             metadataList = Reflect.getOwnMetadata(METADATA_KEY.controllerParameter, target.constructor);
             if (metadataList.hasOwnProperty(methodName)) {
@@ -89,6 +87,7 @@ export function Params(type: PARAMETER_TYPE, parameterName: string) {
             }
             parameterMetadataList.unshift(parameterMetadata);
         }
-
+        metadataList[methodName] = parameterMetadataList;
+        Reflect.defineMetadata(METADATA_KEY.controllerParameter, metadataList, target.constructor);
     };
-};
+}
