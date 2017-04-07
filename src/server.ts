@@ -146,9 +146,9 @@ export class InversifyExpressServer  {
                         res.send(value);
                     }
                 })
-                    .catch((error: any) => {
-                        next(error);
-                    });
+                .catch((error: any) => {
+                   next(error);
+                });
 
             } else if (result && !res.headersSent) {
                 res.send(result);
