@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import * as express from "express";
-import { Controller, Method, Get, Request, Response, RequestParam } from "../src/decorators";
+import { Controller, Method, Get, Request, Response, RequestParam, QueryParam } from "../src/decorators";
 import { interfaces } from "../src/interfaces";
 import { METADATA_KEY, PARAMETER_TYPE } from "../src/constants";
 import { InversifyExpressServer } from "../src/server";
@@ -62,6 +62,38 @@ describe("Unit Test: Previous bugs", () => {
                     .then(response2 => {
                         expect(Array.isArray(response2.body)).to.eql(false);
                         expect(response2.body.id).to.eql("5");
+                        done();
+                    });
+
+    });
+         it("should support empty query params", (done) => {
+        let container = new Container();
+
+        @injectable()
+        @Controller("/api/test")
+        class TestController {
+            @Get("/")
+            public get(
+                @Request() req: express.Request,
+                @Response() res: express.Response,
+                @QueryParam("empty") empty: string,
+                @QueryParam("test") test: string
+            ) {
+                return {empty: empty, test: test};
+            }
+
+        }
+
+        container.bind(TYPE.Controller).to(TestController);
+        let server = new InversifyExpressServer(container);
+        let app = server.build();
+
+        request(app).get("/api/test?test=testquery")
+                    .expect("Content-Type", /json/)
+                    .expect(200)
+                    .then(response1 => {
+                        expect(response1.body.test).to.eql("testquery");
+                        expect(response1.body.empty).to.be.undefined;
                         done();
                     });
 
