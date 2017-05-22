@@ -182,6 +182,14 @@ export class InversifyExpressServer  {
 
     private getParam(source: any, paramType: string, name: string) {
         let param = source[paramType] || source;
-        return param[name] || param;
+        return param[name] || this.checkQueryParam(paramType, param);
+    }
+
+    private checkQueryParam(paramType: string, param: any) {
+        if (paramType === "query") {
+            return undefined;
+        } else {
+            return param;
+        }
     }
 }
