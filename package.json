@@ -33,7 +33,7 @@
     "@types/sinon": "^2.1.0",
     "@types/supertest": "^2.0.0",
     "body-parser": "^1.17.1",
-    "chai": "^3.5.0",
+    "chai": "^4.0.0",
     "cookie-parser": "^1.4.3",
     "gulp": "^3.9.1",
     "gulp-istanbul": "^1.1.1",
