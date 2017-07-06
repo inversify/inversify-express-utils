@@ -69,7 +69,7 @@ describe("Unit Test: Controller Decorators", () => {
         }
         let methodMetadataList: interfaces.ControllerParameterMetadata =
         Reflect.getMetadata(METADATA_KEY.controllerParameter, TestController);
-        expect(methodMetadataList.hasOwnProperty("test")).true;
+        expect(methodMetadataList.hasOwnProperty("test")).to.eqls(true);
 
         let paramaterMetadataList: interfaces.ParameterMetadata[] = methodMetadataList[methodName];
         expect(paramaterMetadataList.length).eql(2);

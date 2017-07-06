@@ -1,13 +1,15 @@
 import { expect } from "chai";
 import * as express from "express";
-import { controller, httpMethod, httpGet, request, response, requestParam,
-         queryParam } from "../src/decorators";
 import { interfaces } from "../src/interfaces";
 import { METADATA_KEY, PARAMETER_TYPE } from "../src/constants";
 import { InversifyExpressServer } from "../src/server";
 import { Container, injectable } from "inversify";
 import { TYPE } from "../src/constants";
 import * as supertest from "supertest";
+import {
+    controller, httpMethod, httpGet, request,
+    response, requestParam, queryParam
+} from "../src/decorators";
 
 describe("Unit Test: Previous bugs", () => {
 
@@ -53,8 +55,8 @@ describe("Unit Test: Previous bugs", () => {
                       .expect(200)
                       .then(response1 => {
                           expect(Array.isArray(response1.body)).to.eql(true);
-                          expect(response1.body[0].id).to.eql("1");
-                          expect(response1.body[0].id).to.eql("2");
+                          expect(response1.body[0].id).to.eql(1);
+                          expect(response1.body[1].id).to.eql(2);
                       });
 
         supertest(app).get("/api/test/5")
@@ -67,7 +69,8 @@ describe("Unit Test: Previous bugs", () => {
                       });
 
     });
-         it("should support empty query params", (done) => {
+
+    it("should support empty query params", (done) => {
         let container = new Container();
 
         @injectable()
@@ -94,7 +97,7 @@ describe("Unit Test: Previous bugs", () => {
                       .expect(200)
                       .then(response1 => {
                           expect(response1.body.test).to.eql("testquery");
-                          expect(response1.body.empty).to.be.undefined;
+                          expect(response1.body.empty).to.eq(undefined);
                           done();
                       });
 

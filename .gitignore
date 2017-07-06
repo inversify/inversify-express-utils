@@ -63,3 +63,4 @@ test/**/*.js
 
 type_definitions/**/*.js
 type_definitions/*.js
+package-lock.json
