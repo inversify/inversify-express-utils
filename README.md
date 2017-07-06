@@ -27,7 +27,7 @@ Please refer to the [InversifyJS documentation](https://github.com/inversify/Inv
 ## The Basics
 
 ### Step 1: Decorate your controllers
-To use a class as a "controller" for your express app, simply add the `@Controller` decorator to the class. Similarly, decorate methods of the class to serve as request handlers.
+To use a class as a "controller" for your express app, simply add the `@controller` decorator to the class. Similarly, decorate methods of the class to serve as request handlers.
 The following example will declare a controller that responds to `GET /foo'.
 
 ```ts
@@ -35,24 +35,24 @@ import * as express from 'express';
 import { interfaces, Controller, Get, Post, Delete } from 'inversify-express-utils';
 import { injectable, inject } from 'inversify';
 
-@Controller('/foo')
+@controller('/foo')
 @injectable()
 export class FooController implements interfaces.Controller {
 
     constructor( @inject('FooService') private fooService: FooService ) {}
 
-    @Get('/')
+    @httpGet('/')
     private index(req: express.Request, res: express.Response, next: express.NextFunction): string {
         return this.fooService.get(req.query.id);
     }
 
-    @Get('/')
-    private list(@QueryParams('start') start: number, @QueryParams('count') cound: number): string {
+    @httpGet('/')
+    private list(@queryParams('start') start: number, @queryParams('count') cound: number): string {
         return this.fooService.get(start, count);
     }
 
-    @Post('/')
-    private async create(@Response() res: express.Response) {
+    @httpPost('/')
+    private async create(@response() res: express.Response) {
         try {
             await this.fooService.create(req.body)
             res.sendStatus(201)
@@ -61,8 +61,8 @@ export class FooController implements interfaces.Controller {
         }
     }
 
-    @Delete('/:id')
-    private delete(@RequestParam("id") id: string, @Response() res: express.Response): Promise<void> {
+    @httpDelete('/:id')
+    private delete(@requestParam("id") id: string, @response() res: express.Response): Promise<void> {
         return this.fooService.delete(id)
             .then(() => res.sendStatus(204))
             .catch((err) => {
@@ -181,40 +181,40 @@ let server = new InversifyExpressServer(container, null, null, app);
 
 ## Decorators
 
-### `@Controller(path, [middleware, ...])`
+### `@controller(path, [middleware, ...])`
 
 Registers the decorated class as a controller with a root path, and optionally registers any global middleware for this controller.
 
-### `@Method(method, path, [middleware, ...])`
+### `@httpMethod(method, path, [middleware, ...])`
 
 Registers the decorated controller method as a request handler for a particular path and method, where the method name is a valid express routing method.
 
 ### `@SHORTCUT(path, [middleware, ...])`
 
-Shortcut decorators which are simply wrappers for `@Method`. Right now these include `@Get`, `@Post`, `@Put`, `@Patch`, `@Head`, `@Delete`, and `@All`. For anything more obscure, use `@Method` (Or make a PR :smile:).
+Shortcut decorators which are simply wrappers for `@httpMethod`. Right now these include `@httpGet`, `@httpPost`, `@httpPut`, `@httpPatch`, `@httpHead`, `@httpDelete`, and `@All`. For anything more obscure, use `@httpMethod` (Or make a PR :smile:).
 
-### `@Request()`
+### `@request()`
     Binds a method parameter to the request object.
 
-### `@Response()`
+### `@response()`
     Binds a method parameter to the response object.
 
-### `@RequestParam(name?: string)`
+### `@requestParam(name?: string)`
     Binds a method parameter to request.params object or to a specific parameter if a name is passed.
     
-### `@QueryParam(name?: string)`
+### `@queryParam(name?: string)`
     Binds a method parameter to request.query or to a specific query parameter if a name is passed.
 
-### `@RequestBody(name?: string)`
+### `@requestBody(name?: string)`
     Binds a method parameter to request.body or to a specific body property if a name is passed.
 
-### `@RequestHeaders(name?: string)`
+### `@requestHeaders(name?: string)`
     Binds a method parameter to the request headers.
 
-### `@Cookies()`
+### `@cookies()`
     Binds a method parameter to the request cookies.
 
-### `@Next()`
+### `@next()`
     Binds a method parameter to the next() function.
 
 ## Examples

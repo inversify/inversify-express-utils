@@ -1,29 +1,29 @@
 import { InversifyExpressServer } from "./server";
-import { Controller, Method, Get, Put, Post, Patch, Head, All, Delete,
-        Request, Response, RequestParam, QueryParam, RequestBody, RequestHeaders,
-        Cookies, Next } from "./decorators";
+import { controller, httpMethod, httpGet, httpPut, httpPost, httpPatch,
+        httpHead, all, httpDelete, request, response, requestParam, queryParam,
+        requestBody, requestHeaders, cookies, next } from "./decorators";
 import { TYPE } from "./constants";
 import { interfaces } from "./interfaces";
 
 export {
     interfaces,
     InversifyExpressServer,
-    Controller,
-    Method,
-    Get,
-    Put,
-    Post,
-    Patch,
-    Head,
-    All,
-    Delete,
+    controller,
+    httpMethod,
+    httpGet,
+    httpPut,
+    httpPost,
+    httpPatch,
+    httpHead,
+    all,
+    httpDelete,
     TYPE,
-    Request,
-    Response,
-    RequestParam,
-    QueryParam,
-    RequestBody,
-    RequestHeaders,
-    Cookies,
-    Next
+    request,
+    response,
+    requestParam,
+    queryParam,
+    requestBody,
+    requestHeaders,
+    cookies,
+    next
 };

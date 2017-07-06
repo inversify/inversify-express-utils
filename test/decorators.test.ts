@@ -1,15 +1,15 @@
 import { expect } from "chai";
-import { Controller, Method, Params } from "../src/decorators";
+import { controller, httpMethod, params } from "../src/decorators";
 import { interfaces } from "../src/interfaces";
 import { METADATA_KEY, PARAMETER_TYPE } from "../src/constants";
 
 describe("Unit Test: Controller Decorators", () => {
 
-    it("should add controller metadata to a class when decorated with @Controller", (done) => {
+    it("should add controller metadata to a class when decorated with @controller", (done) => {
         let middleware = [function() { return; }, "foo", Symbol("bar")];
         let path = "foo";
 
-        @Controller(path, ...middleware)
+        @controller(path, ...middleware)
         class TestController {}
 
         let controllerMetadata: interfaces.ControllerMetadata = Reflect.getMetadata("_controller", TestController);
@@ -21,19 +21,19 @@ describe("Unit Test: Controller Decorators", () => {
     });
 
 
-    it("should add method metadata to a class when decorated with @Method", (done) => {
+    it("should add method metadata to a class when decorated with @httpMethod", (done) => {
         let middleware = [function() { return; }, "bar", Symbol("baz")];
         let path = "foo";
         let method = "get";
 
         class TestController {
-            @Method(method, path, ...middleware)
+            @httpMethod(method, path, ...middleware)
             public test() { return; }
 
-            @Method("foo", "bar")
+            @httpMethod("foo", "bar")
             public test2() { return; }
 
-            @Method("bar", "foo")
+            @httpMethod("bar", "foo")
             public test3() { return; }
         }
 
@@ -51,20 +51,20 @@ describe("Unit Test: Controller Decorators", () => {
         done();
     });
 
-    it("should add parameter metadata to a class when decorated with @Params", (done) => {
+    it("should add parameter metadata to a class when decorated with @params", (done) => {
         let middleware = [function() { return; }, "bar", Symbol("baz")];
         let path = "foo";
         let method = "get";
         let methodName = "test";
 
         class TestController {
-            @Method(method, path, ...middleware)
-            public test(@Params(PARAMETER_TYPE.PARAMS, "id") id: any, @Params(PARAMETER_TYPE.PARAMS, "cat") cat: any) { return; }
+            @httpMethod(method, path, ...middleware)
+            public test(@params(PARAMETER_TYPE.PARAMS, "id") id: any, @params(PARAMETER_TYPE.PARAMS, "cat") cat: any) { return; }
 
-            @Method("foo", "bar")
-            public test2(@Params(PARAMETER_TYPE.PARAMS, "dog")dog: any) { return; }
+            @httpMethod("foo", "bar")
+            public test2(@params(PARAMETER_TYPE.PARAMS, "dog")dog: any) { return; }
 
-            @Method("bar", "foo")
+            @httpMethod("bar", "foo")
             public test3() { return; }
         }
         let methodMetadataList: interfaces.ControllerParameterMetadata =
