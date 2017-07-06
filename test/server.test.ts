@@ -25,14 +25,14 @@ describe("Unit Test: InversifyExpressServer", () => {
         server.setConfig(configFn)
             .setErrorConfig(errorConfigFn);
 
-        expect(configFn.called).to.be.false;
-        expect(errorConfigFn.called).to.be.false;
+        expect(configFn.called).to.eq(false);
+        expect(errorConfigFn.called).to.eq(false);
 
         server.build();
 
-        expect(configFn.calledOnce).to.be.true;
-        expect(errorConfigFn.calledOnce).to.be.true;
-        expect(configFn.calledBefore(errorConfigFn)).to.be.true;
+        expect(configFn.calledOnce).to.eqls(true);
+        expect(errorConfigFn.calledOnce).to.eqls(true);
+        expect(configFn.calledBefore(errorConfigFn)).to.eqls(true);
         done();
     });
 
@@ -49,8 +49,8 @@ describe("Unit Test: InversifyExpressServer", () => {
         let serverWithDefaultRouter = new InversifyExpressServer(container);
         let serverWithCustomRouter = new InversifyExpressServer(container, customRouter);
 
-        expect((serverWithDefaultRouter as any)._router === customRouter).to.be.false;
-        expect((serverWithCustomRouter as any)._router === customRouter).to.be.true;
+        expect((serverWithDefaultRouter as any)._router === customRouter).to.eq(false);
+        expect((serverWithCustomRouter as any)._router === customRouter).to.eqls(true);
 
     });
 

@@ -64,12 +64,12 @@ describe("Integration Tests:", () => {
         });
 
 
-        it ("should work for methods which call next()", (done) => {
+        it ("should work for methods which call nextFunc()", (done) => {
             @injectable()
             @controller("/")
             class TestController {
-                @httpGet("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) {
-                    next();
+                @httpGet("/") public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
+                    nextFunc();
                 }
 
                 @httpGet("/") public getTest2(req: express.Request, res: express.Response) {
@@ -85,14 +85,14 @@ describe("Integration Tests:", () => {
         });
 
 
-        it ("should work for async methods which call next()", (done) => {
+        it ("should work for async methods which call nextFunc()", (done) => {
             @injectable()
             @controller("/")
             class TestController {
-                @httpGet("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) {
+                @httpGet("/") public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
                     return new Promise(((resolve) => {
                         setTimeout(() => {
-                            next();
+                            nextFunc();
                             resolve();
                         }, 100, "GET");
                     }));
@@ -111,12 +111,12 @@ describe("Integration Tests:", () => {
         });
 
 
-        it ("should work for async methods called by next()", (done) => {
+        it ("should work for async methods called by nextFunc()", (done) => {
             @injectable()
             @controller("/")
             class TestController {
-                @httpGet("/") public getTest(req: express.Request, res: express.Response, next: express.NextFunction) {
-                    next();
+                @httpGet("/") public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
+                    nextFunc();
                 }
 
                 @httpGet("/") public getTest2(req: express.Request, res: express.Response) {
@@ -251,17 +251,17 @@ describe("Integration Tests:", () => {
     describe("Middleware:", () => {
         let result: string;
         let middleware: any = {
-            a: function (req: express.Request, res: express.Response, next: express.NextFunction) {
+            a: function (req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
                 result += "a";
-                next();
+                nextFunc();
             },
-            b: function (req: express.Request, res: express.Response, next: express.NextFunction) {
+            b: function (req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
                 result += "b";
-                next();
+                nextFunc();
             },
-            c: function (req: express.Request, res: express.Response, next: express.NextFunction) {
+            c: function (req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
                 result += "c";
-                next();
+                nextFunc();
             }
         };
         let spyA = sinon.spy(middleware, "a");
@@ -289,9 +289,9 @@ describe("Integration Tests:", () => {
 
             agent.get("/")
                 .expect(200, "GET", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -310,9 +310,9 @@ describe("Integration Tests:", () => {
 
             agent.post("/")
                 .expect(200, "POST", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -331,9 +331,9 @@ describe("Integration Tests:", () => {
 
             agent.put("/")
                 .expect(200, "PUT", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -352,9 +352,9 @@ describe("Integration Tests:", () => {
 
             agent.patch("/")
                 .expect(200, "PATCH", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -373,9 +373,9 @@ describe("Integration Tests:", () => {
 
             agent.head("/")
                 .expect(200, "HEAD", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -394,9 +394,9 @@ describe("Integration Tests:", () => {
 
             agent.delete("/")
                 .expect(200, "DELETE", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -415,9 +415,9 @@ describe("Integration Tests:", () => {
 
             agent.get("/")
                 .expect(200, "ALL", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -436,9 +436,9 @@ describe("Integration Tests:", () => {
             supertest(server.build())
                 .get("/")
                 .expect(200, "GET", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -464,9 +464,9 @@ describe("Integration Tests:", () => {
             supertest(server.build())
                 .get("/")
                 .expect(200, "GET", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -490,9 +490,9 @@ describe("Integration Tests:", () => {
             supertest(server.build())
                 .get("/")
                 .expect(200, "GET", function () {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
-                    expect(spyC.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
                     expect(result).to.equal("abc");
                     done();
                 });
@@ -519,8 +519,8 @@ describe("Integration Tests:", () => {
             return agent.get("/")
                 .expect(200, "GET")
                 .then(() => {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
                     expect(result).to.equal("ab");
                 });
         });
@@ -547,8 +547,8 @@ describe("Integration Tests:", () => {
             return agent.get("/")
                 .expect(200, "GET")
                 .then(() => {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
                     expect(result).to.equal("ab");
                 });
         });
@@ -575,8 +575,8 @@ describe("Integration Tests:", () => {
             return agent.get("/")
                 .expect(200, "GET")
                 .then(() => {
-                    expect(spyA.calledOnce).to.be.true;
-                    expect(spyB.calledOnce).to.be.true;
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
                     expect(result).to.equal("ab");
                 });
         });
@@ -652,8 +652,8 @@ describe("Integration Tests:", () => {
             @injectable()
             @controller("/")
             class TestController {
-                @httpPost("/") public getTest(@requestBody() body: string) {
-                    return body;
+                @httpPost("/") public getTest(@requestBody() reqBody: string) {
+                    return reqBody;
                 }
             }
             container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
@@ -703,9 +703,9 @@ describe("Integration Tests:", () => {
             server = new InversifyExpressServer(container);
             server.setConfig((app) => {
                 app.use(cookieParser());
-                app.use(function (req, res, next) {
+                app.use(function (req, res, nextFunc) {
                     res.cookie("cookie", "hey");
-                    next();
+                    nextFunc();
                 });
             });
             supertest(server.build())
@@ -717,9 +717,9 @@ describe("Integration Tests:", () => {
             @injectable()
             @controller("/")
             class TestController {
-                @httpGet("/") public getTest(@next() next: any) {
+                @httpGet("/") public getTest(@next() nextFunc: any) {
                     let err = new Error("foo");
-                    return next();
+                    return nextFunc();
                 }
                 @httpGet("/") public getResult() {
                     return "foo";

@@ -1,6 +1,6 @@
 {
   "name": "inversify-express-utils",
-  "version": "3.5.2",
+  "version": "4.0.0",
   "description": "Some utilities for the development of express applications with Inversify",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
@@ -37,8 +37,8 @@
     "cookie-parser": "^1.4.3",
     "gulp": "^3.9.1",
     "gulp-istanbul": "^1.1.1",
-    "gulp-mocha": "^4.0.1",
-    "gulp-tslint": "^7.0.1",
+    "gulp-mocha": "3.0.1",
+    "gulp-tslint": "^8.1.1",
     "gulp-typescript": "^3.1.3",
     "inversify": "^4.0.0",
     "mocha": "^3.2.0",
@@ -49,7 +49,7 @@
     "source-map-support": "^0.4.6",
     "supertest": "^3.0.0",
     "tslint": "^5.0.0",
-    "typescript": "^2.1.1"
+    "typescript": "^2.4.1"
   },
   "dependencies": {
     "express": "^4.14.1"
