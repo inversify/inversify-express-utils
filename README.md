@@ -82,6 +82,8 @@ In order for the InversifyExpressServer to find your controllers, you must bind 
 The `Controller` interface exported by inversify-express-utils is empty and solely for convenience, so feel free to implement your own if you want.
 
 ```ts
+import * as bodyParser from 'body-parser';
+
 import { Container } from 'inversify';
 import { interfaces, InversifyExpressServer, TYPE } from 'inversify-express-utils';
 
@@ -94,6 +96,13 @@ container.bind<FooService>('FooService').to(FooService);
 
 // create server
 let server = new InversifyExpressServer(container);
+server.setConfig((app) => {
+  // add body parser
+  app.use(bodyParser.urlencoded({
+    extended: true
+  }));
+  app.use(bodyParser.json());
+});
 
 let app = server.build();
 app.listen(3000);
@@ -201,7 +210,7 @@ Shortcut decorators which are simply wrappers for `@httpMethod`. Right now these
 
 ### `@requestParam(name?: string)`
     Binds a method parameter to request.params object or to a specific parameter if a name is passed.
-    
+
 ### `@queryParam(name?: string)`
     Binds a method parameter to request.query or to a specific query parameter if a name is passed.
 
