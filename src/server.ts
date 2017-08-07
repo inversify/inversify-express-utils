@@ -139,20 +139,14 @@ export class InversifyExpressServer  {
             let args = this.extractParameters(req, res, next, parameterMetadata);
             let result: any = this._container.getNamed(TYPE.Controller, controllerName)[key](...args);
             // try to resolve promise
-            if (result && result instanceof Promise) {
-
-                result.then((value: any) => {
+            Promise.resolve(result)
+                .then((value: any) => {
                     if (value && !res.headersSent) {
                         res.send(value);
                     }
                 })
-                .catch((error: any) => {
-                   next(error);
-                });
-
-            } else if (result && !res.headersSent) {
-                res.send(result);
-            }
+                .catch((err: any) => {
+                    next(err);   });
         };
     }
 
