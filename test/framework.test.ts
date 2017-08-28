@@ -14,6 +14,7 @@ import { controller, httpMethod, all, httpGet, httpPost, httpPut, httpPatch,
         requestBody, queryParam, requestHeaders, cookies,
         next } from "../src/decorators";
 import { TYPE, PARAMETER_TYPE } from "../src/constants";
+import * as Bluebird from "bluebird";
 
 describe("Integration Tests:", () => {
     let server: InversifyExpressServer;
@@ -63,6 +64,41 @@ describe("Integration Tests:", () => {
                 .expect(500, done);
         });
 
+        it("should work for async controller methods using non-native Bluebird promise", (done) => {
+            @injectable()
+            @controller("/")
+            class TestController {
+                @httpGet("/") public getTest(req: express.Request, res: express.Response) {
+                    return new Bluebird(((resolve) => {
+                        setTimeout(resolve, 100, "GET");
+                    }));
+                }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container);
+            supertest(server.build())
+                .get("/")
+                .expect(200, "GET", done);
+        });
+
+        it("should work for async controller methods, using non-native Bluebird promise, that fails", (done) => {
+            @injectable()
+            @controller("/")
+            class TestController {
+                @httpGet("/") public getTest(req: express.Request, res: express.Response) {
+                    return new Bluebird(((resolve, reject) => {
+                        setTimeout(reject, 100, "GET");
+                    }));
+                }
+            }
+            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
+
+            server = new InversifyExpressServer(container);
+            supertest(server.build())
+                .get("/")
+                .expect(500, done);
+        });
 
         it ("should work for methods which call nextFunc()", (done) => {
             @injectable()
