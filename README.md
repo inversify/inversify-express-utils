@@ -31,43 +31,43 @@ To use a class as a "controller" for your express app, simply add the `@controll
 The following example will declare a controller that responds to `GET /foo'.
 
 ```ts
-import * as express from 'express';
-import { interfaces, controller, httpGet, httpPost, httpDelete } from 'inversify-express-utils';
-import { injectable, inject } from 'inversify';
+import * as express from "express";
+import { interfaces, controller, httpGet, httpPost, httpDelete, request, queryParam, response, requestParam } from "inversify-express-utils";
+import { injectable, inject } from "inversify";
 
-@controller('/foo')
+@controller("/foo")
 @injectable()
 export class FooController implements interfaces.Controller {
 
-    constructor( @inject('FooService') private fooService: FooService ) {}
+    constructor( @inject("FooService") private fooService: FooService ) {}
 
-    @httpGet('/')
+    @httpGet("/")
     private index(req: express.Request, res: express.Response, next: express.NextFunction): string {
         return this.fooService.get(req.query.id);
     }
 
-    @httpGet('/')
-    private list(@queryParams('start') start: number, @queryParams('count') cound: number): string {
+    @httpGet("/")
+    private list(@queryParam("start") start: number, @queryParam("count") count: number): string {
         return this.fooService.get(start, count);
     }
 
-    @httpPost('/')
-    private async create(@response() res: express.Response) {
+    @httpPost("/")
+    private async create(@request() req: express.Request, @response() res: express.Response) {
         try {
-            await this.fooService.create(req.body)
-            res.sendStatus(201)
+            await this.fooService.create(req.body);
+            res.sendStatus(201);
         } catch (err) {
-            res.status(400).json({ error: err.message })
+            res.status(400).json({ error: err.message });
         }
     }
 
-    @httpDelete('/:id')
+    @httpDelete("/:id")
     private delete(@requestParam("id") id: string, @response() res: express.Response): Promise<void> {
         return this.fooService.delete(id)
             .then(() => res.sendStatus(204))
-            .catch((err) => {
-                res.status(400).json({ error: err.message })
-            })
+            .catch((err: Error) => {
+                res.status(400).json({ error: err.message });
+            });
     }
 }
 ```
