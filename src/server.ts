@@ -14,6 +14,7 @@ export class InversifyExpressServer  {
     private _configFn: interfaces.ConfigFunction;
     private _errorConfigFn: interfaces.ConfigFunction;
     private _routingConfig: interfaces.RoutingConfig;
+    private _authProvider: interfaces.AuthProvider|undefined;
 
     /**
      * Wrapper for the express server.
@@ -24,7 +25,8 @@ export class InversifyExpressServer  {
         container: inversify.interfaces.Container,
         customRouter?: express.Router,
         routingConfig?: interfaces.RoutingConfig,
-        customApp?: express.Application
+        customApp?: express.Application,
+        authProvider?: interfaces.AuthProvider
     ) {
         this._container = container;
         this._router = customRouter || express.Router();
@@ -32,6 +34,7 @@ export class InversifyExpressServer  {
             rootPath: DEFAULT_ROUTING_ROOT_PATH
         };
         this._app = customApp || express();
+        this._authProvider = authProvider;
     }
 
     /**
@@ -136,17 +139,57 @@ export class InversifyExpressServer  {
 
     private handlerFactory(controllerName: any, key: string, parameterMetadata: interfaces.ParameterMetadata[]): express.RequestHandler {
         return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
             let args = this.extractParameters(req, res, next, parameterMetadata);
-            let result: any = this._container.getNamed(TYPE.Controller, controllerName)[key](...args);
-            Promise.resolve(result)
-                .then((value: any) => {
-                    if (value && !res.headersSent) {
-                        res.send(value);
-                    }
-                })
-                .catch((error: any) => {
-                    next(error);   });
+
+            (async () => {
+
+                // create http context instance we use a childContainer for each
+                // request so we can be sure that this binding is unique for each
+                // http request that hits the server
+                const httpContext = await this._getHttpContext(req, res, next);
+                let childContainer = this._container.createChild();
+                childContainer.bind<interfaces.HttpContext>(TYPE.HttpContext)
+                              .toConstantValue(httpContext);
+
+                // invoke controller's action
+                let result = childContainer.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
+                Promise.resolve(result)
+                    .then((value: any) => {
+                        if (value && !res.headersSent) {
+                            res.send(value);
+                        }
+                    })
+                    .catch((error: any) => next(error));
+            })();
+
         };
+    }
+
+    private async _getHttpContext(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) {
+        const principal = await this._getCurrentUser(req, res, next);
+        const httpContext = {
+            request: req,
+            response: res,
+            user: principal
+        };
+        return httpContext;
+    }
+
+    private async _getCurrentUser(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ): Promise<interfaces.Principal|null> {
+        if (this._authProvider !== undefined) {
+            return await this._authProvider.getUser(req, res, next);
+        } else {
+            return Promise.resolve(null);
+        }
     }
 
     private extractParameters(req: express.Request, res: express.Response, next: express.NextFunction,

@@ -12,6 +12,7 @@
         "noImplicitAny": true,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
+        "strictNullChecks": false,
         "outDir": "lib"
     }
 }

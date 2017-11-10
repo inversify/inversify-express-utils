@@ -1,5 +1,6 @@
 const TYPE = {
-    Controller: Symbol("Controller")
+    Controller: Symbol("Controller"),
+    HttpContext: Symbol("HttpContext")
 };
 
 const METADATA_KEY = {

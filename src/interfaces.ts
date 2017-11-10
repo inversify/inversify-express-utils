@@ -41,6 +41,27 @@ namespace interfaces {
         rootPath: string;
     }
 
+    export interface Principal {
+        details: any;
+        isAuthenticated(): boolean;
+        isOwner(resourceId: any): boolean;
+        isInRole(role: string): boolean;
+    }
+
+    export interface AuthProvider {
+        getUser(
+            req: express.Request,
+            res: express.Response,
+            next: express.NextFunction
+        ): Principal;
+    }
+
+    export interface HttpContext {
+        request: express.Request;
+        response: express.Response;
+        user: Principal|null;
+    }
+
 }
 
 export { interfaces };
