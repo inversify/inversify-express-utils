@@ -23,8 +23,8 @@ export class InversifyExpressServer  {
      */
     constructor(
         container: inversify.interfaces.Container,
-        customRouter?: express.Router,
-        routingConfig?: interfaces.RoutingConfig,
+        customRouter?: express.Router|null,
+        routingConfig?: interfaces.RoutingConfig|null,
         customApp?: express.Application,
         authProvider?: interfaces.AuthProvider
     ) {
@@ -216,12 +216,12 @@ export class InversifyExpressServer  {
         return args;
     }
 
-    private getParam(source: any, paramType: string, name: string) {
-        let param = source[paramType] || source;
+    private getParam(source: any, paramType: string|null, name: string) {
+        let param = (paramType !== null) ? source[paramType] : source;
         return param[name] || this.checkQueryParam(paramType, param);
     }
 
-    private checkQueryParam(paramType: string, param: any) {
+    private checkQueryParam(paramType: string|null, param: any) {
         if (paramType === "query") {
             return undefined;
         } else {
