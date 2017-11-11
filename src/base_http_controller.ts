@@ -1,6 +1,6 @@
-import { httpContext } from "../src/decorators";
-import { interfaces } from "../src/interfaces";
 import { injectable } from "inversify";
+import { httpContext } from "./decorators";
+import { interfaces } from "./interfaces";
 
 @injectable()
 export class BaseHttpController {
