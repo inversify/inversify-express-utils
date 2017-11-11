@@ -312,7 +312,7 @@ The `AuthProvider` allow us to get an user (`Principal`):
 
 ```ts
 import { injectable, inject } from "inversify";
-import {} from "inversify-express-utils";
+import { interfaces } from "inversify-express-utils";
 
 const authService = inject("AuthService");
 
@@ -379,6 +379,70 @@ class UserDetailsController extends BaseHttpController {
         }
     }
 }
+```
+
+## BaseMiddleware
+
+We can extend `BaseMiddleware` in order to be able to inject dependencies into a
+Express middleware function and to be able to access the `HttpContext` from the
+middleware.
+
+```ts
+import { BaseMiddleware } from "inversify-express-utils";
+
+@injectable()
+class LoggerMiddleware extends BaseMiddleware {
+    @inject(TYPES.Logger) private readonly _logger: Logger;
+    public handler(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) {
+        if (this.httpContext.user.isAuthenticated()) {
+            this._logger.info(`${this.httpContext.user.details.email} => ${req.url}`);
+        } else {
+            this._logger.info(`Anonymous => ${req.url}`);
+        }
+        next();
+    }
+}
+```
+
+We also need to declare some type bindings:
+
+```ts
+const container = new Container();
+
+container.bind<Logger>(TYPES.Logger)
+        .to(Logger);
+
+container.bind<LoggerMiddleware>(TYPES.LoggerMiddleware)
+         .to(LoggerMiddleware);
+
+```
+
+We can then inject `TYPES.LoggerMiddleware` into one of our controllers. 
+
+```ts
+@injectable()
+@controller("/", TYPES.LoggerMiddleware)
+class UserDetailsController extends BaseHttpController {
+
+    @inject("AuthService") private readonly _authService: AuthService;
+
+    @httpGet("/")
+    public async getUserDetails() {
+        if (this.httpContext.user.isAuthenticated()) {
+            return this._authService.getUserDetails(this.httpContext.user.details.id);
+        } else {
+            throw new Error();
+        }
+    }
+}
+
+container.bind<interfaces.Controller>(TYPE.Controller)
+         .to(UserDetailsController)
+         .whenTargetNamed("UserDetailsController");
 ```
 
 ## Examples
