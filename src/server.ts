@@ -2,6 +2,7 @@ import * as express from "express";
 import * as inversify from "inversify";
 import { interfaces } from "./interfaces";
 import { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH, PARAMETER_TYPE } from "./constants";
+import { BaseMiddleware } from "./index";
 
 /**
  * Wrapper for the express server.
@@ -123,14 +124,9 @@ export class InversifyExpressServer  {
                     let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, metadata.key, paramList);
                     let routeMiddleware = this.resolveMidleware(...metadata.middleware);
                     this._router[metadata.method](
-                        // Request path
                         `${controllerMetadata.path}${metadata.path}`,
-                        // Request middleware
-                        [
-                            ...controllerMiddleware,
-                            ...routeMiddleware,
-                        ],
-                        // Request handler
+                        ...controllerMiddleware,
+                        ...routeMiddleware,
                         handler
                     );
                 });
@@ -142,9 +138,21 @@ export class InversifyExpressServer  {
 
     private resolveMidleware(...middleware: interfaces.Middleware[]): express.RequestHandler[] {
         return middleware.map(middlewareItem => {
-            try {
-                return this._container.get<express.RequestHandler>(middlewareItem);
-            } catch (_) {
+            if (this._container.isBound(middlewareItem)) {
+                type MiddelwareInstance = express.RequestHandler | BaseMiddleware;
+                const m = this._container.get<MiddelwareInstance>(middlewareItem);
+                if (m instanceof BaseMiddleware) {
+                    return function(
+                        req: express.Request,
+                        res: express.Response,
+                        next: express.NextFunction
+                    ) {
+                        m.handler(req, res, next);
+                    };
+                } else {
+                    return m;
+                }
+            } else {
                 return middlewareItem as express.RequestHandler;
             }
         });

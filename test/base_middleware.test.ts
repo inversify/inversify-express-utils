@@ -25,23 +25,6 @@ describe("BaseMiddleware", () => {
             name: string;
         }
 
-        const log: string[] = [];
-
-        @injectable()
-        class LoggerMiddleware extends BaseMiddleware {
-            @inject(TYPES.SomeDependency) private readonly _someDependency: SomeDependency;
-            public handler(
-                req: express.Request,
-                res: express.Response,
-                next: express.NextFunction
-            ) {
-                console.log("!!!!!!!");
-                const email = this.httpContext.user.details.email;
-                log.push(`${email} => ${req.url} ${this._someDependency.name}`);
-                next();
-            }
-        }
-
         class Principal implements interfaces.Principal {
             public details: any;
             public constructor(details: any) {
@@ -76,12 +59,34 @@ describe("BaseMiddleware", () => {
             name: string;
         }
 
+        const logEntries: string[] = [];
+
         @injectable()
-        @controller("/")
+        class LoggerMiddleware extends BaseMiddleware {
+            @inject(TYPES.SomeDependency) private readonly _someDependency: SomeDependency;
+            public handler(
+                req: express.Request,
+                res: express.Response,
+                next: express.NextFunction
+            ) {
+                const email = this.httpContext.user.details.email;
+                logEntries.push(`${email} => ${req.url} ${this._someDependency.name}`);
+                next();
+            }
+        }
+
+        @injectable()
+        @controller(
+            "/",
+            (req, res, next) => {
+                logEntries.push("Hello from controller!");
+                next();
+            }
+        )
         class TestController extends BaseHttpController {
             @httpGet(
-                "/testUrl",
-                TYPES.LoggerMiddleware
+                "/testUrl" // ,
+                // TYPES.LoggerMiddleware
             )
             public async getTest() {
                 if (this.httpContext.user !== null) {
@@ -116,8 +121,9 @@ describe("BaseMiddleware", () => {
         supertest(server.build())
             .get("/testUrl")
             .expect(200, `test@test.com`, () => {
-                expect(log.length).eq(1);
-                expect(log[0]).eq(`test@test.com => /testUrl SomeDependency!`);
+                expect(logEntries.length).eq(2);
+                expect(logEntries[1]).eq("Hello from controller!");
+                expect(logEntries[0]).eq(`test@test.com => /testUrl SomeDependency!`);
                 done();
             });
 
