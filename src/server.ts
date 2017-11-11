@@ -123,9 +123,14 @@ export class InversifyExpressServer  {
                     let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, metadata.key, paramList);
                     let routeMiddleware = this.resolveMidleware(...metadata.middleware);
                     this._router[metadata.method](
+                        // Request path
                         `${controllerMetadata.path}${metadata.path}`,
-                        ...controllerMiddleware,
-                        ...routeMiddleware,
+                        // Request middleware
+                        [
+                            ...controllerMiddleware,
+                            ...routeMiddleware,
+                        ],
+                        // Request handler
                         handler
                     );
                 });
