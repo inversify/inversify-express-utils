@@ -192,12 +192,17 @@ export class InversifyExpressServer  {
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
-    ): Promise<interfaces.Principal|null> {
+    ): Promise<interfaces.Principal> {
         if (this._AuthProvider !== undefined) {
             const authProvider = this._container.get<interfaces.AuthProvider>(TYPE.AuthProvider);
             return await authProvider.getUser(req, res, next);
         } else {
-            return Promise.resolve(null);
+            return Promise.resolve<interfaces.Principal>({
+                details: null,
+                isAuthenticated: () => Promise.resolve(false),
+                isInRole: (role: string) => Promise.resolve(false),
+                isResourceOwner: (resourceId: any) => Promise.resolve(false)
+            });
         }
     }
 
