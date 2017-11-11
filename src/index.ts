@@ -5,6 +5,7 @@ import { controller, httpMethod, httpGet, httpPut, httpPost, httpPatch,
 import { TYPE } from "./constants";
 import { interfaces } from "./interfaces";
 import { BaseHttpController } from "./base_http_controller";
+import { BaseMiddleware } from "./base_middleware";
 
 export {
     interfaces,
@@ -28,5 +29,6 @@ export {
     cookies,
     next,
     BaseHttpController,
-    httpContext
+    httpContext,
+    BaseMiddleware
 };

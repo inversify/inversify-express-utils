@@ -13,27 +13,27 @@ export function controller(path: string, ...middleware: interfaces.Middleware[])
 }
 
 export function all   (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("all",    path, ...middleware);
+    return httpMethod("all", path, ...middleware);
 }
 
 export function httpGet   (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("get",    path, ...middleware);
+    return httpMethod("get", path, ...middleware);
 }
 
 export function httpPost  (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("post",   path, ...middleware);
+    return httpMethod("post", path, ...middleware);
 }
 
 export function httpPut   (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("put",    path, ...middleware);
+    return httpMethod("put", path, ...middleware);
 }
 
 export function httpPatch (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("patch",  path, ...middleware);
+    return httpMethod("patch", path, ...middleware);
 }
 
 export function httpHead  (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("head",   path, ...middleware);
+    return httpMethod("head", path, ...middleware);
 }
 
 export function httpDelete(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
@@ -42,7 +42,15 @@ export function httpDelete(path: string, ...middleware: interfaces.Middleware[])
 
 export function httpMethod(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return function (target: any, key: string, value: any) {
-        let metadata: interfaces.ControllerMethodMetadata = {path, middleware, method, target, key};
+
+        let metadata: interfaces.ControllerMethodMetadata = {
+            key,
+            method,
+            middleware,
+            path,
+            target
+        };
+
         let metadataList: interfaces.ControllerMethodMetadata[] = [];
 
         if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
