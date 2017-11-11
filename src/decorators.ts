@@ -1,8 +1,7 @@
 import * as express from "express";
 import { interfaces } from "./interfaces";
-import { METADATA_KEY, PARAMETER_TYPE } from "./constants";
+import { TYPE, METADATA_KEY, PARAMETER_TYPE } from "./constants";
 import { inject } from "inversify";
-import { TYPE } from "../src/constants";
 
 export const httpContext = inject(TYPE.HttpContext);
 
