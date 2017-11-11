@@ -373,7 +373,7 @@ class UserDetailsController extends BaseHttpController {
     @httpGet("/")
     public async getUserDetails() {
         if (this.httpContext.user.isAuthenticated()) {
-            return this.httpContext.user.details;
+            return this._authService.getUserDetails(this.httpContext.user.details.id);
         } else {
             throw new Error();
         }
