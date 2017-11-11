@@ -4,6 +4,7 @@ import { controller, httpMethod, httpGet, httpPut, httpPost, httpPatch,
         requestBody, requestHeaders, cookies, next } from "./decorators";
 import { TYPE } from "./constants";
 import { interfaces } from "./interfaces";
+import { BaseHttpController } from "./base_http_controller";
 
 export {
     interfaces,
@@ -25,5 +26,6 @@ export {
     requestBody,
     requestHeaders,
     cookies,
-    next
+    next,
+    BaseHttpController
 };

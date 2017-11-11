@@ -84,6 +84,9 @@ export class InversifyExpressServer  {
 
     private registerControllers() {
 
+        // Fake HttpContext is needed during registration
+        this._container.bind<interfaces.HttpContext>(TYPE.HttpContext).toConstantValue({} as any);
+
         let controllers: interfaces.Controller[] = this._container.getAll<interfaces.Controller>(TYPE.Controller);
 
         controllers.forEach((controller: interfaces.Controller) => {
@@ -104,6 +107,7 @@ export class InversifyExpressServer  {
             );
 
             if (controllerMetadata && methodMetadata) {
+
                 let router: express.Router = express.Router();
                 let controllerMiddleware = this.resolveMidleware(...controllerMetadata.middleware);
 
