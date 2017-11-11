@@ -14,7 +14,7 @@ export class InversifyExpressServer  {
     private _configFn: interfaces.ConfigFunction;
     private _errorConfigFn: interfaces.ConfigFunction;
     private _routingConfig: interfaces.RoutingConfig;
-    private _authProvider: interfaces.AuthProvider|undefined;
+    private _AuthProvider: { new(): interfaces.AuthProvider}|undefined;
 
     /**
      * Wrapper for the express server.
@@ -25,8 +25,8 @@ export class InversifyExpressServer  {
         container: inversify.interfaces.Container,
         customRouter?: express.Router|null,
         routingConfig?: interfaces.RoutingConfig|null,
-        customApp?: express.Application,
-        authProvider?: interfaces.AuthProvider
+        customApp?: express.Application| null,
+        authProvider?: { new(): interfaces.AuthProvider}
     ) {
         this._container = container;
         this._router = customRouter || express.Router();
@@ -34,7 +34,11 @@ export class InversifyExpressServer  {
             rootPath: DEFAULT_ROUTING_ROOT_PATH
         };
         this._app = customApp || express();
-        this._authProvider = authProvider;
+        this._AuthProvider = authProvider;
+        if (this._AuthProvider) {
+            container.bind<interfaces.AuthProvider>(TYPE.AuthProvider)
+                     .to(this._AuthProvider);
+        }
     }
 
     /**
@@ -189,8 +193,9 @@ export class InversifyExpressServer  {
         res: express.Response,
         next: express.NextFunction
     ): Promise<interfaces.Principal|null> {
-        if (this._authProvider !== undefined) {
-            return await this._authProvider.getUser(req, res, next);
+        if (this._AuthProvider !== undefined) {
+            const authProvider = this._container.get<interfaces.AuthProvider>(TYPE.AuthProvider);
+            return await authProvider.getUser(req, res, next);
         } else {
             return Promise.resolve(null);
         }

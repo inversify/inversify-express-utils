@@ -1,0 +1,56 @@
+import { expect } from "chai";
+import * as express from "express";
+import { Container, injectable, inject } from "inversify";
+import * as supertest from "supertest";
+import {
+    InversifyExpressServer,
+    TYPE,
+    controller,
+    httpGet,
+    BaseHttpController,
+    interfaces,
+    httpContext
+} from "../src/index";
+
+describe("HttpContex", () => {
+
+    it("Should be able to httpContext manually with the @httpContext decorator", (done) => {
+
+        interface SomeDependency {
+            name: string;
+        }
+
+        @injectable()
+        @controller("/")
+        class TestController {
+
+            @httpContext private readonly _httpContext: interfaces.HttpContext;
+            @inject("SomeDependency") private readonly _someDependency: SomeDependency;
+
+            @httpGet("/")
+            public getTest() {
+                const headerVal = this._httpContext.request.headers["x-custom"];
+                const name = this._someDependency.name;
+                return `${headerVal} & ${name}`;
+            }
+        }
+
+        const container = new Container();
+
+        container.bind<SomeDependency>("SomeDependency")
+                .toConstantValue({ name: "SomeDependency!" });
+
+        container.bind<interfaces.Controller>(TYPE.Controller)
+                 .to(TestController)
+                 .whenTargetNamed("TestController");
+
+        const server = new InversifyExpressServer(container);
+
+        supertest(server.build())
+            .get("/")
+            .set("x-custom", "test-header!")
+            .expect(200, `test-header! & SomeDependency!`, done);
+
+    });
+
+});

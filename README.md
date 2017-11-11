@@ -15,6 +15,7 @@
 Some utilities for the development of express applications with Inversify.
 
 ## Installation
+
 You can install `inversify-express-utils` using npm:
 
 ```
@@ -27,6 +28,7 @@ Please refer to the [InversifyJS documentation](https://github.com/inversify/Inv
 ## The Basics
 
 ### Step 1: Decorate your controllers
+
 To use a class as a "controller" for your express app, simply add the `@controller` decorator to the class. Similarly, decorate methods of the class to serve as request handlers.
 The following example will declare a controller that responds to `GET /foo'.
 
@@ -73,6 +75,7 @@ export class FooController implements interfaces.Controller {
 ```
 
 ### Step 2: Configure container and server
+
 Configure the inversify container in your composition root as usual.
 
 Then, pass the container to the InversifyExpressServer constructor. This will allow it to register all controllers and their dependencies from your container and attach them to the express app.
@@ -109,9 +112,11 @@ app.listen(3000);
 ```
 
 ## InversifyExpressServer
+
 A wrapper for an express Application.
 
 ### `.setConfig(configFn)`
+
 Optional - exposes the express application object for convenient loading of server-level middleware.
 
 ```ts
@@ -126,6 +131,7 @@ server.setConfig((app) => {
 ```
 
 ### `.setErrorConfig(errorConfigFn)`
+
 Optional - like `.setConfig()`, except this function is applied after registering all app middleware and controller routes.
 
 ```ts
@@ -139,6 +145,7 @@ server.setErrorConfig((app) => {
 ```
 
 ### `.build()`
+
 Attaches all registered controllers and middleware to the express application. Returns the application instance.
 
 ```ts
@@ -152,6 +159,7 @@ server
 ```
 
 ## Using a custom Router
+
 It is possible to pass a custom `Router` instance to `InversifyExpressServer`:
 
 ```ts
@@ -177,6 +185,7 @@ let server = new InversifyExpressServer(container, null, { rootPath: "/api/v1" }
 ```
 
 ## Using a custom express application
+
 It is possible to pass a custom `express.Application` instance to `InversifyExpressServer`:
 
 ```ts
@@ -203,30 +212,157 @@ Registers the decorated controller method as a request handler for a particular 
 Shortcut decorators which are simply wrappers for `@httpMethod`. Right now these include `@httpGet`, `@httpPost`, `@httpPut`, `@httpPatch`, `@httpHead`, `@httpDelete`, and `@All`. For anything more obscure, use `@httpMethod` (Or make a PR :smile:).
 
 ### `@request()`
+
 Binds a method parameter to the request object.
 
 ### `@response()`
+
 Binds a method parameter to the response object.
 
 ### `@requestParam(name?: string)`
+
 Binds a method parameter to request.params object or to a specific parameter if a name is passed.
 
 ### `@queryParam(name?: string)`
+
 Binds a method parameter to request.query or to a specific query parameter if a name is passed.
 
 ### `@requestBody(name?: string)`
+
 Binds a method parameter to request.body or to a specific body property if a name is passed. If the bodyParser middleware is not used on the express app, this will bind the method parameter to the express request object.
 
 ### `@requestHeaders(name?: string)`
+
 Binds a method parameter to the request headers.
 
 ### `@cookies()`
+
 Binds a method parameter to the request cookies.
 
 ### `@next()`
+
 Binds a method parameter to the next() function.
 
+## HttpContext
+
+The `HttpContext` property allow us to access the current request,
+response and user with ease. `HttpContext` is available as a property
+in controllers derived from `BaseHttpController`.
+
+```ts
+import { injectable, inject } from "inversify";
+import {
+    controller, httpGet, BaseHttpController
+} from "inversify-express-utils";
+
+@injectable()
+@controller("/")
+class UserPreferencesController extends BaseHttpController {
+
+    @inject("AuthService") private readonly _authService: AuthService;
+
+    @httpGet("/")
+    public async get() {
+        const token = this.httpContext.request.headers["x-auth-token"];
+        return await this._authService.getUserPreferences(token);
+    }
+}
+```
+
+If you are creating a custom controller you will need to inject `HttpContext` manually
+using the `@httpContext` decorator:
+
+```ts
+import { injectable, inject } from "inversify";
+import {
+    controller, httpGet, BaseHttpController, httpContext, interfaces
+} from "inversify-express-utils";
+
+const authService = inject("AuthService")
+
+@injectable()
+@controller("/")
+class UserPreferencesController {
+
+    @httpContext private readonly _httpContext: interfaces.HttpContext;
+    @authService private readonly _authService: AuthService;
+
+    @httpGet("/")
+    public async get() {
+        const token = this.httpContext.request.headers["x-auth-token"];
+        return await this._authService.getUserPreferences(token);
+    }
+}
+```
+
+## AuthProvider
+
+The `HttpContext` will not have access to the current user if you don't
+create a custom `AuthProvider` implementation:
+
+```ts
+const server = new InversifyExpressServer(
+    container, null, null, null, CustomAuthProvider
+);
+```
+
+We need to implement the `AuthProvider` interface.
+
+The `AuthProvider` allow us to get an user (`Principal`):
+
+```ts
+import { injectable, inject } from "inversify";
+import {} from "inversify-express-utils";
+
+const authService = inject("AuthService");
+
+@injectable()
+class CustomAuthProvider implements interfaces.AuthProvider {
+
+    @authService private readonly _authService: AuthService;
+
+    public async getUser(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ): Promise<interfaces.Principal> {
+        const token = req.headers["x-auth-token"]
+        const user = await this._authService.getUser(token);
+        const principal = new Principal(user);
+        return principal;
+    }
+
+}
+```
+
+We alsoneed to implement the Principal interface.
+The `Principal` interface allow us to:
+
+- Access the details of an user
+- Check if it has access to certain resource
+- Check if it is authenticated
+- Check if it is in an user role
+
+```ts
+class Principal implements interfaces.Principal {
+    public details: any;
+    public constrcutor(details: any) {
+        this.details = details;
+    }
+    public isAuthenticated(): Promise<boolean> {
+        return Promise.resolve(true);
+    }
+    public isResourceOwner(resourceId: any): Promise<boolean> {
+        return Promise.resolve(resourceId === 1111);
+    }
+    public isInRole(role: string): Promise<boolean> {
+        return Promise.resolve(role === "admin");
+    }
+}
+```
+
 ## Examples
+
 Some examples can be found at the [inversify-express-example](https://github.com/inversify/inversify-express-example) repository.
 
 ## License

@@ -43,9 +43,9 @@ namespace interfaces {
 
     export interface Principal {
         details: any;
-        isAuthenticated(): boolean;
-        isOwner(resourceId: any): boolean;
-        isInRole(role: string): boolean;
+        isAuthenticated(): Promise<boolean>;
+        isResourceOwner(resourceId: any): Promise<boolean>;
+        isInRole(role: string): Promise<boolean>;
     }
 
     export interface AuthProvider {
@@ -53,7 +53,7 @@ namespace interfaces {
             req: express.Request,
             res: express.Response,
             next: express.NextFunction
-        ): Principal;
+        ): Promise<Principal>;
     }
 
     export interface HttpContext {

@@ -1,4 +1,5 @@
 const TYPE = {
+    AuthProvider:  Symbol("AuthProvider"),
     Controller: Symbol("Controller"),
     HttpContext: Symbol("HttpContext")
 };
