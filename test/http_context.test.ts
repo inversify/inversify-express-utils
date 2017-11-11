@@ -28,9 +28,11 @@ describe("HttpContex", () => {
             @inject("SomeDependency") private readonly _someDependency: SomeDependency;
 
             @httpGet("/")
-            public getTest() {
+            public async getTest() {
                 const headerVal = this._httpContext.request.headers["x-custom"];
                 const name = this._someDependency.name;
+                const isAuthenticated = await this._httpContext.user.isAuthenticated();
+                expect(isAuthenticated).eq(false);
                 return `${headerVal} & ${name}`;
             }
         }

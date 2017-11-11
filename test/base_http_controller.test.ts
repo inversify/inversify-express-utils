@@ -30,9 +30,11 @@ describe("BaseHttpController", () => {
                 this._someDependency = someDependency;
             }
             @httpGet("/")
-            public getTest() {
+            public async getTest() {
                 const headerVal = this.httpContext.request.headers["x-custom"];
                 const name = this._someDependency.name;
+                const isAuthenticated = await this.httpContext.user.isAuthenticated();
+                expect(isAuthenticated).eq(false);
                 return `${headerVal} & ${name}`;
             }
         }

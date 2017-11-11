@@ -361,6 +361,26 @@ class Principal implements interfaces.Principal {
 }
 ```
 
+We can then access the current user (Principal) via the `HttpContext`:
+
+```ts
+@injectable()
+@controller("/")
+class UserDetailsController extends BaseHttpController {
+
+    @inject("AuthService") private readonly _authService: AuthService;
+
+    @httpGet("/")
+    public async getUserDetails() {
+        if (this.httpContext.user.isAuthenticated()) {
+            return this.httpContext.user.details;
+        } else {
+            throw new Error();
+        }
+    }
+}
+```
+
 ## Examples
 
 Some examples can be found at the [inversify-express-example](https://github.com/inversify/inversify-express-example) repository.

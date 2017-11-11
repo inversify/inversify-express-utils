@@ -57,16 +57,17 @@ describe("AuthProvider", () => {
 
         @injectable()
         @controller("/")
-        class TestController {
+        class TestController extends BaseHttpController {
 
-            @httpContext private readonly _httpContext: interfaces.HttpContext;
             @inject("SomeDependency") private readonly _someDependency: SomeDependency;
 
             @httpGet("/")
-            public getTest() {
-                if (this._httpContext.user !== null) {
-                    const email = this._httpContext.user.details.email;
+            public async getTest() {
+                if (this.httpContext.user !== null) {
+                    const email = this.httpContext.user.details.email;
                     const name = this._someDependency.name;
+                    const isAuthenticated = await this.httpContext.user.isAuthenticated();
+                    expect(isAuthenticated).eq(true);
                     return `${email} & ${name}`;
                 }
             }
