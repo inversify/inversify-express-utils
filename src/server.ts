@@ -14,6 +14,7 @@ export class InversifyExpressServer  {
     private _configFn: interfaces.ConfigFunction;
     private _errorConfigFn: interfaces.ConfigFunction;
     private _routingConfig: interfaces.RoutingConfig;
+    private _AuthProvider: { new(): interfaces.AuthProvider}|undefined;
 
     /**
      * Wrapper for the express server.
@@ -22,9 +23,10 @@ export class InversifyExpressServer  {
      */
     constructor(
         container: inversify.interfaces.Container,
-        customRouter?: express.Router,
-        routingConfig?: interfaces.RoutingConfig,
-        customApp?: express.Application
+        customRouter?: express.Router|null,
+        routingConfig?: interfaces.RoutingConfig|null,
+        customApp?: express.Application| null,
+        authProvider?: { new(): interfaces.AuthProvider}
     ) {
         this._container = container;
         this._router = customRouter || express.Router();
@@ -32,6 +34,11 @@ export class InversifyExpressServer  {
             rootPath: DEFAULT_ROUTING_ROOT_PATH
         };
         this._app = customApp || express();
+        this._AuthProvider = authProvider;
+        if (this._AuthProvider) {
+            container.bind<interfaces.AuthProvider>(TYPE.AuthProvider)
+                     .to(this._AuthProvider);
+        }
     }
 
     /**
@@ -81,6 +88,9 @@ export class InversifyExpressServer  {
 
     private registerControllers() {
 
+        // Fake HttpContext is needed during registration
+        this._container.bind<interfaces.HttpContext>(TYPE.HttpContext).toConstantValue({} as any);
+
         let controllers: interfaces.Controller[] = this._container.getAll<interfaces.Controller>(TYPE.Controller);
 
         controllers.forEach((controller: interfaces.Controller) => {
@@ -101,6 +111,7 @@ export class InversifyExpressServer  {
             );
 
             if (controllerMetadata && methodMetadata) {
+
                 let router: express.Router = express.Router();
                 let controllerMiddleware = this.resolveMidleware(...controllerMetadata.middleware);
 
@@ -136,17 +147,63 @@ export class InversifyExpressServer  {
 
     private handlerFactory(controllerName: any, key: string, parameterMetadata: interfaces.ParameterMetadata[]): express.RequestHandler {
         return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
             let args = this.extractParameters(req, res, next, parameterMetadata);
-            let result: any = this._container.getNamed(TYPE.Controller, controllerName)[key](...args);
-            Promise.resolve(result)
-                .then((value: any) => {
-                    if (value && !res.headersSent) {
-                        res.send(value);
-                    }
-                })
-                .catch((error: any) => {
-                    next(error);   });
+
+            (async () => {
+
+                // create http context instance we use a childContainer for each
+                // request so we can be sure that this binding is unique for each
+                // http request that hits the server
+                const httpContext = await this._getHttpContext(req, res, next);
+                let childContainer = this._container.createChild();
+                childContainer.bind<interfaces.HttpContext>(TYPE.HttpContext)
+                              .toConstantValue(httpContext);
+
+                // invoke controller's action
+                let result = childContainer.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
+                Promise.resolve(result)
+                    .then((value: any) => {
+                        if (value && !res.headersSent) {
+                            res.send(value);
+                        }
+                    })
+                    .catch((error: any) => next(error));
+            })();
+
         };
+    }
+
+    private async _getHttpContext(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) {
+        const principal = await this._getCurrentUser(req, res, next);
+        const httpContext = {
+            request: req,
+            response: res,
+            user: principal
+        };
+        return httpContext;
+    }
+
+    private async _getCurrentUser(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ): Promise<interfaces.Principal> {
+        if (this._AuthProvider !== undefined) {
+            const authProvider = this._container.get<interfaces.AuthProvider>(TYPE.AuthProvider);
+            return await authProvider.getUser(req, res, next);
+        } else {
+            return Promise.resolve<interfaces.Principal>({
+                details: null,
+                isAuthenticated: () => Promise.resolve(false),
+                isInRole: (role: string) => Promise.resolve(false),
+                isResourceOwner: (resourceId: any) => Promise.resolve(false)
+            });
+        }
     }
 
     private extractParameters(req: express.Request, res: express.Response, next: express.NextFunction,
@@ -173,12 +230,12 @@ export class InversifyExpressServer  {
         return args;
     }
 
-    private getParam(source: any, paramType: string, name: string) {
-        let param = source[paramType] || source;
+    private getParam(source: any, paramType: string|null, name: string) {
+        let param = (paramType !== null) ? source[paramType] : source;
         return param[name] || this.checkQueryParam(paramType, param);
     }
 
-    private checkQueryParam(paramType: string, param: any) {
+    private checkQueryParam(paramType: string|null, param: any) {
         if (paramType === "query") {
             return undefined;
         } else {

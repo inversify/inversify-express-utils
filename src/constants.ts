@@ -1,5 +1,7 @@
 const TYPE = {
-    Controller: Symbol("Controller")
+    AuthProvider:  Symbol("AuthProvider"),
+    Controller: Symbol("Controller"),
+    HttpContext: Symbol("HttpContext")
 };
 
 const METADATA_KEY = {

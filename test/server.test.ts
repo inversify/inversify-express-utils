@@ -74,12 +74,9 @@ describe("Unit Test: InversifyExpressServer", () => {
 
     it("Should allow to provide a custom express application", () => {
         let container = new Container();
-
         let app = express();
-
         let serverWithDefaultApp = new InversifyExpressServer(container);
         let serverWithCustomApp = new InversifyExpressServer(container, null, null, app);
-
         expect((serverWithCustomApp as any)._app).to.eq(app);
         expect((serverWithDefaultApp as any)._app).to.not.eql((serverWithCustomApp as any)._app);
     });

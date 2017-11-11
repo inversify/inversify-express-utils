@@ -41,6 +41,29 @@ namespace interfaces {
         rootPath: string;
     }
 
+    export interface Principal {
+        details: any;
+        isAuthenticated(): Promise<boolean>;
+        // Allows content-based auth
+        isResourceOwner(resourceId: any): Promise<boolean>;
+        // Allows role-based auth
+        isInRole(role: string): Promise<boolean>;
+    }
+
+    export interface AuthProvider {
+        getUser(
+            req: express.Request,
+            res: express.Response,
+            next: express.NextFunction
+        ): Promise<Principal>;
+    }
+
+    export interface HttpContext {
+        request: express.Request;
+        response: express.Response;
+        user: Principal;
+    }
+
 }
 
 export { interfaces };
