@@ -38,7 +38,6 @@ import { interfaces, controller, httpGet, httpPost, httpDelete, request, queryPa
 import { injectable, inject } from "inversify";
 
 @controller("/foo")
-@injectable()
 export class FooController implements interfaces.Controller {
 
     constructor( @inject("FooService") private fooService: FooService ) {}
@@ -255,7 +254,6 @@ import {
     controller, httpGet, BaseHttpController
 } from "inversify-express-utils";
 
-@injectable()
 @controller("/")
 class UserPreferencesController extends BaseHttpController {
 
@@ -280,7 +278,6 @@ import {
 
 const authService = inject("AuthService")
 
-@injectable()
 @controller("/")
 class UserPreferencesController {
 
@@ -364,7 +361,6 @@ class Principal implements interfaces.Principal {
 We can then access the current user (Principal) via the `HttpContext`:
 
 ```ts
-@injectable()
 @controller("/")
 class UserDetailsController extends BaseHttpController {
 

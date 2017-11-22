@@ -1,13 +1,14 @@
 import * as express from "express";
+import { inject, injectable, decorate } from "inversify";
 import { interfaces } from "./interfaces";
 import { TYPE, METADATA_KEY, PARAMETER_TYPE } from "./constants";
-import { inject } from "inversify";
 
 export const httpContext = inject(TYPE.HttpContext);
 
 export function controller(path: string, ...middleware: interfaces.Middleware[]) {
     return function (target: any) {
         let metadata: interfaces.ControllerMetadata = {path, middleware, target};
+        decorate(injectable(), target);
         Reflect.defineMetadata(METADATA_KEY.controller, metadata, target);
     };
 }

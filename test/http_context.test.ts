@@ -20,7 +20,6 @@ describe("HttpContex", () => {
             name: string;
         }
 
-        @injectable()
         @controller("/")
         class TestController {
 

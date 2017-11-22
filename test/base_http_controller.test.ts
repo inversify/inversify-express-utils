@@ -19,7 +19,6 @@ describe("BaseHttpController", () => {
             name: string;
         }
 
-        @injectable()
         @controller("/")
         class TestController extends BaseHttpController {
             private readonly _someDependency: SomeDependency;

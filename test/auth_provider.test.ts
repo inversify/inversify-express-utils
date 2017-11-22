@@ -55,7 +55,6 @@ describe("AuthProvider", () => {
             name: string;
         }
 
-        @injectable()
         @controller("/")
         class TestController extends BaseHttpController {
 
