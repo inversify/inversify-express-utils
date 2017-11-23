@@ -10,8 +10,14 @@ import {
     BaseHttpController,
     interfaces
 } from "../src/index";
+import { cleanUpMetadata } from "../src/utils";
 
 describe("BaseHttpController", () => {
+
+    beforeEach((done) => {
+        cleanUpMetadata();
+        done();
+    });
 
     it("Should contain httpContext instance", (done) => {
 

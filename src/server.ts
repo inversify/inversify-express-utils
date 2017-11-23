@@ -6,7 +6,8 @@ import {
     METADATA_KEY,
     DEFAULT_ROUTING_ROOT_PATH,
     PARAMETER_TYPE,
-    CONTROLLER_METADATA_TARGET
+    CONTROLLER_METADATA_TARGET,
+    DUPLICATED_CONTROLLER_NAME
 } from "./constants";
 
 /**
@@ -77,6 +78,7 @@ export class InversifyExpressServer  {
      * Applies all routes and configuration to the server, returning the express application.
      */
     public build(): express.Application {
+
         // register server-level middleware before anything else
         if (this._configFn) {
             this._configFn.apply(undefined, [this._app]);
@@ -104,6 +106,11 @@ export class InversifyExpressServer  {
 
         arrayOfControllerMetadata.forEach((metadata) => {
             const constructor = metadata.target;
+
+            if (this._container.isBoundNamed(TYPE.Controller, metadata.target.name)) {
+                throw new Error(DUPLICATED_CONTROLLER_NAME(metadata.target.name));
+            }
+
             this._container.bind(TYPE.Controller)
                            .to(constructor)
                            .whenTargetNamed(metadata.target.name);

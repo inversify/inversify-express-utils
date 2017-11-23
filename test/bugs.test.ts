@@ -10,8 +10,14 @@ import {
     controller, httpMethod, httpGet, request,
     response, requestParam, queryParam
 } from "../src/decorators";
+import { cleanUpMetadata } from "../src/utils";
 
 describe("Unit Test: Previous bugs", () => {
+
+    beforeEach((done) => {
+        cleanUpMetadata();
+        done();
+    });
 
     it("should support multiple controller methods with param annotations", (done) => {
 
@@ -45,7 +51,6 @@ describe("Unit Test: Previous bugs", () => {
             }
         }
 
-        container.bind(TYPE.Controller).to(TestController);
         let server = new InversifyExpressServer(container);
         let app = server.build();
 
@@ -86,7 +91,6 @@ describe("Unit Test: Previous bugs", () => {
 
         }
 
-        container.bind(TYPE.Controller).to(TestController);
         let server = new InversifyExpressServer(container);
         let app = server.build();
 

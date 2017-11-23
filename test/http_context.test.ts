@@ -11,8 +11,14 @@ import {
     interfaces,
     httpContext
 } from "../src/index";
+import { cleanUpMetadata } from "../src/utils";
 
 describe("HttpContex", () => {
+
+    beforeEach((done) => {
+        cleanUpMetadata();
+        done();
+    });
 
     it("Should be able to httpContext manually with the @httpContext decorator", (done) => {
 

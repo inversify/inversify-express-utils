@@ -7,32 +7,29 @@ export const httpContext = inject(TYPE.HttpContext);
 
 export function controller(path: string, ...middleware: interfaces.Middleware[]) {
     return function (target: any) {
+
         let currentMetadata: interfaces.ControllerMetadata = {
             middleware: middleware,
             path: path,
             target: target
         };
+
         decorate(injectable(), target);
         Reflect.defineMetadata(METADATA_KEY.controller, currentMetadata, target);
-        if (Reflect.hasMetadata(METADATA_KEY.controller, CONTROLLER_METADATA_TARGET)) {
-            const newMetadata = [currentMetadata];
-            Reflect.defineMetadata(
-                METADATA_KEY.controller,
-                newMetadata,
-                CONTROLLER_METADATA_TARGET
-            );
-        } else {
-            const previousMetadata = Reflect.getMetadata(
-                METADATA_KEY.controller,
-                CONTROLLER_METADATA_TARGET
-            );
-            const newMetadata = [ currentMetadata, ...previousMetadata ];
-            Reflect.defineMetadata(
-                METADATA_KEY.controller,
-                newMetadata,
-                CONTROLLER_METADATA_TARGET
-            );
-        }
+
+        const previousMetadata: interfaces.ControllerMetadata[] = Reflect.getMetadata(
+            METADATA_KEY.controller,
+            CONTROLLER_METADATA_TARGET
+        ) || [];
+
+        const newMetadata = [currentMetadata, ...previousMetadata];
+
+        Reflect.defineMetadata(
+            METADATA_KEY.controller,
+            newMetadata,
+            CONTROLLER_METADATA_TARGET
+        );
+
     };
 }
 

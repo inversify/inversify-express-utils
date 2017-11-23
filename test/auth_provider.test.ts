@@ -11,8 +11,14 @@ import {
     interfaces,
     httpContext
 } from "../src/index";
+import { cleanUpMetadata } from "../src/utils";
 
 describe("AuthProvider", () => {
+
+    beforeEach((done) => {
+        cleanUpMetadata();
+        done();
+    });
 
     it("Should be able to access current user via HttpContext", (done) => {
 

@@ -5,8 +5,10 @@ import { controller, httpMethod, httpGet, httpPut, httpPost, httpPatch,
 import { TYPE } from "./constants";
 import { interfaces } from "./interfaces";
 import { BaseHttpController } from "./base_http_controller";
+import { cleanUpMetadata } from "./utils";
 
 export {
+    cleanUpMetadata,
     interfaces,
     InversifyExpressServer,
     controller,

@@ -15,13 +15,15 @@ import { controller, httpMethod, all, httpGet, httpPost, httpPut, httpPatch,
         next } from "../src/decorators";
 import { TYPE, PARAMETER_TYPE } from "../src/constants";
 import * as Bluebird from "bluebird";
+import { cleanUpMetadata } from "../src/utils";
 
 describe("Integration Tests:", () => {
+
     let server: InversifyExpressServer;
     let container: inversify.interfaces.Container;
 
     beforeEach((done) => {
-        // refresh container and container
+        cleanUpMetadata();
         container = new Container();
         done();
     });
