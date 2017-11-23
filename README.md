@@ -108,6 +108,39 @@ let app = server.build();
 app.listen(3000);
 ```
 
+## Important information about the @controller decorator
+
+Since the `inversify-express-util@5.0.0` release. The `@injectable` annotation is no longer required in classes annotated with `@controller`. Declaring bindings is for controllers is also no longer required in classes annotated with `@controller`.
+
+> :warning: Note: declaring a binding is not required for Controllers but it is required to import the controller at least once. When the controller file is imported (e.g. `import "./controllers/some_controller"`) the class is declared and the metadata is generated. If you don't import it the metadata is never generated and therefore the controller is not found.
+
+If you run the application multiple times within a shared runtime process (e.g. unit testing) you might need to clean up the existing metadata before each test. 
+
+```ts
+import { cleanUpMetadata } from "inversify-express-utils";
+
+describe("Integration Tests:", () => {
+
+    beforeEach((done) => {
+        cleanUpMetadata();
+        container = new Container();
+        done();
+    });
+
+    describe("Routing & Request Handling:", () => {
+
+        it("should work for async controller methods", (done) => {
+            // ...
+           done();
+        });
+
+    });
+
+});
+```
+
+You can find an example of this in [our unit tests](https://github.com/inversify/inversify-express-utils/blob/master/test/framework.test.ts#L25-L29).
+
 ## InversifyExpressServer
 
 A wrapper for an express Application.
