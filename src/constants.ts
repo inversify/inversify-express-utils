@@ -21,6 +21,8 @@ export enum PARAMETER_TYPE {
     NEXT
 }
 
+export const DUPLICATED_CONTROLLER_NAME = (name: string) => `Two controllers cannot have the same name: ${name}`;
+
 const DEFAULT_ROUTING_ROOT_PATH = "/";
 
 export { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH };

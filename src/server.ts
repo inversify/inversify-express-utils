@@ -1,8 +1,14 @@
 import * as express from "express";
 import * as inversify from "inversify";
 import { interfaces } from "./interfaces";
-import { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH, PARAMETER_TYPE } from "./constants";
 import { BaseMiddleware } from "./index";
+import {
+    TYPE,
+    METADATA_KEY,
+    DEFAULT_ROUTING_ROOT_PATH,
+    PARAMETER_TYPE,
+    DUPLICATED_CONTROLLER_NAME
+} from "./constants";
 
 /**
  * Wrapper for the express server.
@@ -72,6 +78,7 @@ export class InversifyExpressServer  {
      * Applies all routes and configuration to the server, returning the express application.
      */
     public build(): express.Application {
+
         // register server-level middleware before anything else
         if (this._configFn) {
             this._configFn.apply(undefined, [this._app]);
@@ -91,6 +98,23 @@ export class InversifyExpressServer  {
 
         // Fake HttpContext is needed during registration
         this._container.bind<interfaces.HttpContext>(TYPE.HttpContext).toConstantValue({} as any);
+
+        let arrayOfControllerMetadata: interfaces.ControllerMetadata[] = Reflect.getMetadata(
+            METADATA_KEY.controller,
+            Reflect
+        ) || [];
+
+        arrayOfControllerMetadata.forEach((metadata) => {
+            const constructor = metadata.target;
+
+            if (this._container.isBoundNamed(TYPE.Controller, metadata.target.name)) {
+                throw new Error(DUPLICATED_CONTROLLER_NAME(metadata.target.name));
+            }
+
+            this._container.bind(TYPE.Controller)
+                           .to(constructor)
+                           .whenTargetNamed(metadata.target.name);
+        });
 
         let controllers: interfaces.Controller[] = this._container.getAll<interfaces.Controller>(TYPE.Controller);
 

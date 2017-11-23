@@ -10,8 +10,14 @@ import {
     BaseHttpController,
     interfaces
 } from "../src/index";
+import { cleanUpMetadata } from "../src/utils";
 
 describe("BaseHttpController", () => {
+
+    beforeEach((done) => {
+        cleanUpMetadata();
+        done();
+    });
 
     it("Should contain httpContext instance", (done) => {
 
@@ -19,7 +25,6 @@ describe("BaseHttpController", () => {
             name: string;
         }
 
-        @injectable()
         @controller("/")
         class TestController extends BaseHttpController {
             private readonly _someDependency: SomeDependency;
@@ -43,10 +48,6 @@ describe("BaseHttpController", () => {
 
         container.bind<SomeDependency>("SomeDependency")
                 .toConstantValue({ name: "SomeDependency!" });
-
-        container.bind<interfaces.Controller>(TYPE.Controller)
-                 .to(TestController)
-                 .whenTargetNamed("TestController");
 
         const server = new InversifyExpressServer(container);
 

@@ -6,8 +6,10 @@ import { TYPE } from "./constants";
 import { interfaces } from "./interfaces";
 import { BaseHttpController } from "./base_http_controller";
 import { BaseMiddleware } from "./base_middleware";
+import { cleanUpMetadata } from "./utils";
 
 export {
+    cleanUpMetadata,
     interfaces,
     InversifyExpressServer,
     controller,
