@@ -1,7 +1,13 @@
 import * as express from "express";
 import * as inversify from "inversify";
 import { interfaces } from "./interfaces";
-import { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH, PARAMETER_TYPE } from "./constants";
+import {
+    TYPE,
+    METADATA_KEY,
+    DEFAULT_ROUTING_ROOT_PATH,
+    PARAMETER_TYPE,
+    CONTROLLER_METADATA_TARGET
+} from "./constants";
 
 /**
  * Wrapper for the express server.
@@ -90,6 +96,18 @@ export class InversifyExpressServer  {
 
         // Fake HttpContext is needed during registration
         this._container.bind<interfaces.HttpContext>(TYPE.HttpContext).toConstantValue({} as any);
+
+        let arrayOfControllerMetadata: interfaces.ControllerMetadata[] = Reflect.getMetadata(
+            METADATA_KEY.controller,
+            CONTROLLER_METADATA_TARGET
+        ) || [];
+
+        arrayOfControllerMetadata.forEach((metadata) => {
+            const constructor = metadata.target;
+            this._container.bind(TYPE.Controller)
+                           .to(constructor)
+                           .whenTargetNamed(metadata.target.name);
+        });
 
         let controllers: interfaces.Controller[] = this._container.getAll<interfaces.Controller>(TYPE.Controller);
 

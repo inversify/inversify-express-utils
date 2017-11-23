@@ -92,8 +92,6 @@ import { interfaces, InversifyExpressServer, TYPE } from 'inversify-express-util
 // set up container
 let container = new Container();
 
-// note that you *must* bind your controllers to Controller
-container.bind<interfaces.Controller>(TYPE.Controller).to(FooController).whenTargetNamed('FooController');
 container.bind<FooService>('FooService').to(FooService);
 
 // create server

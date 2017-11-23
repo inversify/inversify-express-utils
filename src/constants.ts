@@ -10,6 +10,8 @@ const METADATA_KEY = {
     controllerParameter: "_controller-parameter"
 };
 
+export const CONTROLLER_METADATA_TARGET: any = {};
+
 export enum PARAMETER_TYPE {
     REQUEST,
     RESPONSE,

@@ -38,7 +38,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -56,7 +55,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -74,7 +72,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -92,7 +89,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -112,7 +108,6 @@ describe("Integration Tests:", () => {
                     return "GET";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -138,7 +133,6 @@ describe("Integration Tests:", () => {
                     return "GET";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -161,7 +155,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -181,7 +174,6 @@ describe("Integration Tests:", () => {
                 @httpHead("/") public headTest(req: express.Request, res: express.Response) { res.send("HEAD"); }
                 @httpDelete("/") public deleteTest(req: express.Request, res: express.Response) { res.send("DELETE"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -203,7 +195,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpMethod("propfind", "/") public getTest(req: express.Request, res: express.Response) { res.send("PROPFIND"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -219,7 +210,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) { return result; }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -234,7 +224,6 @@ describe("Integration Tests:", () => {
                     return "Such Text";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             const customRouter = express.Router({
                 caseSensitive: true
@@ -271,7 +260,6 @@ describe("Integration Tests:", () => {
                     return "pong";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container, null, { rootPath: "/api/v1" });
 
@@ -316,7 +304,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpGet("/", spyA, spyB, spyC) public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -337,7 +324,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpPost("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("POST"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -358,7 +344,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpPut("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("PUT"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -379,7 +364,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpPatch("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("PATCH"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -400,7 +384,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpHead("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("HEAD"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -421,7 +404,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpDelete("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("DELETE"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -442,7 +424,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @all("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("ALL"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -464,7 +445,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -485,7 +465,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
 
@@ -513,7 +492,6 @@ describe("Integration Tests:", () => {
             class TestController {
                 @httpGet("/", spyC) public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
 
@@ -542,7 +520,6 @@ describe("Integration Tests:", () => {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
 
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
             container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
             container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
 
@@ -569,7 +546,6 @@ describe("Integration Tests:", () => {
                 public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
 
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
             container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
             container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
 
@@ -597,7 +573,6 @@ describe("Integration Tests:", () => {
                 public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
 
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
             container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
             container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
 
@@ -624,7 +599,6 @@ describe("Integration Tests:", () => {
                     return id;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -640,7 +614,6 @@ describe("Integration Tests:", () => {
                     return req.params.id;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -656,7 +629,6 @@ describe("Integration Tests:", () => {
                     return res.send("foo");
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -672,7 +644,6 @@ describe("Integration Tests:", () => {
                     return id;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -689,7 +660,6 @@ describe("Integration Tests:", () => {
                     return reqBody;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let body = {foo: "bar"};
@@ -710,7 +680,6 @@ describe("Integration Tests:", () => {
                     return headers;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -731,7 +700,6 @@ describe("Integration Tests:", () => {
                     }
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             server.setConfig((app) => {
@@ -758,7 +726,6 @@ describe("Integration Tests:", () => {
                     return "foo";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())

@@ -41,10 +41,6 @@ describe("HttpContex", () => {
         container.bind<SomeDependency>("SomeDependency")
                 .toConstantValue({ name: "SomeDependency!" });
 
-        container.bind<interfaces.Controller>(TYPE.Controller)
-                 .to(TestController)
-                 .whenTargetNamed("TestController");
-
         const server = new InversifyExpressServer(container);
 
         supertest(server.build())
