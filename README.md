@@ -38,7 +38,6 @@ import { interfaces, controller, httpGet, httpPost, httpDelete, request, queryPa
 import { injectable, inject } from "inversify";
 
 @controller("/foo")
-@injectable()
 export class FooController implements interfaces.Controller {
 
     constructor( @inject("FooService") private fooService: FooService ) {}
@@ -93,8 +92,6 @@ import { interfaces, InversifyExpressServer, TYPE } from 'inversify-express-util
 // set up container
 let container = new Container();
 
-// note that you *must* bind your controllers to Controller
-container.bind<interfaces.Controller>(TYPE.Controller).to(FooController).whenTargetNamed('FooController');
 container.bind<FooService>('FooService').to(FooService);
 
 // create server
@@ -255,7 +252,6 @@ import {
     controller, httpGet, BaseHttpController
 } from "inversify-express-utils";
 
-@injectable()
 @controller("/")
 class UserPreferencesController extends BaseHttpController {
 
@@ -280,7 +276,6 @@ import {
 
 const authService = inject("AuthService")
 
-@injectable()
 @controller("/")
 class UserPreferencesController {
 
@@ -364,7 +359,6 @@ class Principal implements interfaces.Principal {
 We can then access the current user (Principal) via the `HttpContext`:
 
 ```ts
-@injectable()
 @controller("/")
 class UserDetailsController extends BaseHttpController {
 

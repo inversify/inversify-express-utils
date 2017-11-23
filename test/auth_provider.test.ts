@@ -11,8 +11,14 @@ import {
     interfaces,
     httpContext
 } from "../src/index";
+import { cleanUpMetadata } from "../src/utils";
 
 describe("AuthProvider", () => {
+
+    beforeEach((done) => {
+        cleanUpMetadata();
+        done();
+    });
 
     it("Should be able to access current user via HttpContext", (done) => {
 
@@ -55,7 +61,6 @@ describe("AuthProvider", () => {
             name: string;
         }
 
-        @injectable()
         @controller("/")
         class TestController extends BaseHttpController {
 
@@ -77,10 +82,6 @@ describe("AuthProvider", () => {
 
         container.bind<SomeDependency>("SomeDependency")
                 .toConstantValue({ name: "SomeDependency!" });
-
-        container.bind<interfaces.Controller>(TYPE.Controller)
-                 .to(TestController)
-                 .whenTargetNamed("TestController");
 
         const server = new InversifyExpressServer(
             container,

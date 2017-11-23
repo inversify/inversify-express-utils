@@ -15,13 +15,15 @@ import { controller, httpMethod, all, httpGet, httpPost, httpPut, httpPatch,
         next } from "../src/decorators";
 import { TYPE, PARAMETER_TYPE } from "../src/constants";
 import * as Bluebird from "bluebird";
+import { cleanUpMetadata } from "../src/utils";
 
 describe("Integration Tests:", () => {
+
     let server: InversifyExpressServer;
     let container: inversify.interfaces.Container;
 
     beforeEach((done) => {
-        // refresh container and container
+        cleanUpMetadata();
         container = new Container();
         done();
     });
@@ -29,7 +31,7 @@ describe("Integration Tests:", () => {
     describe("Routing & Request Handling:", () => {
 
         it("should work for async controller methods", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) {
@@ -38,7 +40,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -47,7 +48,7 @@ describe("Integration Tests:", () => {
         });
 
         it("should work for async controller methods that fails", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) {
@@ -56,7 +57,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -65,7 +65,7 @@ describe("Integration Tests:", () => {
         });
 
         it("should work for async controller methods using non-native Bluebird promise", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) {
@@ -74,7 +74,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -83,7 +82,7 @@ describe("Integration Tests:", () => {
         });
 
         it("should work for async controller methods, using non-native Bluebird promise, that fails", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) {
@@ -92,7 +91,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -101,7 +99,7 @@ describe("Integration Tests:", () => {
         });
 
         it ("should work for methods which call nextFunc()", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
@@ -112,7 +110,6 @@ describe("Integration Tests:", () => {
                     return "GET";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -122,7 +119,7 @@ describe("Integration Tests:", () => {
 
 
         it ("should work for async methods which call nextFunc()", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
@@ -138,7 +135,6 @@ describe("Integration Tests:", () => {
                     return "GET";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -148,7 +144,7 @@ describe("Integration Tests:", () => {
 
 
         it ("should work for async methods called by nextFunc()", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
@@ -161,7 +157,6 @@ describe("Integration Tests:", () => {
                     }));
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -171,7 +166,7 @@ describe("Integration Tests:", () => {
 
 
         it("should work for each shortcut decorator", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
@@ -181,7 +176,6 @@ describe("Integration Tests:", () => {
                 @httpHead("/") public headTest(req: express.Request, res: express.Response) { res.send("HEAD"); }
                 @httpDelete("/") public deleteTest(req: express.Request, res: express.Response) { res.send("DELETE"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -198,12 +192,11 @@ describe("Integration Tests:", () => {
 
 
         it("should work for more obscure HTTP methods using the httpMethod decorator", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpMethod("propfind", "/") public getTest(req: express.Request, res: express.Response) { res.send("PROPFIND"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -215,12 +208,10 @@ describe("Integration Tests:", () => {
         it("should use returned values as response", (done) => {
             let result = {"hello": "world"};
 
-            @injectable()
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) { return result; }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -229,14 +220,12 @@ describe("Integration Tests:", () => {
         });
 
         it("should use custom router passed from configuration", () => {
-            @injectable()
             @controller("/CaseSensitive")
             class TestController {
                 @httpGet("/Endpoint") public get() {
                     return "Such Text";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             const customRouter = express.Router({
                 caseSensitive: true
@@ -266,14 +255,13 @@ describe("Integration Tests:", () => {
         });
 
         it("should use custom routing configuration", () => {
-            @injectable()
+
             @controller("/ping")
             class TestController {
                 @httpGet("/endpoint") public get() {
                     return "pong";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container, null, { rootPath: "/api/v1" });
 
@@ -313,12 +301,11 @@ describe("Integration Tests:", () => {
         });
 
         it("should call method-level middleware correctly (GET)", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/", spyA, spyB, spyC) public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -334,12 +321,11 @@ describe("Integration Tests:", () => {
         });
 
         it("should call method-level middleware correctly (POST)", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpPost("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("POST"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -355,12 +341,11 @@ describe("Integration Tests:", () => {
         });
 
         it("should call method-level middleware correctly (PUT)", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpPut("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("PUT"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -376,12 +361,11 @@ describe("Integration Tests:", () => {
         });
 
         it("should call method-level middleware correctly (PATCH)", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpPatch("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("PATCH"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -397,12 +381,11 @@ describe("Integration Tests:", () => {
         });
 
         it("should call method-level middleware correctly (HEAD)", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpHead("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("HEAD"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -418,12 +401,11 @@ describe("Integration Tests:", () => {
         });
 
         it("should call method-level middleware correctly (DELETE)", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpDelete("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("DELETE"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -439,12 +421,11 @@ describe("Integration Tests:", () => {
         });
 
         it("should call method-level middleware correctly (ALL)", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @all("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("ALL"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let agent = supertest(server.build());
@@ -461,12 +442,11 @@ describe("Integration Tests:", () => {
 
 
         it("should call controller-level middleware correctly", (done) => {
-            @injectable()
+
             @controller("/", spyA, spyB, spyC)
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -482,12 +462,11 @@ describe("Integration Tests:", () => {
 
 
         it("should call server-level middleware correctly", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
 
@@ -510,12 +489,11 @@ describe("Integration Tests:", () => {
 
 
         it("should call all middleware in correct order", (done) => {
-            @injectable()
+
             @controller("/", spyB)
             class TestController {
                 @httpGet("/", spyC) public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
 
@@ -535,16 +513,15 @@ describe("Integration Tests:", () => {
         });
 
         it("should resolve controller-level middleware", () => {
+
             const symbolId = Symbol("spyA");
             const strId = "spyB";
 
-            @injectable()
             @controller("/", symbolId, strId)
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
 
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
             container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
             container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
 
@@ -565,14 +542,12 @@ describe("Integration Tests:", () => {
             const symbolId = Symbol("spyA");
             const strId = "spyB";
 
-            @injectable()
             @controller("/")
             class TestController {
                 @httpGet("/", symbolId, strId)
                 public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
 
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
             container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
             container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
 
@@ -590,17 +565,16 @@ describe("Integration Tests:", () => {
         });
 
         it("should compose controller- and method-level middleware", () => {
+
             const symbolId = Symbol("spyA");
             const strId = "spyB";
 
-            @injectable()
             @controller("/", symbolId)
             class TestController {
                 @httpGet("/", strId)
                 public getTest(req: express.Request, res: express.Response) { res.send("GET"); }
             }
 
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
             container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
             container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
 
@@ -619,7 +593,7 @@ describe("Integration Tests:", () => {
     });
     describe("Parameters:", () => {
         it("should bind a method parameter to the url parameter of the web request", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 // tslint:disable-next-line:max-line-length
@@ -627,7 +601,6 @@ describe("Integration Tests:", () => {
                     return id;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -636,14 +609,13 @@ describe("Integration Tests:", () => {
         });
 
         it("should bind a method parameter to the request object", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet(":id") public getTest(@request() req: express.Request) {
                     return req.params.id;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -652,14 +624,13 @@ describe("Integration Tests:", () => {
         });
 
         it("should bind a method parameter to the response object", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(@response() res: express.Response) {
                     return res.send("foo");
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -668,14 +639,13 @@ describe("Integration Tests:", () => {
         });
 
         it("should bind a method parameter to a query parameter", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(@queryParam("id") id: string) {
                     return id;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -685,14 +655,13 @@ describe("Integration Tests:", () => {
         });
 
         it("should bind a method parameter to the request body", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpPost("/") public getTest(@requestBody() reqBody: string) {
                     return reqBody;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             let body = {foo: "bar"};
@@ -706,14 +675,13 @@ describe("Integration Tests:", () => {
         });
 
         it("should bind a method parameter to the request headers", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(@requestHeaders("testhead") headers: any) {
                     return headers;
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
@@ -723,7 +691,7 @@ describe("Integration Tests:", () => {
         });
 
         it("should bind a method parameter to a cookie", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getCookie(@cookies("cookie") cookie: any, req: express.Request, res: express.Response) {
@@ -734,7 +702,6 @@ describe("Integration Tests:", () => {
                     }
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             server.setConfig((app) => {
@@ -750,7 +717,7 @@ describe("Integration Tests:", () => {
         });
 
         it("should bind a method parameter to the next function", (done) => {
-            @injectable()
+
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(@next() nextFunc: any) {
@@ -761,7 +728,6 @@ describe("Integration Tests:", () => {
                     return "foo";
                 }
             }
-            container.bind<interfaces.Controller>(TYPE.Controller).to(TestController).whenTargetNamed("TestController");
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
