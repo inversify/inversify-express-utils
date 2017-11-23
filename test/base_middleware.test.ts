@@ -11,8 +11,14 @@ import {
     BaseHttpController,
     interfaces
 } from "../src/index";
+import { cleanUpMetadata } from "../src/utils";
 
 describe("BaseMiddleware", () => {
+
+    beforeEach((done) => {
+        cleanUpMetadata();
+        done();
+    });
 
     it("Should be able to inject BaseMiddleware implementations", (done) => {
 
@@ -75,7 +81,6 @@ describe("BaseMiddleware", () => {
             }
         }
 
-        @injectable()
         @controller(
             "/",
             (req, res, next) => {
@@ -102,10 +107,6 @@ describe("BaseMiddleware", () => {
 
         container.bind<SomeDependency>(TYPES.SomeDependency)
                 .toConstantValue({ name: "SomeDependency!" });
-
-        container.bind<interfaces.Controller>(TYPE.Controller)
-                    .to(TestController)
-                    .whenTargetNamed("TestController");
 
         container.bind<LoggerMiddleware>(TYPES.LoggerMiddleware)
                  .to(LoggerMiddleware);
