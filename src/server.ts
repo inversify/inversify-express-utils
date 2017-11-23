@@ -6,7 +6,6 @@ import {
     METADATA_KEY,
     DEFAULT_ROUTING_ROOT_PATH,
     PARAMETER_TYPE,
-    CONTROLLER_METADATA_TARGET,
     DUPLICATED_CONTROLLER_NAME
 } from "./constants";
 
@@ -101,7 +100,7 @@ export class InversifyExpressServer  {
 
         let arrayOfControllerMetadata: interfaces.ControllerMetadata[] = Reflect.getMetadata(
             METADATA_KEY.controller,
-            CONTROLLER_METADATA_TARGET
+            Reflect
         ) || [];
 
         arrayOfControllerMetadata.forEach((metadata) => {
