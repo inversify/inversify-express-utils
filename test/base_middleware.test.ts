@@ -90,7 +90,7 @@ describe("BaseMiddleware", () => {
         )
         class TestController extends BaseHttpController {
             @httpGet(
-                "/testUrl",
+                "testUrl",
                 TYPES.LoggerMiddleware
             )
             public async getTest() {
