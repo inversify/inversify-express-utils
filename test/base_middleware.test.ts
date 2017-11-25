@@ -34,7 +34,6 @@ describe("BaseMiddleware", () => {
         class Principal implements interfaces.Principal {
             public details: any;
             public constructor(details: any) {
-                console.log("--------------> Principal --->", details);
                 this.details = details;
             }
             public isAuthenticated() {
@@ -55,7 +54,6 @@ describe("BaseMiddleware", () => {
                 res: express.Response,
                 next: express.NextFunction
             ) {
-                console.log("--------------> CustomAuthProvider --->", req);
                 const principal = new Principal({
                     email: `test@test.com`
                 });
@@ -77,7 +75,6 @@ describe("BaseMiddleware", () => {
                 res: express.Response,
                 next: express.NextFunction
             ) {
-                console.log("-------------->", this.httpContext, this._someDependency.name);
                 const email = this.httpContext.user.details.email;
                 logEntries.push(`${email} => ${req.url} ${this._someDependency.name}`);
                 next();
@@ -125,13 +122,13 @@ describe("BaseMiddleware", () => {
         supertest(server.build())
             .get("/")
             .expect(200, `test@test.com`, () => {
-                console.log("=====>", logEntries);
+                expect(logEntries.length).eq(3);
                 expect(logEntries[0]).eq(
                     "Hello from controller middleware!",
                     "Expected controller action to be invoked 1st!"
                 );
                 expect(logEntries[1]).eq(
-                    "test@test.com => /testUrl SomeDependency!",
+                    "test@test.com => / SomeDependency!",
                     "Expected action middleare to be invoked 2nd!"
                 );
                 expect(logEntries[2]).eq(

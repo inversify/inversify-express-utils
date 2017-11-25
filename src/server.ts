@@ -165,14 +165,18 @@ export class InversifyExpressServer  {
             if (this._container.isBound(middlewareItem)) {
                 type MiddelwareInstance = express.RequestHandler | BaseMiddleware;
                 const m = this._container.get<MiddelwareInstance>(middlewareItem);
-                console.log("!!!!!", m);
                 if (m instanceof BaseMiddleware) {
+                    const _self = this;
                     return function(
                         req: express.Request,
                         res: express.Response,
                         next: express.NextFunction
                     ) {
-                        m.handler(req, res, next);
+                        (async () => {
+                            const httpContext = await _self._getHttpContext(req, res, next);
+                            (m as any).httpContext = httpContext;
+                            m.handler(req, res, next);
+                        })();
                     };
                 } else {
                     return m;
@@ -183,13 +187,16 @@ export class InversifyExpressServer  {
         });
     }
 
-    private handlerFactory(controllerName: any, key: string, parameterMetadata: interfaces.ParameterMetadata[]): express.RequestHandler {
+    private handlerFactory(
+        controllerName: any,
+        key: string,
+        parameterMetadata: interfaces.ParameterMetadata[]
+    ): express.RequestHandler {
         return (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
             let args = this.extractParameters(req, res, next, parameterMetadata);
 
             (async () => {
-
                 // create http context instance we use a childContainer for each
                 // request so we can be sure that this binding is unique for each
                 // http request that hits the server
