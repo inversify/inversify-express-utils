@@ -31,6 +31,8 @@ describe("BaseMiddleware", () => {
             name: string;
         }
 
+        let principalInstanceCount = 0;
+
         class Principal implements interfaces.Principal {
             public details: any;
             public constructor(details: any) {
@@ -54,6 +56,7 @@ describe("BaseMiddleware", () => {
                 res: express.Response,
                 next: express.NextFunction
             ) {
+                principalInstanceCount = principalInstanceCount + 1;
                 const principal = new Principal({
                     email: `test@test.com`
                 });
@@ -122,6 +125,10 @@ describe("BaseMiddleware", () => {
         supertest(server.build())
             .get("/")
             .expect(200, `test@test.com`, () => {
+                expect(principalInstanceCount).eq(
+                    3,
+                    "Only one instance of HttpContext should be created per HTTP request!"
+                );
                 expect(logEntries.length).eq(3);
                 expect(logEntries[0]).eq(
                     "Hello from controller middleware!",
