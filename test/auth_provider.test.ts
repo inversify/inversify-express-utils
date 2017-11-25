@@ -8,8 +8,7 @@ import {
     controller,
     httpGet,
     BaseHttpController,
-    interfaces,
-    httpContext
+    interfaces
 } from "../src/index";
 import { cleanUpMetadata } from "../src/utils";
 

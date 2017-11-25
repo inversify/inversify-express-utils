@@ -3,7 +3,7 @@ import { inject, injectable, decorate } from "inversify";
 import { interfaces } from "./interfaces";
 import { TYPE, METADATA_KEY, PARAMETER_TYPE } from "./constants";
 
-export const httpContext = inject(TYPE.HttpContext);
+export const injectHttpContext = inject(TYPE.HttpContext);
 
 export function controller(path: string, ...middleware: interfaces.Middleware[]) {
     return function (target: any) {
@@ -69,7 +69,15 @@ export function httpDelete(path: string, ...middleware: interfaces.Middleware[])
 
 export function httpMethod(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return function (target: any, key: string, value: any) {
-        let metadata: interfaces.ControllerMethodMetadata = {path, middleware, method, target, key};
+
+        let metadata: interfaces.ControllerMethodMetadata = {
+            key,
+            method,
+            middleware,
+            path,
+            target
+        };
+
         let metadataList: interfaces.ControllerMethodMetadata[] = [];
 
         if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerMethod, target.constructor)) {

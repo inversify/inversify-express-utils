@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
-import { httpContext } from "./decorators";
+import { injectHttpContext } from "./decorators";
 import { interfaces } from "./interfaces";
 
 @injectable()
 export class BaseHttpController {
-    @httpContext protected httpContext: interfaces.HttpContext;
+    @injectHttpContext protected readonly httpContext: interfaces.HttpContext;
 }

@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as inversify from "inversify";
 import { interfaces } from "./interfaces";
+import { BaseMiddleware } from "./index";
 import {
     TYPE,
     METADATA_KEY,
@@ -77,6 +78,27 @@ export class InversifyExpressServer  {
      * Applies all routes and configuration to the server, returning the express application.
      */
     public build(): express.Application {
+
+        const _self = this;
+
+        // The very first middleware to be invoked
+        // it creates a new httpContext and attaches it to the
+        // current request as metadata using Reflect
+        this._app.all("*", (
+            req: express.Request,
+            res: express.Response,
+            next: express.NextFunction
+        ) => {
+            (async () => {
+                const httpContext = await _self._createHttpContext(req, res, next);
+                Reflect.defineMetadata(
+                    METADATA_KEY.httpContext,
+                    httpContext,
+                    req
+                );
+                next();
+            })();
+        });
 
         // register server-level middleware before anything else
         if (this._configFn) {
@@ -161,26 +183,43 @@ export class InversifyExpressServer  {
 
     private resolveMidleware(...middleware: interfaces.Middleware[]): express.RequestHandler[] {
         return middleware.map(middlewareItem => {
-            try {
-                return this._container.get<express.RequestHandler>(middlewareItem);
-            } catch (_) {
+            if (this._container.isBound(middlewareItem)) {
+                type MiddelwareInstance = express.RequestHandler | BaseMiddleware;
+                const m = this._container.get<MiddelwareInstance>(middlewareItem);
+                if (m instanceof BaseMiddleware) {
+                    const _self = this;
+                    return function(
+                        req: express.Request,
+                        res: express.Response,
+                        next: express.NextFunction
+                    ) {
+                        const httpContext = _self._getHttpContext(req);
+                        (m as any).httpContext = httpContext;
+                        m.handler(req, res, next);
+                    };
+                } else {
+                    return m;
+                }
+            } else {
                 return middlewareItem as express.RequestHandler;
             }
         });
     }
 
-    private handlerFactory(controllerName: any, key: string, parameterMetadata: interfaces.ParameterMetadata[]): express.RequestHandler {
+    private handlerFactory(
+        controllerName: any,
+        key: string,
+        parameterMetadata: interfaces.ParameterMetadata[]
+    ): express.RequestHandler {
         return (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
             let args = this.extractParameters(req, res, next, parameterMetadata);
 
             (async () => {
-
-                // create http context instance we use a childContainer for each
-                // request so we can be sure that this binding is unique for each
-                // http request that hits the server
-                const httpContext = await this._getHttpContext(req, res, next);
+                // We use a childContainer for each request so we can be
+                // sure that the binding is unique for each HTTP request
                 let childContainer = this._container.createChild();
+                const httpContext = this._getHttpContext(req);
                 childContainer.bind<interfaces.HttpContext>(TYPE.HttpContext)
                               .toConstantValue(httpContext);
 
@@ -198,7 +237,15 @@ export class InversifyExpressServer  {
         };
     }
 
-    private async _getHttpContext(
+    private _getHttpContext(req: express.Request) {
+        const httpContext = Reflect.getOwnMetadata(
+            METADATA_KEY.httpContext,
+            req
+        );
+        return httpContext;
+    }
+
+    private async _createHttpContext(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
