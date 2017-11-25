@@ -9,7 +9,7 @@ import {
     httpGet,
     BaseHttpController,
     interfaces,
-    httpContext
+    injectHttpContext
 } from "../src/index";
 import { cleanUpMetadata } from "../src/utils";
 
@@ -20,7 +20,7 @@ describe("HttpContex", () => {
         done();
     });
 
-    it("Should be able to httpContext manually with the @httpContext decorator", (done) => {
+    it("Should be able to httpContext manually with the @injectHttpContext decorator", (done) => {
 
         interface SomeDependency {
             name: string;
@@ -29,7 +29,7 @@ describe("HttpContex", () => {
         @controller("/")
         class TestController {
 
-            @httpContext private readonly _httpContext: interfaces.HttpContext;
+            @injectHttpContext private readonly _httpContext: interfaces.HttpContext;
             @inject("SomeDependency") private readonly _someDependency: SomeDependency;
 
             @httpGet("/")

@@ -3,7 +3,7 @@ import { inject, injectable, decorate } from "inversify";
 import { interfaces } from "./interfaces";
 import { TYPE, METADATA_KEY, PARAMETER_TYPE } from "./constants";
 
-export const httpContext = inject(TYPE.HttpContext);
+export const injectHttpContext = inject(TYPE.HttpContext);
 
 export function controller(path: string, ...middleware: interfaces.Middleware[]) {
     return function (target: any) {

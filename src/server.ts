@@ -165,6 +165,7 @@ export class InversifyExpressServer  {
             if (this._container.isBound(middlewareItem)) {
                 type MiddelwareInstance = express.RequestHandler | BaseMiddleware;
                 const m = this._container.get<MiddelwareInstance>(middlewareItem);
+                console.log("!!!!!", m);
                 if (m instanceof BaseMiddleware) {
                     return function(
                         req: express.Request,

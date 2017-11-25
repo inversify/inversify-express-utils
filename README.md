@@ -266,7 +266,7 @@ class UserPreferencesController extends BaseHttpController {
 ```
 
 If you are creating a custom controller you will need to inject `HttpContext` manually
-using the `@httpContext` decorator:
+using the `@injectHttpContext` decorator:
 
 ```ts
 import { injectable, inject } from "inversify";
@@ -279,7 +279,7 @@ const authService = inject("AuthService")
 @controller("/")
 class UserPreferencesController {
 
-    @httpContext private readonly _httpContext: interfaces.HttpContext;
+    @injectHttpContext private readonly _httpContext: interfaces.HttpContext;
     @authService private readonly _authService: AuthService;
 
     @httpGet("/")

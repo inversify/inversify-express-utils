@@ -34,6 +34,7 @@ describe("BaseMiddleware", () => {
         class Principal implements interfaces.Principal {
             public details: any;
             public constructor(details: any) {
+                console.log("--------------> Principal --->", details);
                 this.details = details;
             }
             public isAuthenticated() {
@@ -54,6 +55,7 @@ describe("BaseMiddleware", () => {
                 res: express.Response,
                 next: express.NextFunction
             ) {
+                console.log("--------------> CustomAuthProvider --->", req);
                 const principal = new Principal({
                     email: `test@test.com`
                 });
@@ -75,6 +77,7 @@ describe("BaseMiddleware", () => {
                 res: express.Response,
                 next: express.NextFunction
             ) {
+                console.log("-------------->", this.httpContext, this._someDependency.name);
                 const email = this.httpContext.user.details.email;
                 logEntries.push(`${email} => ${req.url} ${this._someDependency.name}`);
                 next();
@@ -84,20 +87,20 @@ describe("BaseMiddleware", () => {
         @controller(
             "/",
             (req, res, next) => {
-                logEntries.push("Hello from controller!");
+                logEntries.push("Hello from controller middleware!");
                 next();
             }
         )
         class TestController extends BaseHttpController {
             @httpGet(
-                "testUrl",
+                "/",
                 TYPES.LoggerMiddleware
             )
             public async getTest() {
                 if (this.httpContext.user !== null) {
                     const email = this.httpContext.user.details.email;
                     const isAuthenticated = await this.httpContext.user.isAuthenticated();
-                    expect(isAuthenticated).eq(true);
+                    logEntries.push(`${email} => isAuthenticated() => ${isAuthenticated}`);
                     return `${email}`;
                 }
             }
@@ -120,11 +123,21 @@ describe("BaseMiddleware", () => {
         );
 
         supertest(server.build())
-            .get("/testUrl")
+            .get("/")
             .expect(200, `test@test.com`, () => {
-                expect(logEntries.length).eq(2);
-                expect(logEntries[1]).eq("Hello from controller!");
-                expect(logEntries[0]).eq(`test@test.com => /testUrl SomeDependency!`);
+                console.log("=====>", logEntries);
+                expect(logEntries[0]).eq(
+                    "Hello from controller middleware!",
+                    "Expected controller action to be invoked 1st!"
+                );
+                expect(logEntries[1]).eq(
+                    "test@test.com => /testUrl SomeDependency!",
+                    "Expected action middleare to be invoked 2nd!"
+                );
+                expect(logEntries[2]).eq(
+                    "test@test.com => isAuthenticated() => true",
+                    "Expected action to be invoked 3rd!"
+                );
                 done();
             });
 

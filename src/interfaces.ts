@@ -64,6 +64,15 @@ namespace interfaces {
         user: Principal;
     }
 
+    export interface BaseMidleware {
+        httpContext: HttpContext;
+        handler(
+            req: express.Request,
+            res: express.Response,
+            next: express.NextFunction
+        ): void;
+    }
+
 }
 
 export { interfaces };
