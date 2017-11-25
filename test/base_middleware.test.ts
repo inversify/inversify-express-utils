@@ -126,7 +126,7 @@ describe("BaseMiddleware", () => {
             .get("/")
             .expect(200, `test@test.com`, () => {
                 expect(principalInstanceCount).eq(
-                    3,
+                    1,
                     "Only one instance of HttpContext should be created per HTTP request!"
                 );
                 expect(logEntries.length).eq(3);

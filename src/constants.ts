@@ -5,9 +5,10 @@ const TYPE = {
 };
 
 const METADATA_KEY = {
-    controller: "_controller",
-    controllerMethod: "_controller-method",
-    controllerParameter: "_controller-parameter"
+    controller: "inversify-express-utils:controller",
+    controllerMethod: "inversify-express-utils:controller-method",
+    controllerParameter: "inversify-express-utils:controller-parameter",
+    httpContext: "inversify-express-utils:httpcontext"
 };
 
 export enum PARAMETER_TYPE {

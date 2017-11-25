@@ -12,7 +12,10 @@ describe("Unit Test: Controller Decorators", () => {
         @controller(path, ...middleware)
         class TestController {}
 
-        let controllerMetadata: interfaces.ControllerMetadata = Reflect.getMetadata("_controller", TestController);
+        let controllerMetadata: interfaces.ControllerMetadata = Reflect.getMetadata(
+            METADATA_KEY.controller,
+            TestController
+        );
 
         expect(controllerMetadata.middleware).eql(middleware);
         expect(controllerMetadata.path).eql(path);
@@ -37,7 +40,10 @@ describe("Unit Test: Controller Decorators", () => {
             public test3() { return; }
         }
 
-        let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getMetadata("_controller-method", TestController);
+        let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getMetadata(
+            METADATA_KEY.controllerMethod,
+            TestController
+        );
 
         expect(methodMetadata.length).eql(3);
 

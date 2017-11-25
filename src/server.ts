@@ -79,6 +79,27 @@ export class InversifyExpressServer  {
      */
     public build(): express.Application {
 
+        const _self = this;
+
+        // The very first middleware to be invoked
+        // it creates a new httpContext and attaches it to the
+        // current request as metadata using Reflect
+        this._app.all("*", (
+            req: express.Request,
+            res: express.Response,
+            next: express.NextFunction
+        ) => {
+            (async () => {
+                const httpContext = await _self._createHttpContext(req, res, next);
+                Reflect.defineMetadata(
+                    METADATA_KEY.httpContext,
+                    httpContext,
+                    req
+                );
+                next();
+            })();
+        });
+
         // register server-level middleware before anything else
         if (this._configFn) {
             this._configFn.apply(undefined, [this._app]);
@@ -172,11 +193,9 @@ export class InversifyExpressServer  {
                         res: express.Response,
                         next: express.NextFunction
                     ) {
-                        (async () => {
-                            const httpContext = await _self._getHttpContext(req, res, next);
-                            (m as any).httpContext = httpContext;
-                            m.handler(req, res, next);
-                        })();
+                        const httpContext = _self._getHttpContext(req);
+                        (m as any).httpContext = httpContext;
+                        m.handler(req, res, next);
                     };
                 } else {
                     return m;
@@ -197,11 +216,10 @@ export class InversifyExpressServer  {
             let args = this.extractParameters(req, res, next, parameterMetadata);
 
             (async () => {
-                // create http context instance we use a childContainer for each
-                // request so we can be sure that this binding is unique for each
-                // http request that hits the server
-                const httpContext = await this._getHttpContext(req, res, next);
+                // We use a childContainer for each request so we can be
+                // sure that the binding is unique for each HTTP request
                 let childContainer = this._container.createChild();
+                const httpContext = this._getHttpContext(req);
                 childContainer.bind<interfaces.HttpContext>(TYPE.HttpContext)
                               .toConstantValue(httpContext);
 
@@ -219,7 +237,15 @@ export class InversifyExpressServer  {
         };
     }
 
-    private async _getHttpContext(
+    private _getHttpContext(req: express.Request) {
+        const httpContext = Reflect.getOwnMetadata(
+            METADATA_KEY.httpContext,
+            req
+        );
+        return httpContext;
+    }
+
+    private async _createHttpContext(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
