@@ -124,7 +124,7 @@ If you run the application multiple times within a shared runtime process (e.g. 
 ```ts
 import { cleanUpMetadata } from "inversify-express-utils";
 
-describe("Some Component:", () => {
+describe("Some Component", () => {
 
     beforeEach(() => {
         cleanUpMetadata();
