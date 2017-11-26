@@ -361,7 +361,7 @@ class CustomAuthProvider implements interfaces.AuthProvider {
 }
 ```
 
-We alsoneed to implement the Principal interface.
+We also need to implement the Principal interface.
 The `Principal` interface allow us to:
 
 - Access the details of an user
