@@ -131,7 +131,7 @@ describe("Some Component", () => {
     });
 
     it("Some test case", () => {
-            // ...
+        // ...
     });
 
 });
