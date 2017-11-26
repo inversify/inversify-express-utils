@@ -90,9 +90,13 @@ import * as bodyParser from 'body-parser';
 import { Container } from 'inversify';
 import { interfaces, InversifyExpressServer, TYPE } from 'inversify-express-utils';
 
+// declare metadata by @controller annotation
+import "./controllers/foo_controller";
+
 // set up container
 let container = new Container();
 
+// set up bindings
 container.bind<FooService>('FooService').to(FooService);
 
 // create server
