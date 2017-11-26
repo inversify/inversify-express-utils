@@ -124,21 +124,14 @@ If you run the application multiple times within a shared runtime process (e.g. 
 ```ts
 import { cleanUpMetadata } from "inversify-express-utils";
 
-describe("Integration Tests:", () => {
+describe("Some Component:", () => {
 
-    beforeEach((done) => {
+    beforeEach(async () => {
         cleanUpMetadata();
-        container = new Container();
-        done();
     });
 
-    describe("Routing & Request Handling:", () => {
-
-        it("should work for async controller methods", (done) => {
+    it("Some test case", async () => {
             // ...
-           done();
-        });
-
     });
 
 });
