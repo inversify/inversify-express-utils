@@ -410,9 +410,8 @@ class UserDetailsController extends BaseHttpController {
 
 ## BaseMiddleware
 
-We can extend `BaseMiddleware` in order to be able to inject dependencies into a
-Express middleware function and to be able to access the `HttpContext` from the
-middleware.
+Extending `BaseMiddleware` allow us to inject dependencies 
+and to be access the current `HttpContext` in Express middleware function.
 
 ```ts
 import { BaseMiddleware } from "inversify-express-utils";
@@ -452,12 +451,12 @@ We can then inject `TYPES.LoggerMiddleware` into one of our controllers.
 
 ```ts
 @injectable()
-@controller("/", TYPES.LoggerMiddleware)
+@controller("/")
 class UserDetailsController extends BaseHttpController {
 
     @inject("AuthService") private readonly _authService: AuthService;
 
-    @httpGet("/")
+    @httpGet("/", TYPES.LoggerMiddleware)
     public async getUserDetails() {
         if (this.httpContext.user.isAuthenticated()) {
             return this._authService.getUserDetails(this.httpContext.user.details.id);
