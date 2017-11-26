@@ -126,11 +126,11 @@ import { cleanUpMetadata } from "inversify-express-utils";
 
 describe("Some Component:", () => {
 
-    beforeEach(async () => {
+    beforeEach(() => {
         cleanUpMetadata();
     });
 
-    it("Some test case", async () => {
+    it("Some test case", () => {
             // ...
     });
 
