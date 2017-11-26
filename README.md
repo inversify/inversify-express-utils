@@ -30,6 +30,7 @@ Please refer to the [InversifyJS documentation](https://github.com/inversify/Inv
 ### Step 1: Decorate your controllers
 
 To use a class as a "controller" for your express app, simply add the `@controller` decorator to the class. Similarly, decorate methods of the class to serve as request handlers.
+
 The following example will declare a controller that responds to `GET /foo'.
 
 ```ts
@@ -112,7 +113,7 @@ app.listen(3000);
 
 Since the `inversify-express-util@5.0.0` release. The `@injectable` annotation is no longer required in classes annotated with `@controller`. Declaring a type binding for controllers is also no longer required in classes annotated with `@controller`.
 
-:warning: Declaring a binding is not required for Controllers but **it is required to import the controller at least once**. When the controller file is imported (e.g. `import "./controllers/some_controller"`) the class is declared and the metadata is generated. If you don't import it the metadata is never generated and therefore the controller is not found. An example of this can be found [here](https://github.com/inversify/inversify-express-example/blob/master/MongoDB/bootstrap.ts#L10-L11). 
+:warning: Declaring a binding is not required for Controllers but **it is required to import the controller one unique time**. When the controller file is imported (e.g. `import "./controllers/some_controller"`) the class is declared and the metadata is generated. If you don't import it the metadata is never generated and therefore the controller is not found. An example of this can be found [here](https://github.com/inversify/inversify-express-example/blob/master/MongoDB/bootstrap.ts#L10-L11). 
 
 If you run the application multiple times within a shared runtime process (e.g. unit testing) you might need to clean up the existing metadata before each test. 
 
