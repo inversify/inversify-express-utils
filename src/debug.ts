@@ -1,7 +1,7 @@
 import { interfaces as inversifyInterfaces } from "inversify";
 import { BaseHttpController } from "./base_http_controller";
 import { interfaces } from "./interfaces";
-import { PARAMETER_TYPE } from "./constants";
+import { PARAMETER_TYPE, TYPE } from "./constants";
 import {
     getControllersFromContainer,
     getControllerMetadata,
@@ -15,7 +15,7 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
 
     const info = raw.map(r => {
 
-        const controllerId = Symbol.for(r.controllerMetadata.target.name).toString();
+        const controllerId = r.controllerMetadata.target.name;
 
         const endpoints = r.methodMetadata.map(m => {
 
