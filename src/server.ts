@@ -3,6 +3,13 @@ import * as inversify from "inversify";
 import { interfaces } from "./interfaces";
 import { BaseMiddleware } from "./index";
 import {
+    getControllersFromMetadata,
+    getControllersFromContainer,
+    getControllerMetadata,
+    getControllerMethodMetadata,
+    getControllerParameterMetadata
+} from "./utils";
+import {
     TYPE,
     METADATA_KEY,
     DEFAULT_ROUTING_ROOT_PATH,
@@ -10,9 +17,6 @@ import {
     DUPLICATED_CONTROLLER_NAME
 } from "./constants";
 
-/**
- * Wrapper for the express server.
- */
 export class InversifyExpressServer  {
 
     private _router: express.Router;
@@ -120,41 +124,28 @@ export class InversifyExpressServer  {
         // Fake HttpContext is needed during registration
         this._container.bind<interfaces.HttpContext>(TYPE.HttpContext).toConstantValue({} as any);
 
-        let arrayOfControllerMetadata: interfaces.ControllerMetadata[] = Reflect.getMetadata(
-            METADATA_KEY.controller,
-            Reflect
-        ) || [];
+        let constructors = getControllersFromMetadata();
 
-        arrayOfControllerMetadata.forEach((metadata) => {
-            const constructor = metadata.target;
+        constructors.forEach((constructor) => {
 
-            if (this._container.isBoundNamed(TYPE.Controller, metadata.target.name)) {
-                throw new Error(DUPLICATED_CONTROLLER_NAME(metadata.target.name));
+            const name = constructor.name;
+
+            if (this._container.isBoundNamed(TYPE.Controller, name)) {
+                throw new Error(DUPLICATED_CONTROLLER_NAME(name));
             }
 
             this._container.bind(TYPE.Controller)
                            .to(constructor)
-                           .whenTargetNamed(metadata.target.name);
+                           .whenTargetNamed(name);
         });
 
-        let controllers: interfaces.Controller[] = this._container.getAll<interfaces.Controller>(TYPE.Controller);
+        let controllers = getControllersFromContainer(this._container);
 
         controllers.forEach((controller: interfaces.Controller) => {
 
-            let controllerMetadata: interfaces.ControllerMetadata = Reflect.getOwnMetadata(
-                METADATA_KEY.controller,
-                controller.constructor
-            );
-
-            let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getOwnMetadata(
-                METADATA_KEY.controllerMethod,
-                controller.constructor
-            );
-
-            let parameterMetadata: interfaces.ControllerParameterMetadata = Reflect.getOwnMetadata(
-                METADATA_KEY.controllerParameter,
-                controller.constructor
-            );
+            let controllerMetadata = getControllerMetadata(controller.constructor);
+            let methodMetadata = getControllerMethodMetadata(controller.constructor);
+            let parameterMetadata = getControllerParameterMetadata(controller.constructor);
 
             if (controllerMetadata && methodMetadata) {
 

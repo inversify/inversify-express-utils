@@ -7,8 +7,11 @@ import { interfaces } from "./interfaces";
 import { BaseHttpController } from "./base_http_controller";
 import { BaseMiddleware } from "./base_middleware";
 import { cleanUpMetadata } from "./utils";
+import { getRouteInfo, getRawMetadata } from "./debug";
 
 export {
+    getRouteInfo,
+    getRawMetadata,
     cleanUpMetadata,
     interfaces,
     InversifyExpressServer,

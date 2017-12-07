@@ -6,7 +6,7 @@ import { METADATA_KEY, PARAMETER_TYPE } from "../src/constants";
 describe("Unit Test: Controller Decorators", () => {
 
     it("should add controller metadata to a class when decorated with @controller", (done) => {
-        let middleware = [function() { return; }, "foo", Symbol("bar")];
+        let middleware = [function() { return; }, "foo", Symbol.for("bar")];
         let path = "foo";
 
         @controller(path, ...middleware)
@@ -25,7 +25,7 @@ describe("Unit Test: Controller Decorators", () => {
 
 
     it("should add method metadata to a class when decorated with @httpMethod", (done) => {
-        let middleware = [function() { return; }, "bar", Symbol("baz")];
+        let middleware = [function() { return; }, "bar", Symbol.for("baz")];
         let path = "foo";
         let method = "get";
 
@@ -58,7 +58,7 @@ describe("Unit Test: Controller Decorators", () => {
     });
 
     it("should add parameter metadata to a class when decorated with @params", (done) => {
-        let middleware = [function() { return; }, "bar", Symbol("baz")];
+        let middleware = [function() { return; }, "bar", Symbol.for("baz")];
         let path = "foo";
         let method = "get";
         let methodName = "test";
