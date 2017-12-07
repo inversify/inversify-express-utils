@@ -18,8 +18,8 @@ Some utilities for the development of express applications with Inversify.
 
 You can install `inversify-express-utils` using npm:
 
-```
-$ npm install inversify inversify-express-utils reflect-metadata --save
+```sh
+npm install inversify inversify-express-utils reflect-metadata --save
 ```
 
 The `inversify-express-utils` type definitions are included in the npm module and require TypeScript 2.0.
@@ -524,12 +524,14 @@ console.log(prettyjson.render({ routes: routeInfo }));
 // ...
 ```
 
+> :warning: Please ensure that you invoke `getRouteInfo` after invoking `server.build()`!
+
 The output formatter by `prettyjson` looks as follows:
 
 ```txt
 routes:
   -
-    controller: Symbol(OrderController)
+    controller: OrderController
     endpoints:
       -
         route: GET /api/order/
@@ -540,7 +542,7 @@ routes:
         route:
           - @requestParam id
   -
-    controller: Symbol(UserController)
+    controller: UserController
     endpoints:
       -
         route: GET /api/user/

@@ -64,8 +64,8 @@ describe("Debug utils", () => {
         }
 
         const TYPES = {
-            OrderController: Symbol.for(OrderController.name).toString(),
-            UserController: Symbol.for(UserController.name).toString()
+            OrderController: OrderController.name,
+            UserController: UserController.name
         };
 
         let server = new InversifyExpressServer(container);
