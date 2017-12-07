@@ -519,7 +519,7 @@ let server = new InversifyExpressServer(container);
 let app = server.build();
 const routeInfo = getRouteInfo(container);
 
-console.log(prettyjson.render({ ROUTES: routeInfo }));
+console.log(prettyjson.render({ routes: routeInfo }));
 
 // ...
 ```
@@ -527,27 +527,27 @@ console.log(prettyjson.render({ ROUTES: routeInfo }));
 The output formatter by `prettyjson` looks as follows:
 
 ```txt
-ROUTES:
+routes:
   -
     controller: Symbol(OrderController)
     endpoints:
       -
-        path: GET /api/order/
+        route: GET /api/order/
       -
-        path: POST /api/order/
+        route: POST /api/order/
       -
         path: DELETE /api/order/:id
-        args:
+        route:
           - @requestParam id
   -
     controller: Symbol(UserController)
     endpoints:
       -
-        path: GET /api/user/
+        route: GET /api/user/
       -
-        path: POST /api/user/
+        route: POST /api/user/
       -
-        path: DELETE /api/user/:id
+        route: DELETE /api/user/:id
         args:
           - @requestParam id
 ```

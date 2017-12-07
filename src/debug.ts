@@ -59,14 +59,14 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
             }
 
             const details = {
-                path: `${method} ${controllerPath}${actionPath}`
+                route: `${method} ${controllerPath}${actionPath}`
             };
 
             if (args) {
                 details["args"] = args;
             }
 
-            return details as { path: string, args?: string[] };
+            return details as { route: string, args?: string[] };
 
         });
 
