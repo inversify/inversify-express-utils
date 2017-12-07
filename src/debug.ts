@@ -22,40 +22,43 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
             const method = m.method.toUpperCase();
             const controllerPath = r.controllerMetadata.path;
             const actionPath = m.path;
-            const paramMetadata = r.parameterMetadata[m.key] || undefined;
+            const paramMetadata = r.parameterMetadata;
             let args: string[] | undefined = undefined;
 
-            if (paramMetadata) {
-                args = (r.parameterMetadata[m.key] || []).map(a => {
-                    let type = "";
-                    switch (a.type) {
-                        case PARAMETER_TYPE.RESPONSE:
-                            type = "@response";
-                            break;
-                        case PARAMETER_TYPE.REQUEST:
-                            type = "@request";
-                            break;
-                        case PARAMETER_TYPE.NEXT:
-                            type = "@next";
-                            break;
-                        case PARAMETER_TYPE.PARAMS:
-                            type = "@requestParam";
-                            break;
-                        case PARAMETER_TYPE.QUERY:
-                            type = "queryParam";
-                            break;
-                        case PARAMETER_TYPE.BODY:
-                            type = "@requestBody";
-                            break;
-                        case PARAMETER_TYPE.HEADERS:
-                            type = "@requestHeaders";
-                            break;
-                        case PARAMETER_TYPE.COOKIES:
-                            type = "@cookies";
-                            break;
-                    }
-                    return `${type} ${a.parameterName}`;
-                });
+            if (paramMetadata !== undefined ) {
+                const paramMetadataForKey = paramMetadata[m.key] || undefined;
+                if (paramMetadataForKey) {
+                    args = (r.parameterMetadata[m.key] || []).map(a => {
+                        let type = "";
+                        switch (a.type) {
+                            case PARAMETER_TYPE.RESPONSE:
+                                type = "@response";
+                                break;
+                            case PARAMETER_TYPE.REQUEST:
+                                type = "@request";
+                                break;
+                            case PARAMETER_TYPE.NEXT:
+                                type = "@next";
+                                break;
+                            case PARAMETER_TYPE.PARAMS:
+                                type = "@requestParam";
+                                break;
+                            case PARAMETER_TYPE.QUERY:
+                                type = "queryParam";
+                                break;
+                            case PARAMETER_TYPE.BODY:
+                                type = "@requestBody";
+                                break;
+                            case PARAMETER_TYPE.HEADERS:
+                                type = "@requestHeaders";
+                                break;
+                            case PARAMETER_TYPE.COOKIES:
+                                type = "@cookies";
+                                break;
+                        }
+                        return `${type} ${a.parameterName}`;
+                    });
+                }
             }
 
             const details = {

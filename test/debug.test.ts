@@ -107,4 +107,43 @@ describe("Debug utils", () => {
 
     });
 
+    it("should be able to handle missig parameter metadata", () => {
+
+        let container = new Container();
+
+        @controller("/api/order")
+        class OrderController extends BaseHttpController {
+            @httpGet("/")
+            public get() {
+                return {};
+            }
+            @httpPost("/")
+            public post() {
+                return {};
+            }
+        }
+
+        const TYPES = {
+            OrderController: OrderController.name
+        };
+
+        let server = new InversifyExpressServer(container);
+        let app = server.build();
+
+        const routeInfo = getRouteInfo(container);
+
+        console.log(
+            prettyjson.render({ CONTROLLERS: routeInfo })
+        );
+
+        console.log(routeInfo);
+
+        expect(routeInfo[0].controller).to.eq(TYPES.OrderController);
+        expect(routeInfo[0].endpoints[0].route).to.eq("GET /api/order/");
+        expect(routeInfo[0].endpoints[0].args).to.eq(undefined);
+        expect(routeInfo[0].endpoints[1].route).to.eq("POST /api/order/");
+        expect(routeInfo[0].endpoints[1].args).to.eq(undefined);
+
+    });
+
 });
