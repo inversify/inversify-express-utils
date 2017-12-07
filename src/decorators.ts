@@ -39,27 +39,27 @@ export function controller(path: string, ...middleware: interfaces.Middleware[])
     };
 }
 
-export function all   (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+export function all(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return httpMethod("all", path, ...middleware);
 }
 
-export function httpGet   (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+export function httpGet(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return httpMethod("get", path, ...middleware);
 }
 
-export function httpPost  (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+export function httpPost(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return httpMethod("post", path, ...middleware);
 }
 
-export function httpPut   (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+export function httpPut(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return httpMethod("put", path, ...middleware);
 }
 
-export function httpPatch (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+export function httpPatch(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return httpMethod("patch", path, ...middleware);
 }
 
-export function httpHead  (path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+export function httpHead(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return httpMethod("head", path, ...middleware);
 }
 

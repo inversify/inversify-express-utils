@@ -469,6 +469,89 @@ container.bind<interfaces.Controller>(TYPE.Controller)
          .whenTargetNamed("UserDetailsController");
 ```
 
+## Route Map
+
+If we have some controllers like for example:
+
+```ts
+@controller("/api/user")
+class UserController extends BaseHttpController {
+    @httpGet("/")
+    public get() {
+        return {};
+    }
+    @httpPost("/")
+    public post() {
+        return {};
+    }
+    @httpDelete("/:id")
+    public delete(@requestParam("id") id: string) {
+        return {};
+    }
+}
+
+@controller("/api/order")
+class OrderController extends BaseHttpController {
+    @httpGet("/")
+    public get() {
+        return {};
+    }
+    @httpPost("/")
+    public post() {
+        return {};
+    }
+    @httpDelete("/:id")
+    public delete(@requestParam("id") id: string) {
+        return {};
+    }
+}
+```
+
+We can use the `prettyjson` function to see all the available enpoints:
+
+```ts
+import { getRouteInfo } from "inversify-express-utils";
+import * as prettyjson from "prettyjson";
+
+// ...
+
+let server = new InversifyExpressServer(container);
+let app = server.build();
+const routeInfo = getRouteInfo(container);
+
+console.log(prettyjson.render({ ROUTES: routeInfo }));
+
+// ...
+```
+
+The output formatter by `prettyjson` looks as follows:
+
+```txt
+ROUTES:
+  -
+    controller: Symbol(OrderController)
+    endpoints:
+      -
+        path: GET /api/order/
+      -
+        path: POST /api/order/
+      -
+        path: DELETE /api/order/:id
+        args:
+          - @requestParam id
+  -
+    controller: Symbol(UserController)
+    endpoints:
+      -
+        path: GET /api/user/
+      -
+        path: POST /api/user/
+      -
+        path: DELETE /api/user/:id
+        args:
+          - @requestParam id
+```
+
 ## Examples
 
 Some examples can be found at the [inversify-express-example](https://github.com/inversify/inversify-express-example) repository.

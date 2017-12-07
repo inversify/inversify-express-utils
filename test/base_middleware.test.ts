@@ -23,8 +23,8 @@ describe("BaseMiddleware", () => {
     it("Should be able to inject BaseMiddleware implementations", (done) => {
 
         const TYPES = {
-            LoggerMiddleware: Symbol("LoggerMiddleware"),
-            SomeDependency: Symbol("SomeDependency")
+            LoggerMiddleware: Symbol.for("LoggerMiddleware"),
+            SomeDependency: Symbol.for("SomeDependency")
         };
 
         interface SomeDependency {
