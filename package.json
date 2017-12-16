@@ -43,7 +43,7 @@
     "gulp-mocha": "3.0.1",
     "gulp-tslint": "8.1.2",
     "gulp-typescript": "3.2.3",
-    "inversify": "4.6.1",
+    "inversify": "4.7.0",
     "mocha": "4.0.1",
     "prettyjson": "1.2.1",
     "publish-please": "2.3.1",
