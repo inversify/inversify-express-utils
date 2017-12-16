@@ -25,7 +25,8 @@ export class InversifyExpressServer  {
     private _configFn: interfaces.ConfigFunction;
     private _errorConfigFn: interfaces.ConfigFunction;
     private _routingConfig: interfaces.RoutingConfig;
-    private _AuthProvider: { new(): interfaces.AuthProvider}|undefined;
+    private _AuthProvider: { new(): interfaces.AuthProvider};
+    private _forceControllers: boolean;
 
     /**
      * Wrapper for the express server.
@@ -37,16 +38,18 @@ export class InversifyExpressServer  {
         customRouter?: express.Router|null,
         routingConfig?: interfaces.RoutingConfig|null,
         customApp?: express.Application| null,
-        authProvider?: { new(): interfaces.AuthProvider}
+        authProvider?: { new(): interfaces.AuthProvider} | null,
+        forceControllers = true
     ) {
         this._container = container;
+        this._forceControllers = forceControllers;
         this._router = customRouter || express.Router();
         this._routingConfig = routingConfig || {
             rootPath: DEFAULT_ROUTING_ROOT_PATH
         };
         this._app = customApp || express();
-        this._AuthProvider = authProvider;
-        if (this._AuthProvider) {
+        if (authProvider) {
+            this._AuthProvider = authProvider;
             container.bind<interfaces.AuthProvider>(TYPE.AuthProvider)
                      .to(this._AuthProvider);
         }
@@ -139,7 +142,10 @@ export class InversifyExpressServer  {
                            .whenTargetNamed(name);
         });
 
-        let controllers = getControllersFromContainer(this._container);
+        let controllers = getControllersFromContainer(
+            this._container,
+            this._forceControllers
+        );
 
         controllers.forEach((controller: interfaces.Controller) => {
 

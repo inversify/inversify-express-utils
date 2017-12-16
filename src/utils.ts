@@ -3,11 +3,16 @@ import { METADATA_KEY, NO_CONTROLLERS_FOUND } from "./constants";
 import { interfaces } from "./interfaces";
 import { TYPE } from "./constants";
 
-export function getControllersFromContainer(container: inversifyInterfaces.Container) {
+export function getControllersFromContainer(
+    container: inversifyInterfaces.Container,
+    forceControllers: boolean
+) {
     if (container.isBound(TYPE.Controller)) {
         return container.getAll<interfaces.Controller>(TYPE.Controller);
-    } else {
+    } else if (forceControllers) {
         throw new Error(NO_CONTROLLERS_FOUND);
+    } else {
+        return [];
     }
 }
 
