@@ -22,7 +22,11 @@ export enum PARAMETER_TYPE {
     NEXT
 }
 
-export const DUPLICATED_CONTROLLER_NAME = (name: string) => `Two controllers cannot have the same name: ${name}`;
+export const DUPLICATED_CONTROLLER_NAME = (name: string) =>
+    `Two controllers cannot have the same name: ${name}`;
+
+export const NO_CONTROLLERS_FOUND = "No controllers have been found! " +
+    "Please ensure that you have register at least one Controller.";
 
 const DEFAULT_ROUTING_ROOT_PATH = "/";
 
