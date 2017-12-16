@@ -86,7 +86,7 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
 
 export function getRawMetadata(container: inversifyInterfaces.Container) {
 
-    const controllers = getControllersFromContainer(container);
+    const controllers = getControllersFromContainer(container, true);
 
     const raw = controllers.map((controller) => {
 
