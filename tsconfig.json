@@ -3,6 +3,7 @@
         "target": "es5",
         "lib": ["es6", "dom"],
         "types": ["express", "inversify", "mocha", "reflect-metadata"],
+        "sourceMap": true,
         "module": "commonjs",
         "moduleResolution": "node",
         "isolatedModules": false,
@@ -13,6 +14,5 @@
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
         "strictNullChecks": true,
-        "outDir": "lib"
     }
 }

@@ -60,6 +60,7 @@ src/syntax/*.d.ts
 
 test/*.js
 test/**/*.js
+test/**/*.js.map
 
 type_definitions/**/*.js
 type_definitions/*.js
