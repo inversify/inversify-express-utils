@@ -224,7 +224,12 @@ export class InversifyExpressServer  {
                 let result = childContainer.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
                 Promise.resolve(result)
                     .then((value: any) => {
-                        if (value && !res.headersSent) {
+                        if (value instanceof Function) {
+                            value();
+                        } else if (!res.headersSent) {
+                            if (value === undefined) {
+                                res.status(204);
+                            }
                             res.send(value);
                         }
                     })

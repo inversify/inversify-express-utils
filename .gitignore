@@ -65,3 +65,6 @@ test/**/*.js.map
 type_definitions/**/*.js
 type_definitions/*.js
 package-lock.json
+
+# JetBrains IDE
+.idea
