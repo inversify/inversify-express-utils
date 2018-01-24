@@ -98,7 +98,7 @@ describe("Integration Tests:", () => {
                 .expect(500, done);
         });
 
-        it ("should work for methods which call nextFunc()", (done) => {
+        it("should work for methods which call nextFunc()", (done) => {
 
             @controller("/")
             class TestController {
@@ -118,7 +118,7 @@ describe("Integration Tests:", () => {
         });
 
 
-        it ("should work for async methods which call nextFunc()", (done) => {
+        it("should work for async methods which call nextFunc()", (done) => {
 
             @controller("/")
             class TestController {
@@ -143,12 +143,12 @@ describe("Integration Tests:", () => {
         });
 
 
-        it ("should work for async methods called by nextFunc()", (done) => {
+        it("should work for async methods called by nextFunc()", (done) => {
 
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
-                    nextFunc();
+                    return nextFunc;
                 }
 
                 @httpGet("/") public getTest2(req: express.Request, res: express.Response) {
@@ -268,6 +268,20 @@ describe("Integration Tests:", () => {
             return supertest(server.build())
                 .get("/api/v1/ping/endpoint")
                 .expect(200, "pong");
+        });
+
+        it("should work for controller methods who's return value is falsey", (done) => {
+            @controller("/user")
+            class TestController {
+                @httpDelete("/") private async delete(): Promise<void> {
+                    return;
+                }
+            }
+
+            server = new InversifyExpressServer(container);
+            supertest(server.build())
+                .delete("/user")
+                .expect(204, "", done);
         });
     });
 
