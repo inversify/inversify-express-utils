@@ -374,7 +374,7 @@ The `Principal` interface allow us to:
 ```ts
 class Principal implements interfaces.Principal {
     public details: any;
-    public constrcutor(details: any) {
+    public constructor(details: any) {
         this.details = details;
     }
     public isAuthenticated(): Promise<boolean> {
