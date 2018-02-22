@@ -237,11 +237,10 @@ export class InversifyExpressServer {
         key: string,
         parameterMetadata: interfaces.ParameterMetadata[]
     ): express.RequestHandler {
-        return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+            try {
+                let args = this.extractParameters(req, res, next, parameterMetadata);
 
-            let args = this.extractParameters(req, res, next, parameterMetadata);
-
-            (async () => {
                 // We use a childContainer for each request so we can be
                 // sure that the binding is unique for each HTTP request
                 let childContainer = this._container.createChild();
@@ -250,27 +249,24 @@ export class InversifyExpressServer {
                     .toConstantValue(httpContext);
 
                 // invoke controller's action
-                let result = childContainer.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
-                Promise.resolve(result)
-                    .then((value: any) => {
-                        if (value instanceof HttpResponseMessage) {
-                            return this.handleHttpResponseMessage(value, res);
-                        } else if (instanceOfIHttpActionResult(value)) {
-                            return value.executeAsync().then((httpResponseMessage) => {
-                                return this.handleHttpResponseMessage(httpResponseMessage, res);
-                            });
-                        } else if (value instanceof Function) {
-                            value();
-                        } else if (!res.headersSent) {
-                            if (value === undefined) {
-                                res.status(204);
-                            }
-                            res.send(value);
-                        }
-                    })
-                    .catch((error: any) => next(error));
-            })();
+                const value = await childContainer.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
 
+                if (value instanceof HttpResponseMessage) {
+                    await this.handleHttpResponseMessage(value, res);
+                } else if (instanceOfIHttpActionResult(value)) {
+                    const httpResponseMessage = await value.executeAsync();
+                    await this.handleHttpResponseMessage(httpResponseMessage, res);
+                } else if (value instanceof Function) {
+                    value();
+                } else if (!res.headersSent) {
+                    if (value === undefined) {
+                        res.status(204);
+                    }
+                    res.send(value);
+                }
+            } catch (err) {
+                next(err);
+            }
         };
     }
 
