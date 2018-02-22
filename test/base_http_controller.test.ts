@@ -11,6 +11,8 @@ import {
     interfaces
 } from "../src/index";
 import { cleanUpMetadata } from "../src/utils";
+import { HttpResponseMessage } from "../src/httpResponseMessage";
+import { StringContent } from "../src/content/stringContent";
 
 describe("BaseHttpController", () => {
 
@@ -58,4 +60,46 @@ describe("BaseHttpController", () => {
 
     });
 
+    it("should support returning an HttpResponseMessage from a method", async function() {
+        @controller("/")
+        class TestController extends BaseHttpController {
+            @httpGet("/")
+            public async getTest() {
+                const response = new HttpResponseMessage(200);
+                response.headers["x-custom"] = "test-header";
+                response.content = new StringContent("12345");
+                return response;
+            }
+        }
+
+        const server = new InversifyExpressServer(new Container());
+
+        await supertest(server.build())
+            .get("/")
+            .expect(200, "12345")
+            .expect("x-custom", "test-header")
+            .expect("content-type", "text/plain; charset=utf-8");
+    });
+
+    it("should support returning an IHttpActionResult from a method", async function() {
+        @controller("/")
+        class TestController extends BaseHttpController {
+            @httpGet("/")
+            public async getTest() {
+                return new class TestActionResult implements interfaces.IHttpActionResult {
+                    public async executeAsync() {
+                        const response = new HttpResponseMessage(400);
+                        response.content = new StringContent("You done did that wrong");
+                        return response;
+                    }
+                };
+            }
+        }
+
+        const server = new InversifyExpressServer(new Container());
+
+        await supertest(server.build())
+            .get("/")
+            .expect(400, "You done did that wrong");
+    });
 });

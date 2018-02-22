@@ -55,3 +55,7 @@ export function cleanUpMetadata() {
         Reflect
     );
 }
+
+export function instanceOfIHttpActionResult(value: any): value is interfaces.IHttpActionResult {
+    return value != null && typeof value.executeAsync === "function";
+}
