@@ -50,7 +50,7 @@
     "publish-please": "2.3.1",
     "reflect-metadata": "0.1.12",
     "run-sequence": "2.2.1",
-    "source-map-support": "0.5.1",
+    "source-map-support": "0.5.4",
     "sinon": "4.4.4",
     "supertest": "3.0.0",
     "tslint": "5.9.1",
