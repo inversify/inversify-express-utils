@@ -25,7 +25,7 @@ export function getControllersFromMetadata() {
 }
 
 export function getControllerMetadata(constructor: any) {
-    let controllerMetadata: interfaces.ControllerMetadata = Reflect.getOwnMetadata(
+    let controllerMetadata: interfaces.ControllerMetadata = Reflect.getMetadata(
         METADATA_KEY.controller,
         constructor
     );
@@ -33,7 +33,7 @@ export function getControllerMetadata(constructor: any) {
 }
 
 export function getControllerMethodMetadata(constructor: any) {
-    let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getOwnMetadata(
+    let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getMetadata(
         METADATA_KEY.controllerMethod,
         constructor
     );
@@ -41,7 +41,7 @@ export function getControllerMethodMetadata(constructor: any) {
 }
 
 export function getControllerParameterMetadata(constructor: any) {
-    let parameterMetadata: interfaces.ControllerParameterMetadata = Reflect.getOwnMetadata(
+    let parameterMetadata: interfaces.ControllerParameterMetadata = Reflect.getMetadata(
         METADATA_KEY.controllerParameter,
         constructor
     );

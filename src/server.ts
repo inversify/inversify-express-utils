@@ -240,7 +240,7 @@ export class InversifyExpressServer {
     }
 
     private _getHttpContext(req: express.Request) {
-        const httpContext = Reflect.getOwnMetadata(
+        const httpContext = Reflect.getMetadata(
             METADATA_KEY.httpContext,
             req
         );
