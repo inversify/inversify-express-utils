@@ -249,23 +249,23 @@ Binds a method parameter to the request object.
 
 Binds a method parameter to the response object.
 
-### `@requestParam(name?: string)`
+### `@requestParam(name: string)`
 
 Binds a method parameter to request.params object or to a specific parameter if a name is passed.
 
-### `@queryParam(name?: string)`
+### `@queryParam(name: string)`
 
 Binds a method parameter to request.query or to a specific query parameter if a name is passed.
 
-### `@requestBody(name?: string)`
+### `@requestBody()`
 
 Binds a method parameter to request.body or to a specific body property if a name is passed. If the bodyParser middleware is not used on the express app, this will bind the method parameter to the express request object.
 
-### `@requestHeaders(name?: string)`
+### `@requestHeaders(name: string)`
 
 Binds a method parameter to the request headers.
 
-### `@cookies()`
+### `@cookies(name: string)`
 
 Binds a method parameter to the request cookies.
 
