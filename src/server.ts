@@ -17,7 +17,7 @@ import {
     DUPLICATED_CONTROLLER_NAME
 } from "./constants";
 
-export class InversifyExpressServer  {
+export class InversifyExpressServer {
 
     private _router: express.Router;
     private _container: inversify.interfaces.Container;
@@ -25,7 +25,7 @@ export class InversifyExpressServer  {
     private _configFn: interfaces.ConfigFunction;
     private _errorConfigFn: interfaces.ConfigFunction;
     private _routingConfig: interfaces.RoutingConfig;
-    private _AuthProvider: { new(): interfaces.AuthProvider};
+    private _AuthProvider: { new(): interfaces.AuthProvider };
     private _forceControllers: boolean;
 
     /**
@@ -35,10 +35,10 @@ export class InversifyExpressServer  {
      */
     constructor(
         container: inversify.interfaces.Container,
-        customRouter?: express.Router|null,
-        routingConfig?: interfaces.RoutingConfig|null,
-        customApp?: express.Application| null,
-        authProvider?: { new(): interfaces.AuthProvider} | null,
+        customRouter?: express.Router | null,
+        routingConfig?: interfaces.RoutingConfig | null,
+        customApp?: express.Application | null,
+        authProvider?: { new(): interfaces.AuthProvider } | null,
         forceControllers = true
     ) {
         this._container = container;
@@ -51,7 +51,7 @@ export class InversifyExpressServer  {
         if (authProvider) {
             this._AuthProvider = authProvider;
             container.bind<interfaces.AuthProvider>(TYPE.AuthProvider)
-                     .to(this._AuthProvider);
+                .to(this._AuthProvider);
         }
     }
 
@@ -138,8 +138,8 @@ export class InversifyExpressServer  {
             }
 
             this._container.bind(TYPE.Controller)
-                           .to(constructor)
-                           .whenTargetNamed(name);
+                .to(constructor)
+                .whenTargetNamed(name);
         });
 
         let controllers = getControllersFromContainer(
@@ -185,7 +185,7 @@ export class InversifyExpressServer  {
                 const m = this._container.get<MiddelwareInstance>(middlewareItem);
                 if (m instanceof BaseMiddleware) {
                     const _self = this;
-                    return function(
+                    return function (
                         req: express.Request,
                         res: express.Response,
                         next: express.NextFunction
@@ -218,7 +218,7 @@ export class InversifyExpressServer  {
                 let childContainer = this._container.createChild();
                 const httpContext = this._getHttpContext(req);
                 childContainer.bind<interfaces.HttpContext>(TYPE.HttpContext)
-                              .toConstantValue(httpContext);
+                    .toConstantValue(httpContext);
 
                 // invoke controller's action
                 let result = childContainer.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
@@ -288,14 +288,30 @@ export class InversifyExpressServer  {
         for (let item of params) {
 
             switch (item.type) {
-                default: args[item.index] = res; break; // response
-                case PARAMETER_TYPE.REQUEST: args[item.index] = this.getParam(req, null, item.parameterName); break;
-                case PARAMETER_TYPE.NEXT: args[item.index] = next; break;
-                case PARAMETER_TYPE.PARAMS: args[item.index] = this.getParam(req, "params", item.parameterName); break;
-                case PARAMETER_TYPE.QUERY: args[item.index] = this.getParam(req, "query", item.parameterName); break;
-                case PARAMETER_TYPE.BODY: args[item.index] = this.getParam(req, "body", item.parameterName); break;
-                case PARAMETER_TYPE.HEADERS: args[item.index] = this.getParam(req, "headers", item.parameterName); break;
-                case PARAMETER_TYPE.COOKIES: args[item.index] = this.getParam(req, "cookies", item.parameterName); break;
+                case PARAMETER_TYPE.REQUEST:
+                    args[item.index] = req;
+                    break;
+                case PARAMETER_TYPE.NEXT:
+                    args[item.index] = next;
+                    break;
+                case PARAMETER_TYPE.PARAMS:
+                    args[item.index] = this.getParam(req, "params", item.parameterName);
+                    break;
+                case PARAMETER_TYPE.QUERY:
+                    args[item.index] = this.getParam(req, "query", item.parameterName);
+                    break;
+                case PARAMETER_TYPE.BODY:
+                    args[item.index] = req.body;
+                    break;
+                case PARAMETER_TYPE.HEADERS:
+                    args[item.index] = this.getParam(req, "headers", item.parameterName.toLowerCase());
+                    break;
+                case PARAMETER_TYPE.COOKIES:
+                    args[item.index] = this.getParam(req, "cookies", item.parameterName);
+                    break;
+                default:
+                    args[item.index] = res;
+                    break; // response
             }
 
         }
@@ -303,16 +319,9 @@ export class InversifyExpressServer  {
         return args;
     }
 
-    private getParam(source: any, paramType: string|null, name: string) {
-        let param = (paramType !== null) ? source[paramType] : source;
-        return param[name] || this.checkQueryParam(paramType, param);
+    private getParam(source: express.Request, paramType: string, name: string) {
+        let param = source[paramType];
+        return param ? param[name] : undefined;
     }
 
-    private checkQueryParam(paramType: string|null, param: any) {
-        if (paramType === "query") {
-            return undefined;
-        } else {
-            return param;
-        }
-    }
 }

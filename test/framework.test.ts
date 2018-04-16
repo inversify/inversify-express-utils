@@ -9,10 +9,12 @@ import * as cookieParser from "cookie-parser";
 import { injectable, Container } from "inversify";
 import { interfaces } from "../src/interfaces";
 import { InversifyExpressServer } from "../src/server";
-import { controller, httpMethod, all, httpGet, httpPost, httpPut, httpPatch,
-        httpHead, httpDelete, request, response, params, requestParam,
-        requestBody, queryParam, requestHeaders, cookies,
-        next } from "../src/decorators";
+import {
+    controller, httpMethod, all, httpGet, httpPost, httpPut, httpPatch,
+    httpHead, httpDelete, request, response, params, requestParam,
+    requestBody, queryParam, requestHeaders, cookies,
+    next
+} from "../src/decorators";
 import { TYPE, PARAMETER_TYPE } from "../src/constants";
 import * as Bluebird from "bluebird";
 import { cleanUpMetadata } from "../src/utils";
@@ -206,7 +208,7 @@ describe("Integration Tests:", () => {
 
 
         it("should use returned values as response", (done) => {
-            let result = {"hello": "world"};
+            let result = { "hello": "world" };
 
             @controller("/")
             class TestController {
@@ -485,9 +487,9 @@ describe("Integration Tests:", () => {
             server = new InversifyExpressServer(container);
 
             server.setConfig((app) => {
-               app.use(spyA);
-               app.use(spyB);
-               app.use(spyC);
+                app.use(spyA);
+                app.use(spyB);
+                app.use(spyC);
             });
 
             supertest(server.build())
@@ -512,7 +514,7 @@ describe("Integration Tests:", () => {
             server = new InversifyExpressServer(container);
 
             server.setConfig((app) => {
-               app.use(spyA);
+                app.use(spyA);
             });
 
             supertest(server.build())
@@ -678,7 +680,7 @@ describe("Integration Tests:", () => {
             }
 
             server = new InversifyExpressServer(container);
-            let body = {foo: "bar"};
+            let body = { foo: "bar" };
             server.setConfig((app) => {
                 app.use(bodyParser.json());
             });
@@ -704,30 +706,39 @@ describe("Integration Tests:", () => {
                 .expect(200, "foo", done);
         });
 
+        it("should be case insensitve to request headers", (done) => {
+
+            @controller("/")
+            class TestController {
+                @httpGet("/") public getTest(@requestHeaders("TestHead") headers: any) {
+                    return headers;
+                }
+            }
+
+            server = new InversifyExpressServer(container);
+            supertest(server.build())
+                .get("/")
+                .set("TestHead", "foo")
+                .expect(200, "foo", done);
+        });
+
         it("should bind a method parameter to a cookie", (done) => {
 
             @controller("/")
             class TestController {
-                @httpGet("/") public getCookie(@cookies("cookie") cookie: any, req: express.Request, res: express.Response) {
-                    if (cookie) {
-                        res.send(cookie);
-                    } else {
-                        res.send(":(");
-                    }
+                @httpGet("/") public getCookie(@cookies("Cookie") cookie: any, req: express.Request, res: express.Response) {
+                    return cookie;
                 }
             }
 
             server = new InversifyExpressServer(container);
             server.setConfig((app) => {
                 app.use(cookieParser());
-                app.use(function (req, res, nextFunc) {
-                    res.cookie("cookie", "hey");
-                    nextFunc();
-                });
             });
             supertest(server.build())
                 .get("/")
-                .expect("set-cookie", "cookie=hey; Path=/", done);
+                .set("Cookie", "Cookie=hey")
+                .expect(200, "hey", done);
         });
 
         it("should bind a method parameter to the next function", (done) => {

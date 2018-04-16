@@ -8,7 +8,7 @@ import { TYPE } from "../src/constants";
 import * as supertest from "supertest";
 import {
     controller, httpMethod, httpGet, request,
-    response, requestParam, queryParam
+    response, requestParam, queryParam, requestHeaders
 } from "../src/decorators";
 import { cleanUpMetadata } from "../src/utils";
 
@@ -55,22 +55,22 @@ describe("Unit Test: Previous bugs", () => {
         let app = server.build();
 
         supertest(app).get("/api/test/")
-                      .expect("Content-Type", /json/)
-                      .expect(200)
-                      .then(response1 => {
-                          expect(Array.isArray(response1.body)).to.eql(true);
-                          expect(response1.body[0].id).to.eql(1);
-                          expect(response1.body[1].id).to.eql(2);
-                      });
+            .expect("Content-Type", /json/)
+            .expect(200)
+            .then(response1 => {
+                expect(Array.isArray(response1.body)).to.eql(true);
+                expect(response1.body[0].id).to.eql(1);
+                expect(response1.body[1].id).to.eql(2);
+            });
 
         supertest(app).get("/api/test/5")
-                      .expect("Content-Type", /json/)
-                      .expect(200)
-                      .then(response2 => {
-                          expect(Array.isArray(response2.body)).to.eql(false);
-                          expect(response2.body.id).to.eql("5");
-                          done();
-                      });
+            .expect("Content-Type", /json/)
+            .expect(200)
+            .then(response2 => {
+                expect(Array.isArray(response2.body)).to.eql(false);
+                expect(response2.body.id).to.eql("5");
+                done();
+            });
 
     });
 
@@ -86,7 +86,7 @@ describe("Unit Test: Previous bugs", () => {
                 @queryParam("empty") empty: string,
                 @queryParam("test") test: string
             ) {
-                return {empty: empty, test: test};
+                return { empty: empty, test: test };
             }
 
         }
@@ -95,13 +95,45 @@ describe("Unit Test: Previous bugs", () => {
         let app = server.build();
 
         supertest(app).get("/api/test?test=testquery")
-                      .expect("Content-Type", /json/)
-                      .expect(200)
-                      .then(response1 => {
-                          expect(response1.body.test).to.eql("testquery");
-                          expect(response1.body.empty).to.eq(undefined);
-                          done();
-                      });
+            .expect("Content-Type", /json/)
+            .expect(200)
+            .then(response1 => {
+                expect(response1.body.test).to.eql("testquery");
+                expect(response1.body.empty).to.eq(undefined);
+                done();
+            });
+
+    });
+
+    it("should support empty headers params", (done) => {
+        let container = new Container();
+
+        @controller("/api/test")
+        class TestController {
+            @httpGet("/")
+            public get(
+                @request() req: express.Request,
+                @response() res: express.Response,
+                @requestHeaders("TestHead") test: string,
+                @requestHeaders("empty") empty: string
+            ) {
+                return { empty: empty, test: test };
+            }
+
+        }
+
+        let server = new InversifyExpressServer(container);
+        let app = server.build();
+
+        supertest(app).get("/api/test?test=testquery")
+            .expect("Content-Type", /json/)
+            .set("TestHead", "foo")
+            .expect(200)
+            .then(response1 => {
+                expect(response1.body.test).to.eql("foo");
+                expect(response1.body.empty).to.eq(undefined);
+                done();
+            });
 
     });
 
