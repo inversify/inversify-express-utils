@@ -139,7 +139,7 @@ describe("Some Component", () => {
 
 You can find an example of this in [our unit tests](https://github.com/inversify/inversify-express-utils/blob/master/test/framework.test.ts#L25-L29).
 
-Inversidy express utils will throw an exception if your application doesn't have controllers. You can disable this behaviour using the `forceControllers` option. You can find some examples of `forceControllers` in [our unit tests](https://github.com/inversify/inversify-express-utils/blob/master/test/issue_590.test.ts).
+Inversify express utils will throw an exception if your application doesn't have controllers. You can disable this behaviour using the `forceControllers` option. You can find some examples of `forceControllers` in [our unit tests](https://github.com/inversify/inversify-express-utils/blob/master/test/issue_590.test.ts).
 
 ## InversifyExpressServer
 
