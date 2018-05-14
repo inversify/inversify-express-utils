@@ -35,7 +35,7 @@
     "@types/sinon": "4.3.3",
     "@types/supertest": "2.0.4",
     "bluebird": "3.5.1",
-    "body-parser": "1.18.2",
+    "body-parser": "1.18.3",
     "chai": "4.1.2",
     "cookie-parser": "1.4.3",
     "gulp": "3.9.1",
