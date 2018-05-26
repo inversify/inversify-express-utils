@@ -310,9 +310,9 @@ describe("Integration Tests:", () => {
 
         beforeEach((done) => {
             result = "";
-            spyA.reset();
-            spyB.reset();
-            spyC.reset();
+            spyA.resetHistory();
+            spyB.resetHistory();
+            spyC.resetHistory();
             done();
         });
 
