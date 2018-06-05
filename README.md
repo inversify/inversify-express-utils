@@ -471,6 +471,71 @@ container.bind<interfaces.Controller>(TYPE.Controller)
          .whenTargetNamed("UserDetailsController");
 ```
 
+### Request-scope services
+
+Middleware extending `BaseMiddleware` is capable of re-binding services in the scope of a HTTP request.
+This is useful if you need access to a HTTP request or context-specific property in a service that doesn't have 
+the direct access to them otherwise.
+
+Consider the below `TracingMiddleware`. In this example we want to capture the `X-Trace-Id` header from the incoming request 
+and make it available to our IoC services as `TYPES.TraceIdValue`:
+
+```typescript
+import { inject, injectable } from "inversify";
+import { BaseHttpController, BaseMiddleware, controller, httpGet } from "inversify-express-utils";
+import * as express from "express";
+
+const TYPES = {
+    TraceId: Symbol.for("TraceIdValue"),
+    TracingMiddleware: Symbol.for("TracingMiddleware"),
+    Service: Symbol.for("Service"),
+};
+
+@injectable()
+class TracingMiddleware extends BaseMiddleware {
+
+    public handler(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) {
+        this.bind<string>(TYPES.TraceIdValue)
+            .toConstantValue(`${ req.header('X-Trace-Id') }`);
+
+        next();
+    }
+}
+
+@controller("/")
+class TracingTestController extends BaseHttpController {
+
+    constructor(@inject(TYPES.Service) private readonly service: Service) {
+        super();
+    }
+
+    @httpGet(
+        "/",
+        TYPES.TracingMiddleware
+    )
+    public getTest() {
+        return this.service.doSomethingThatRequiresTheTraceID();
+    }
+}
+
+@injectable()
+class Service {
+    constructor(@inject(TYPES.TraceIdValue) private readonly traceID: string) {
+    }
+
+    public doSomethingThatRequiresTheTraceID() {
+        // ...
+    }
+}
+```
+
+The `BaseMiddleware.bind()` method will bind the `TYPES.TraceIdValue` if it hasn't been bound yet or re-bind if it has
+already been bound. 
+
 ## Route Map
 
 If we have some controllers like for example:
