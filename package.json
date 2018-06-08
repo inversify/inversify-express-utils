@@ -52,7 +52,7 @@
     "publish-please": "2.4.1",
     "reflect-metadata": "0.1.12",
     "run-sequence": "2.2.1",
-    "sinon": "5.1.0",
+    "sinon": "5.1.1",
     "source-map-support": "0.5.6",
     "supertest": "3.1.0",
     "tslint": "5.9.1",
