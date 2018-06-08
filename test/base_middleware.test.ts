@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import * as async from "async";
 import * as express from "express";
 import { Container, injectable, inject } from "inversify";
 import * as supertest from "supertest";
@@ -144,7 +145,114 @@ describe("BaseMiddleware", () => {
                 );
                 done();
             });
-
     });
 
+    it("Should allow the middleware to inject services in a HTTP request scope", (done) => {
+
+        const TRACE_HEADER = "X-Trace-Id";
+
+        const TYPES = {
+            TraceId: Symbol.for("TraceId"),
+            TraceIdValue: Symbol.for("TraceIdValue"),
+            TracingMiddleware: Symbol.for("TracingMiddleware"),
+            Service: Symbol.for("Service"),
+        };
+
+        class TraceId {
+            constructor(public readonly value: string) {
+            }
+        }
+
+        @injectable()
+        class TracingMiddleware extends BaseMiddleware {
+
+            public handler(
+                req: express.Request,
+                res: express.Response,
+                next: express.NextFunction
+            ) {
+                this.bind<string>(TYPES.TraceIdValue)
+                    .toConstantValue(`${ req.header(TRACE_HEADER) }`);
+                next();
+            }
+        }
+
+        @injectable()
+        class Service {
+            constructor(@inject(TYPES.TraceId) private readonly traceID: TraceId) {
+            }
+
+            public doSomethingThatRequiresTheTraceID() {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        resolve(this.traceID.value);
+                    }, someTimeBetween(0, 500));
+                });
+            }
+        }
+
+        @controller("/")
+        class TracingTestController extends BaseHttpController {
+
+            constructor(@inject(TYPES.Service) private readonly service: Service) {
+                super();
+            }
+
+            @httpGet(
+                "/",
+                TYPES.TracingMiddleware
+            )
+            public getTest() {
+                return this.service.doSomethingThatRequiresTheTraceID();
+            }
+        }
+
+        const container = new Container();
+
+        container.bind<TracingMiddleware>(TYPES.TracingMiddleware).to(TracingMiddleware);
+        container.bind<Service>(TYPES.Service).to(Service);
+        container.bind<string>(TYPES.TraceIdValue).toConstantValue(undefined as any);
+        container.bind<TraceId>(TYPES.TraceId).toDynamicValue((context) => {
+            const traceIdValue = context.container.get<string>(TYPES.TraceIdValue);
+            return new TraceId(traceIdValue);
+        }).inRequestScope();
+
+        const api = new InversifyExpressServer(container).build();
+
+        const expectedRequests = 100;
+        let handledRequests = 0;
+
+        run(expectedRequests, (executionId: number) => {
+            return supertest(api)
+                .get("/")
+                .set(TRACE_HEADER, `trace-id-${ executionId }`)
+                .expect(200, `trace-id-${ executionId }`)
+                .then(res => {
+                    handledRequests++;
+                });
+        }, (err?: Error) => {
+            expect(handledRequests).eq(
+                expectedRequests,
+                `Only ${ handledRequests } out of ${ expectedRequests } have been handled correctly`
+            );
+            done(err);
+        });
+    });
 });
+
+function run(parallelRuns: number, test: (executionId: number) => PromiseLike<any>, done: (error?: Error) => void) {
+    const testTaskNo = (id: number) => function(cb: (err?: Error) => void) {
+        test(id).then(cb, cb);
+    };
+
+    const testTasks = Array.from({ length: parallelRuns }, (val: undefined, key: number) => testTaskNo(key));
+
+    async.parallel(testTasks, done);
+}
+
+function someTimeBetween(minimum: number, maximum: number) {
+    const min = Math.ceil(minimum);
+    const max = Math.floor(maximum);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+

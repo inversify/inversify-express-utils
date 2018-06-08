@@ -192,6 +192,7 @@ export class InversifyExpressServer {
                     ) {
                         const httpContext = _self._getHttpContext(req);
                         (m as any).httpContext = httpContext;
+                        (m as any)._container = _self._container;
                         m.handler(req, res, next);
                     };
                 } else {
