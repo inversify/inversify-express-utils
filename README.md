@@ -117,9 +117,9 @@ app.listen(3000);
 
 Since the `inversify-express-util@5.0.0` release. The `@injectable` annotation is no longer required in classes annotated with `@controller`. Declaring a type binding for controllers is also no longer required in classes annotated with `@controller`.
 
-:warning: Declaring a binding is not required for Controllers but **it is required to import the controller one unique time**. When the controller file is imported (e.g. `import "./controllers/some_controller"`) the class is declared and the metadata is generated. If you don't import it the metadata is never generated and therefore the controller is not found. An example of this can be found [here](https://github.com/inversify/inversify-express-example/blob/master/MongoDB/bootstrap.ts#L10-L11). 
+:warning: Declaring a binding is not required for Controllers but **it is required to import the controller one unique time**. When the controller file is imported (e.g. `import "./controllers/some_controller"`) the class is declared and the metadata is generated. If you don't import it the metadata is never generated and therefore the controller is not found. An example of this can be found [here](https://github.com/inversify/inversify-express-example/blob/master/MongoDB/bootstrap.ts#L10-L11).
 
-If you run the application multiple times within a shared runtime process (e.g. unit testing) you might need to clean up the existing metadata before each test. 
+If you run the application multiple times within a shared runtime process (e.g. unit testing) you might need to clean up the existing metadata before each test.
 
 ```ts
 import { cleanUpMetadata } from "inversify-express-utils";
@@ -273,6 +273,57 @@ Binds a method parameter to the request cookies.
 
 Binds a method parameter to the next() function.
 
+## BaseHttpController
+
+The `BaseHttpController` is a base class that provides a significant amount of helper functions in order to aid writing testable controllers.  When returning a response from a method defined on one of these controllers, you may use the `response` object available on the `httpContext` property described in the next section, or you may return an `HttpResponseMessage`, or you may return an object that implements the IHttpActionResult interface.
+
+The benefit of the latter two methods are that since your controller is no longer directly coupled to requiring an httpContext to send a response, unit testing controllers becomes extraordinarily simple as you no longer need to mock the entire response object, you can simply run assertions on the returned value.  This API also allows us to make future improvements in this area and add in functionality that exists in similar frameworks (.NET WebAPI) such as media formatters, content negotation, etc.
+
+```ts
+import { injectable, inject } from "inversify";
+import {
+    controller, httpGet, BaseHttpController, HttpResponseMessage, StringContent
+} from "inversify-express-utils";
+
+@controller("/")
+class ExampleController extends BaseHttpController {
+    @httpGet("/")
+    public async get() {
+        const response = new HttpResponseMessage(200);
+        response.content = new StringContent("foo");
+        return response;
+    }
+```
+
+On the BaseHttpController, we provide a litany of helper methods to ease returning common IHttpActionResults including
+
+* OkResult
+* OkNegotiatedContentResult
+* RedirectResult
+* ResponseMessageResult
+* StatusCodeResult
+* BadRequestErrorMessageResult
+* BadRequestResult
+* ConflictResult
+* CreatedNegotiatedContentResult
+* ExceptionResult
+* InternalServerError
+* NotFoundResult
+
+```ts
+import { injectable, inject } from "inversify";
+import {
+    controller, httpGet, BaseHttpController
+} from "inversify-express-utils";
+
+@controller("/")
+class ExampleController extends BaseHttpController {
+    @httpGet("/")
+    public async get() {
+        return this.ok("foo");
+    }
+```
+
 ## HttpContext
 
 The `HttpContext` property allow us to access the current request,
@@ -410,7 +461,7 @@ class UserDetailsController extends BaseHttpController {
 
 ## BaseMiddleware
 
-Extending `BaseMiddleware` allow us to inject dependencies 
+Extending `BaseMiddleware` allow us to inject dependencies
 and to be access the current `HttpContext` in Express middleware function.
 
 ```ts
@@ -447,7 +498,7 @@ container.bind<LoggerMiddleware>(TYPES.LoggerMiddleware)
 
 ```
 
-We can then inject `TYPES.LoggerMiddleware` into one of our controllers. 
+We can then inject `TYPES.LoggerMiddleware` into one of our controllers.
 
 ```ts
 @injectable()

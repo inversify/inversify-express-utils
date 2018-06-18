@@ -1,6 +1,7 @@
 import * as express from "express";
 import { interfaces as inversifyInterfaces } from "inversify";
 import { PARAMETER_TYPE } from "./constants";
+import { HttpResponseMessage } from "./httpResponseMessage";
 
 namespace interfaces {
 
@@ -64,6 +65,9 @@ namespace interfaces {
         user: Principal;
     }
 
+    export interface IHttpActionResult {
+        executeAsync(): Promise<HttpResponseMessage>;
+    }
 }
 
 export { interfaces };

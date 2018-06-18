@@ -7,7 +7,8 @@ import {
     getControllersFromContainer,
     getControllerMetadata,
     getControllerMethodMetadata,
-    getControllerParameterMetadata
+    getControllerParameterMetadata,
+    instanceOfIHttpActionResult
 } from "./utils";
 import {
     TYPE,
@@ -16,6 +17,8 @@ import {
     PARAMETER_TYPE,
     DUPLICATED_CONTROLLER_NAME
 } from "./constants";
+import { HttpResponseMessage } from "./httpResponseMessage";
+import { OutgoingHttpHeaders } from "http";
 
 export class InversifyExpressServer {
 
@@ -32,6 +35,7 @@ export class InversifyExpressServer {
      * Wrapper for the express server.
      *
      * @param container Container loaded with all controllers and their dependencies.
+     *
      */
     constructor(
         container: inversify.interfaces.Container,
@@ -204,16 +208,40 @@ export class InversifyExpressServer {
         });
     }
 
+    private copyHeadersTo(headers: OutgoingHttpHeaders, target: express.Response) {
+        for (const name of Object.keys(headers)) {
+            const headerValue = headers[name];
+
+            target.append(
+                name,
+                typeof headerValue === "number" ? headerValue.toString() : headerValue
+            );
+        }
+    }
+
+    private async handleHttpResponseMessage(message: HttpResponseMessage, res: express.Response) {
+        this.copyHeadersTo(message.headers, res);
+        this.copyHeadersTo(message.content.headers, res);
+
+        if (message.content !== undefined) {
+            res.status(message.statusCode)
+               // If the content is a number, ensure we change it to a string, else our content is treated
+               // as a statusCode rather than as the content of the Response
+               .send(await message.content.readAsStringAsync());
+        } else {
+            res.sendStatus(message.statusCode);
+        }
+    }
+
     private handlerFactory(
         controllerName: any,
         key: string,
         parameterMetadata: interfaces.ParameterMetadata[]
     ): express.RequestHandler {
-        return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+            try {
+                let args = this.extractParameters(req, res, next, parameterMetadata);
 
-            let args = this.extractParameters(req, res, next, parameterMetadata);
-
-            (async () => {
                 // We use a childContainer for each request so we can be
                 // sure that the binding is unique for each HTTP request
                 let childContainer = this._container.createChild();
@@ -222,21 +250,24 @@ export class InversifyExpressServer {
                     .toConstantValue(httpContext);
 
                 // invoke controller's action
-                let result = childContainer.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
-                Promise.resolve(result)
-                    .then((value: any) => {
-                        if (value instanceof Function) {
-                            value();
-                        } else if (!res.headersSent) {
-                            if (value === undefined) {
-                                res.status(204);
-                            }
-                            res.send(value);
-                        }
-                    })
-                    .catch((error: any) => next(error));
-            })();
+                const value = await childContainer.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
 
+                if (value instanceof HttpResponseMessage) {
+                    await this.handleHttpResponseMessage(value, res);
+                } else if (instanceOfIHttpActionResult(value)) {
+                    const httpResponseMessage = await value.executeAsync();
+                    await this.handleHttpResponseMessage(httpResponseMessage, res);
+                } else if (value instanceof Function) {
+                    value();
+                } else if (!res.headersSent) {
+                    if (value === undefined) {
+                        res.status(204);
+                    }
+                    res.send(value);
+                }
+            } catch (err) {
+                next(err);
+            }
         };
     }
 

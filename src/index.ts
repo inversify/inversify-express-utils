@@ -4,10 +4,14 @@ import { controller, httpMethod, httpGet, httpPut, httpPost, httpPatch,
         requestBody, requestHeaders, cookies, next, injectHttpContext } from "./decorators";
 import { TYPE } from "./constants";
 import { interfaces } from "./interfaces";
+import * as results from "./results";
 import { BaseHttpController } from "./base_http_controller";
 import { BaseMiddleware } from "./base_middleware";
 import { cleanUpMetadata } from "./utils";
 import { getRouteInfo, getRawMetadata } from "./debug";
+import { HttpResponseMessage } from "./httpResponseMessage";
+import { StringContent } from "./content/stringContent";
+import { HttpContent } from "./content/httpContent";
 
 export {
     getRouteInfo,
@@ -35,5 +39,9 @@ export {
     next,
     BaseHttpController,
     injectHttpContext,
-    BaseMiddleware
+    BaseMiddleware,
+    HttpResponseMessage,
+    HttpContent,
+    StringContent,
+    results
 };
