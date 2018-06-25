@@ -53,7 +53,7 @@
     "publish-please": "3.0.3",
     "reflect-metadata": "0.1.12",
     "run-sequence": "2.2.1",
-    "sinon": "6.0.0",
+    "sinon": "6.0.1",
     "source-map-support": "0.5.6",
     "supertest": "3.1.0",
     "tslint": "5.9.1",
