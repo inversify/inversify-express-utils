@@ -26,7 +26,7 @@
   "homepage": "https://github.com/inversify/inversify-express-utils#readme",
   "devDependencies": {
     "@types/async": "2.0.49",
-    "@types/bluebird": "3.5.20",
+    "@types/bluebird": "3.5.21",
     "@types/body-parser": "1.17.0",
     "@types/chai": "4.1.4",
     "@types/cookie-parser": "1.4.1",
