@@ -35,7 +35,11 @@ export class InversifyExpressServer {
      * Wrapper for the express server.
      *
      * @param container Container loaded with all controllers and their dependencies.
-     *
+     * @param customRouter optional express.Router custom router
+     * @param routingConfig optional interfaces.RoutingConfig routing config
+     * @param customApp optional express.Application custom app
+     * @param authProvider optional interfaces.AuthProvider auth provider
+     * @param forceControllers optional boolean setting to force controllers (defaults do true)
      */
     constructor(
         container: inversify.interfaces.Container,
@@ -159,7 +163,6 @@ export class InversifyExpressServer {
 
             if (controllerMetadata && methodMetadata) {
 
-                let router: express.Router = express.Router();
                 let controllerMiddleware = this.resolveMidleware(...controllerMetadata.middleware);
 
                 methodMetadata.forEach((metadata: interfaces.ControllerMethodMetadata) => {
@@ -184,27 +187,26 @@ export class InversifyExpressServer {
 
     private resolveMidleware(...middleware: interfaces.Middleware[]): express.RequestHandler[] {
         return middleware.map(middlewareItem => {
-            if (this._container.isBound(middlewareItem)) {
-                type MiddelwareInstance = express.RequestHandler | BaseMiddleware;
-                const m = this._container.get<MiddelwareInstance>(middlewareItem);
-                if (m instanceof BaseMiddleware) {
-                    const _self = this;
-                    return function (
-                        req: express.Request,
-                        res: express.Response,
-                        next: express.NextFunction
-                    ) {
-                        const httpContext = _self._getHttpContext(req);
-                        (m as any).httpContext = httpContext;
-                        (m as any)._container = _self._container;
-                        m.handler(req, res, next);
-                    };
-                } else {
-                    return m;
-                }
-            } else {
+            if (!this._container.isBound(middlewareItem)) {
                 return middlewareItem as express.RequestHandler;
             }
+
+            type MiddlewareInstance = express.RequestHandler | BaseMiddleware;
+            const m = this._container.get<MiddlewareInstance>(middlewareItem);
+            if (m instanceof BaseMiddleware) {
+                const _self = this;
+                return function (
+                    req: express.Request,
+                    res: express.Response,
+                    next: express.NextFunction
+                ) {
+                    (m as any).httpContext = _self._getHttpContext(req);
+                    (m as any)._container = _self._container;
+                    m.handler(req, res, next);
+                };
+            }
+
+            return m;
         });
     }
 
@@ -272,11 +274,10 @@ export class InversifyExpressServer {
     }
 
     private _getHttpContext(req: express.Request) {
-        const httpContext = Reflect.getMetadata(
+        return Reflect.getMetadata(
             METADATA_KEY.httpContext,
             req
         );
-        return httpContext;
     }
 
     private async _createHttpContext(
@@ -285,12 +286,11 @@ export class InversifyExpressServer {
         next: express.NextFunction
     ) {
         const principal = await this._getCurrentUser(req, res, next);
-        const httpContext = {
+        return {
             request: req,
             response: res,
             user: principal
         };
-        return httpContext;
     }
 
     private async _getCurrentUser(
@@ -301,52 +301,54 @@ export class InversifyExpressServer {
         if (this._AuthProvider !== undefined) {
             const authProvider = this._container.get<interfaces.AuthProvider>(TYPE.AuthProvider);
             return await authProvider.getUser(req, res, next);
-        } else {
-            return Promise.resolve<interfaces.Principal>({
-                details: null,
-                isAuthenticated: () => Promise.resolve(false),
-                isInRole: (role: string) => Promise.resolve(false),
-                isResourceOwner: (resourceId: any) => Promise.resolve(false)
-            });
         }
+        return Promise.resolve<interfaces.Principal>({
+            details: null,
+            isAuthenticated: () => Promise.resolve(false),
+            isInRole: (role: string) => Promise.resolve(false),
+            isResourceOwner: (resourceId: any) => Promise.resolve(false)
+        });
     }
 
     private extractParameters(req: express.Request, res: express.Response, next: express.NextFunction,
         params: interfaces.ParameterMetadata[]): any[] {
-        let args = [];
+        let args: any[] = [];
         if (!params || !params.length) {
             return [req, res, next];
         }
-        for (let item of params) {
 
-            switch (item.type) {
+        params.forEach(({type, index, parameterName}) => {
+            switch (type) {
                 case PARAMETER_TYPE.REQUEST:
-                    args[item.index] = req;
+                    args[index] = req;
                     break;
                 case PARAMETER_TYPE.NEXT:
-                    args[item.index] = next;
+                    args[index] = next;
                     break;
                 case PARAMETER_TYPE.PARAMS:
-                    args[item.index] = this.getParam(req, "params", item.parameterName);
+                    args[index] = this.getParam(req, "params", parameterName);
                     break;
                 case PARAMETER_TYPE.QUERY:
-                    args[item.index] = this.getParam(req, "query", item.parameterName);
+                    args[index] = this.getParam(req, "query", parameterName);
                     break;
                 case PARAMETER_TYPE.BODY:
-                    args[item.index] = req.body;
+                    args[index] = req.body;
                     break;
                 case PARAMETER_TYPE.HEADERS:
-                    args[item.index] = this.getParam(req, "headers", item.parameterName.toLowerCase());
+                    args[index] = this.getParam(req, "headers", parameterName.toLowerCase());
                     break;
                 case PARAMETER_TYPE.COOKIES:
-                    args[item.index] = this.getParam(req, "cookies", item.parameterName);
+                    args[index] = this.getParam(req, "cookies", parameterName);
+                    break;
+                case PARAMETER_TYPE.PRINCIPAL:
+                    args[index] = this._getPrincipal(req);
                     break;
                 default:
-                    args[item.index] = res;
+                    args[index] = res;
                     break; // response
             }
+        });
 
-        }
         args.push(req, res, next);
         return args;
     }
@@ -356,4 +358,7 @@ export class InversifyExpressServer {
         return param ? param[name] : undefined;
     }
 
+    private _getPrincipal(req: express.Request): interfaces.Principal | null {
+        return this._getHttpContext(req).user;
+    }
 }

@@ -273,6 +273,10 @@ Binds a method parameter to the request cookies.
 
 Binds a method parameter to the next() function.
 
+### `@principal()`
+
+Binds a method parameter to the user principal obtained from the AuthProvider.
+
 ## BaseHttpController
 
 The `BaseHttpController` is a base class that provides a significant amount of helper functions in order to aid writing testable controllers.  When returning a response from a method defined on one of these controllers, you may use the `response` object available on the `httpContext` property described in the next section, or you may return an `HttpResponseMessage`, or you may return an object that implements the IHttpActionResult interface.

@@ -1,7 +1,7 @@
 import { InversifyExpressServer } from "./server";
 import { controller, httpMethod, httpGet, httpPut, httpPost, httpPatch,
         httpHead, all, httpDelete, request, response, requestParam, queryParam,
-        requestBody, requestHeaders, cookies, next, injectHttpContext } from "./decorators";
+        requestBody, requestHeaders, cookies, next, principal, injectHttpContext } from "./decorators";
 import { TYPE } from "./constants";
 import { interfaces } from "./interfaces";
 import * as results from "./results";
@@ -37,6 +37,7 @@ export {
     requestHeaders,
     cookies,
     next,
+    principal,
     BaseHttpController,
     injectHttpContext,
     BaseMiddleware,
