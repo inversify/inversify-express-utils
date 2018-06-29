@@ -1,6 +1,6 @@
 {
   "name": "inversify-express-utils",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "description": "Some utilities for the development of express applications with Inversify",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
@@ -61,6 +61,7 @@
   },
   "dependencies": {
     "express": "4.16.2",
-    "http-status-codes": "^1.3.0"
+    "http-status-codes": "^1.3.0",
+    "npm": "^6.1.0"
   }
 }

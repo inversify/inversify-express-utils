@@ -7,17 +7,16 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import { injectable, Container } from "inversify";
-import { interfaces } from "../src/interfaces";
-import { InversifyExpressServer } from "../src/server";
+import { interfaces, InversifyExpressServer } from "../src";
 import {
     controller, httpMethod, all, httpGet, httpPost, httpPut, httpPatch,
     httpHead, httpDelete, request, response, params, requestParam,
     requestBody, queryParam, requestHeaders, cookies,
-    next
+    next, principal
 } from "../src/decorators";
-import { TYPE, PARAMETER_TYPE } from "../src/constants";
 import * as Bluebird from "bluebird";
 import { cleanUpMetadata } from "../src/utils";
+import { it, describe, beforeEach } from "mocha";
 
 describe("Integration Tests:", () => {
 
@@ -706,7 +705,7 @@ describe("Integration Tests:", () => {
                 .expect(200, "foo", done);
         });
 
-        it("should be case insensitve to request headers", (done) => {
+        it("should be case insensitive to request headers", (done) => {
 
             @controller("/")
             class TestController {
@@ -758,6 +757,52 @@ describe("Integration Tests:", () => {
             supertest(server.build())
                 .get("/")
                 .expect(200, "foo", done);
+        });
+
+        it("should bind a method parameter to a principal with null (empty) details when no AuthProvider is set.", (done) => {
+
+            @controller("/")
+            class TestController {
+                @httpGet("/") public getPrincipalTest(@principal() userPrincipal: interfaces.Principal) {
+                    return userPrincipal.details;
+                }
+            }
+
+            server = new InversifyExpressServer(container);
+            supertest(server.build())
+                .get("/")
+                .expect(200, "", done);
+        });
+
+        it("should bind a method parameter to a principal with valid details when an AuthProvider is set.", (done) => {
+
+            @controller("/")
+            class TestController {
+                @httpGet("/") public async getPrincipalTest(@principal() userPrincipal: interfaces.Principal) {
+                    return await userPrincipal.details;
+                }
+            }
+
+            @injectable()
+            class CustomAuthProvider implements interfaces.AuthProvider {
+                public async getUser(
+                    req: express.Request,
+                    res: express.Response,
+                    nextFunc: express.NextFunction
+                ): Promise<interfaces.Principal> {
+                    return Promise.resolve({
+                        details: "something",
+                        isAuthenticated: () => Promise.resolve(true),
+                        isResourceOwner: () => Promise.resolve(true),
+                        isInRole: () => Promise.resolve(true)
+                    } as interfaces.Principal);
+                }
+            }
+
+            server = new InversifyExpressServer(container, null, null, null, CustomAuthProvider);
+            supertest(server.build())
+                .get("/")
+                .expect(200, "something", done);
         });
 
     });

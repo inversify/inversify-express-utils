@@ -98,6 +98,7 @@ export const requestBody: () => ParameterDecorator = paramDecoratorFactory(PARAM
 export const requestHeaders: (headderName: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.HEADERS);
 export const cookies: (cookieName: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.COOKIES);
 export const next: () => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.NEXT);
+export const principal: () => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.PRINCIPAL);
 
 function paramDecoratorFactory(parameterType: PARAMETER_TYPE): (name?: string) => ParameterDecorator {
     return function (name?: string): ParameterDecorator {
