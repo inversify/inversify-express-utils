@@ -11,6 +11,7 @@ import { cleanUpMetadata } from "./utils";
 import { getRouteInfo, getRawMetadata } from "./debug";
 import { HttpResponseMessage } from "./httpResponseMessage";
 import { StringContent } from "./content/stringContent";
+import { JsonContent } from "./content/jsonContent";
 import { HttpContent } from "./content/httpContent";
 
 export {
@@ -43,5 +44,6 @@ export {
     HttpResponseMessage,
     HttpContent,
     StringContent,
+    JsonContent,
     results
 };
