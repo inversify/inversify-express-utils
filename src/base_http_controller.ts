@@ -15,8 +15,10 @@ import {
     NotFoundResult,
     RedirectResult,
     ResponseMessageResult,
-    StatusCodeResult
+    StatusCodeResult,
+    JsonResult
 } from "./results";
+import { OK } from "http-status-codes";
 
 @injectable()
 export class BaseHttpController {
@@ -66,5 +68,9 @@ export class BaseHttpController {
 
     protected statusCode(statusCode: number) {
         return new StatusCodeResult(statusCode, this);
+    }
+
+    protected json(content: any, statusCode: number = OK) {
+        return new JsonResult(content, statusCode, this);
     }
 }

@@ -309,6 +309,7 @@ On the BaseHttpController, we provide a litany of helper methods to ease returni
 * ExceptionResult
 * InternalServerError
 * NotFoundResult
+* JsonResult
 
 ```ts
 import { injectable, inject } from "inversify";
