@@ -34,7 +34,7 @@
     "@types/mocha": "5.2.3",
     "@types/prettyjson": "0.0.28",
     "@types/sinon": "5.0.1",
-    "@types/supertest": "2.0.4",
+    "@types/supertest": "2.0.5",
     "async": "2.6.1",
     "bluebird": "3.5.1",
     "body-parser": "1.18.3",
