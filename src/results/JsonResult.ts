@@ -6,8 +6,8 @@ import { BaseHttpController } from "../base_http_controller";
 export default class JsonResult implements interfaces.IHttpActionResult {
 
   constructor(
-    private json: any,
-    private statusCode: number,
+    public readonly json: any,
+    public readonly statusCode: number,
     private apiController: BaseHttpController) {}
 
   public async executeAsync() {
