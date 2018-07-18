@@ -223,9 +223,9 @@ export class InversifyExpressServer {
 
     private async handleHttpResponseMessage(message: HttpResponseMessage, res: express.Response) {
         this.copyHeadersTo(message.headers, res);
-        this.copyHeadersTo(message.content.headers, res);
 
         if (message.content !== undefined) {
+            this.copyHeadersTo(message.content.headers, res);
             res.status(message.statusCode)
                // If the content is a number, ensure we change it to a string, else our content is treated
                // as a statusCode rather than as the content of the Response
