@@ -33,7 +33,6 @@ node_modules
 .node_repl_history
 
 build
-node_modules
 bower_components
 docs
 bundled
@@ -47,10 +46,10 @@ es
 
 type_definitions/inversify/*.js
 
-src/*.js
+#src/*.js
 src/**/*.js
 
-src/*.js.map
+#src/*.js.map
 src/**/*.js.map
 
 src/*.d.ts
@@ -58,7 +57,7 @@ src/decorator/*.d.ts
 src/factory/*.d.ts
 src/syntax/*.d.ts
 
-test/*.js
+#test/*.js
 test/**/*.js
 test/**/*.js.map
 
@@ -68,3 +67,8 @@ package-lock.json
 
 # JetBrains IDE
 .idea
+.iml
+inversify-express-utils.iml
+
+# OS folders
+.DS_Store

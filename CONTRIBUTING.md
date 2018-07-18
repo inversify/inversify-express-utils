@@ -27,6 +27,6 @@ happening again in the future
 
 - Please keep the test coverage at 100%. Write additional unit tests if necessary
 
--  Please create an issue before sending a PR if it is going to change the public interface of InversifyJS or includes significant architecture changes
+- Please create an issue before sending a PR if it is going to change the public interface of InversifyJS or includes significant architecture changes
 
 - Feel free to ask for help from other members of the InversifyJS team via the chat / mailing list or github issues

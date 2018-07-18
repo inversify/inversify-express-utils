@@ -1,7 +1,6 @@
 import { interfaces as inversifyInterfaces } from "inversify";
-import { BaseHttpController } from "./base_http_controller";
 import { interfaces } from "./interfaces";
-import { PARAMETER_TYPE, TYPE } from "./constants";
+import { PARAMETER_TYPE } from "./constants";
 import {
     getControllersFromContainer,
     getControllerMetadata,
@@ -13,7 +12,7 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
 
     const raw = getRawMetadata(container);
 
-    const info = raw.map(r => {
+    return raw.map(r => {
 
         const controllerId = r.controllerMetadata.target.name;
 
@@ -25,7 +24,7 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
             const paramMetadata = r.parameterMetadata;
             let args: string[] | undefined = undefined;
 
-            if (paramMetadata !== undefined ) {
+            if (paramMetadata !== undefined) {
                 const paramMetadataForKey = paramMetadata[m.key] || undefined;
                 if (paramMetadataForKey) {
                     args = (r.parameterMetadata[m.key] || []).map(a => {
@@ -55,6 +54,9 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
                             case PARAMETER_TYPE.COOKIES:
                                 type = "@cookies";
                                 break;
+                            case PARAMETER_TYPE.PRINCIPAL:
+                                type = "@principal";
+                                break;
                         }
                         return `${type} ${a.parameterName}`;
                     });
@@ -80,15 +82,13 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
 
     });
 
-    return info;
-
 }
 
 export function getRawMetadata(container: inversifyInterfaces.Container) {
 
     const controllers = getControllersFromContainer(container, true);
 
-    const raw = controllers.map((controller) => {
+    return controllers.map((controller) => {
 
         let constructor = controller.constructor;
         let controllerMetadata: interfaces.ControllerMetadata = getControllerMetadata(constructor);
@@ -102,8 +102,6 @@ export function getRawMetadata(container: inversifyInterfaces.Container) {
         };
 
     });
-
-    return raw;
 
 }
 
