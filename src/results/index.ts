@@ -10,3 +10,4 @@ export { default as RedirectResult } from "./RedirectResult";
 export { default as ResponseMessageResult } from "./ResponseMessageResult";
 export { default as ConflictResult } from "./ConflictResult";
 export { default as StatusCodeResult } from "./StatusCodeResult";
+export { default as JsonResult } from "./JsonResult";

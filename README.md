@@ -313,6 +313,7 @@ On the BaseHttpController, we provide a litany of helper methods to ease returni
 * ExceptionResult
 * InternalServerError
 * NotFoundResult
+* JsonResult
 
 ```ts
 import { injectable, inject } from "inversify";
@@ -327,6 +328,55 @@ class ExampleController extends BaseHttpController {
         return this.ok("foo");
     }
 ```
+
+### JsonResult
+
+In some scenarios, you'll want to set the status code of the response.
+This can be done by using the `json` helper method provided by `BaseHttpController`.
+
+```ts
+import {
+    controller, httpGet, BaseHttpController
+} from "inversify-express-utils";
+
+@controller("/")
+export class ExampleController extends BaseHttpController {
+    @httpGet("/")
+    public async get() {
+        const content = { foo: "bar" };
+        const statusCode = 403;
+
+        return this.json(content, statusCode);
+    }
+}
+```
+
+This gives you the flexability to create your own responses while keeping unit testing simple.
+
+```ts
+import { expect } from "chai";
+
+import { ExampleController } from "./example-controller";
+import { results } from "inversify-express-utils";
+
+describe("ExampleController", () => {
+    let controller: ExampleController;
+
+    beforeEach(() => {
+        controller = new ExampleController();
+    });
+
+    describe("#get", () => {
+        it("should have a status code of 403", async () => {
+            const response = await controller.get();
+
+            expect(response).to.be.an.instanceof(results.JsonResult);
+            expect(response.statusCode).to.equal(403);
+        });
+    });
+});
+```
+*This example uses [Mocha](https://mochajs.org) and [Chai](http://www.chaijs.com) as a unit testing framework*
 
 ## HttpContext
 
@@ -529,10 +579,10 @@ container.bind<interfaces.Controller>(TYPE.Controller)
 ### Request-scope services
 
 Middleware extending `BaseMiddleware` is capable of re-binding services in the scope of a HTTP request.
-This is useful if you need access to a HTTP request or context-specific property in a service that doesn't have 
+This is useful if you need access to a HTTP request or context-specific property in a service that doesn't have
 the direct access to them otherwise.
 
-Consider the below `TracingMiddleware`. In this example we want to capture the `X-Trace-Id` header from the incoming request 
+Consider the below `TracingMiddleware`. In this example we want to capture the `X-Trace-Id` header from the incoming request
 and make it available to our IoC services as `TYPES.TraceIdValue`:
 
 ```typescript
@@ -589,7 +639,7 @@ class Service {
 ```
 
 The `BaseMiddleware.bind()` method will bind the `TYPES.TraceIdValue` if it hasn't been bound yet or re-bind if it has
-already been bound. 
+already been bound.
 
 ## Route Map
 
