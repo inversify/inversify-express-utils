@@ -318,7 +318,7 @@ export class InversifyExpressServer {
             return [req, res, next];
         }
 
-        params.forEach(({type, index, parameterName}) => {
+        params.forEach(({ type, index, parameterName, injectRoot }) => {
             switch (type) {
                 case PARAMETER_TYPE.REQUEST:
                     args[index] = req;
@@ -327,19 +327,19 @@ export class InversifyExpressServer {
                     args[index] = next;
                     break;
                 case PARAMETER_TYPE.PARAMS:
-                    args[index] = this.getParam(req, "params", parameterName);
+                    args[index] = this.getParam(req, "params", injectRoot, parameterName);
                     break;
                 case PARAMETER_TYPE.QUERY:
-                    args[index] = this.getParam(req, "query", parameterName);
+                    args[index] = this.getParam(req, "query", injectRoot, parameterName);
                     break;
                 case PARAMETER_TYPE.BODY:
                     args[index] = req.body;
                     break;
                 case PARAMETER_TYPE.HEADERS:
-                    args[index] = this.getParam(req, "headers", parameterName.toLowerCase());
+                    args[index] = this.getParam(req, "headers", injectRoot, parameterName);
                     break;
                 case PARAMETER_TYPE.COOKIES:
-                    args[index] = this.getParam(req, "cookies", parameterName);
+                    args[index] = this.getParam(req, "cookies", injectRoot, parameterName);
                     break;
                 case PARAMETER_TYPE.PRINCIPAL:
                     args[index] = this._getPrincipal(req);
@@ -354,9 +354,15 @@ export class InversifyExpressServer {
         return args;
     }
 
-    private getParam(source: express.Request, paramType: string, name: string) {
+    private getParam(source: express.Request, paramType: string, injectRoot: boolean, name?: string, ) {
+        if (paramType === "headers" && name) { name = name.toLowerCase(); }
         let param = source[paramType];
-        return param ? param[name] : undefined;
+
+        if (injectRoot) {
+            return param;
+        } else {
+            return (param && name) ? param[name] : undefined;
+        }
     }
 
     private _getPrincipal(req: express.Request): interfaces.Principal | null {

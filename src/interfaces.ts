@@ -23,12 +23,13 @@ namespace interfaces {
     }
 
     export interface ParameterMetadata {
-        parameterName: string;
+        parameterName?: string;
+        injectRoot: boolean;
         index: number;
         type: PARAMETER_TYPE;
     }
 
-    export interface Controller {}
+    export interface Controller { }
 
     export interface HandlerDecorator {
         (target: any, key: string, value: any): void;
