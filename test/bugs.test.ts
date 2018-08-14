@@ -6,9 +6,10 @@ import { InversifyExpressServer } from "../src/server";
 import { Container, injectable } from "inversify";
 import { TYPE } from "../src/constants";
 import * as supertest from "supertest";
+import * as cookieParser from "cookie-parser";
 import {
     controller, httpMethod, httpGet, request,
-    response, requestParam, queryParam, requestHeaders
+    response, requestParam, queryParam, requestHeaders, cookies
 } from "../src/decorators";
 import { cleanUpMetadata } from "../src/utils";
 
@@ -61,7 +62,7 @@ describe("Unit Test: Previous bugs", () => {
                 expect(Array.isArray(response1.body)).to.eql(true);
                 expect(response1.body[0].id).to.eql(1);
                 expect(response1.body[1].id).to.eql(2);
-            });
+            }).catch(done);
 
         supertest(app).get("/api/test/5")
             .expect("Content-Type", /json/)
@@ -70,7 +71,7 @@ describe("Unit Test: Previous bugs", () => {
                 expect(Array.isArray(response2.body)).to.eql(false);
                 expect(response2.body.id).to.eql("5");
                 done();
-            });
+            }).catch(done);
 
     });
 
@@ -101,7 +102,7 @@ describe("Unit Test: Previous bugs", () => {
                 expect(response1.body.test).to.eql("testquery");
                 expect(response1.body.empty).to.eq(undefined);
                 done();
-            });
+            }).catch(done);
 
     });
 
@@ -133,8 +134,136 @@ describe("Unit Test: Previous bugs", () => {
                 expect(response1.body.test).to.eql("foo");
                 expect(response1.body.empty).to.eq(undefined);
                 done();
+            }).catch(done);
+
+    });
+
+    describe("param objects without a name (key)", () => {
+        it("should be injected for params", (done) => {
+            let container = new Container();
+
+            @controller("/api/test")
+            class TestController {
+                @httpGet("/:id/:other")
+                public get(
+                    @request() req: express.Request,
+                    @response() res: express.Response,
+                    @requestParam() params: object
+                ) {
+                    return { ...params };
+                }
+
+            }
+
+            let server = new InversifyExpressServer(container);
+            let app = server.build();
+
+            supertest(app).get("/api/test/23/andMe")
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then(res => {
+                    expect(res.body.id).to.eql("23");
+                    expect(res.body.other).to.eq("andMe");
+                    done();
+                }).catch(done);
+        });
+
+        it("should be injected for query params", (done) => {
+            let container = new Container();
+
+            @controller("/api/test")
+            class TestController {
+                @httpGet("/")
+                public get(
+                    @request() req: express.Request,
+                    @response() res: express.Response,
+                    @queryParam() query: object
+                ) {
+                    return { ...query };
+                }
+
+            }
+
+            let server = new InversifyExpressServer(container);
+            let app = server.build();
+
+            supertest(app).get("/api/test?id=23&other=andMe")
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then(res => {
+                    expect(res.body.id).to.eql("23");
+                    expect(res.body.other).to.eq("andMe");
+                    done();
+                }).catch(done);
+        });
+
+        it("should be injected for cookie params", (done) => {
+            let container = new Container();
+
+            @controller("/api/test")
+            class TestController {
+                @httpGet("/")
+                public get(
+                    @request() req: express.Request,
+                    @response() res: express.Response,
+                    @cookies() cookie: object,
+                ) {
+                    return { ...cookie };
+                }
+
+            }
+
+            let server = new InversifyExpressServer(container);
+            server.setConfig((_app) => {
+                _app.use(cookieParser());
             });
 
+            let app = server.build();
+
+            supertest(app).get("/api/test")
+                .set("Cookie", "id=23;other=andMe")
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then(res => {
+                    console.log(res.body);
+                    expect(res.body.id).to.eql("23");
+                    expect(res.body.other).to.eq("andMe");
+                    done();
+                }).catch(done);
+        });
+
+        it("should be injected for header params", (done) => {
+            let container = new Container();
+
+            @controller("/api/test")
+            class TestController {
+                @httpGet("/")
+                public get(
+                    @request() req: express.Request,
+                    @response() res: express.Response,
+                    @requestHeaders() headers: object,
+                ) {
+                    return { ...headers };
+                }
+
+            }
+
+            let server = new InversifyExpressServer(container);
+
+            let app = server.build();
+
+            supertest(app).get("/api/test")
+                .set("id", "23")
+                .set("other", "andMe")
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then(res => {
+                    console.log(res.body);
+                    expect(res.body.id).to.eql("23");
+                    expect(res.body.other).to.eq("andMe");
+                    done();
+                }).catch(done);
+        });
     });
 
 });

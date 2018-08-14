@@ -92,28 +92,28 @@ export function httpMethod(method: string, path: string, ...middleware: interfac
 
 export const request: () => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.REQUEST);
 export const response: () => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.RESPONSE);
-export const requestParam: (paramName: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.PARAMS);
-export const queryParam: (queryParamName: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.QUERY);
+export const requestParam: (paramName?: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.PARAMS);
+export const queryParam: (queryParamName?: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.QUERY);
 export const requestBody: () => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.BODY);
-export const requestHeaders: (headderName: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.HEADERS);
-export const cookies: (cookieName: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.COOKIES);
+export const requestHeaders: (headerName?: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.HEADERS);
+export const cookies: (cookieName?: string) => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.COOKIES);
 export const next: () => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.NEXT);
 export const principal: () => ParameterDecorator = paramDecoratorFactory(PARAMETER_TYPE.PRINCIPAL);
 
 function paramDecoratorFactory(parameterType: PARAMETER_TYPE): (name?: string) => ParameterDecorator {
     return function (name?: string): ParameterDecorator {
-        name = name || "default";
         return params(parameterType, name);
     };
 }
 
-export function params(type: PARAMETER_TYPE, parameterName: string) {
+export function params(type: PARAMETER_TYPE, parameterName?: string) {
     return function (target: Object, methodName: string, index: number) {
 
         let metadataList: interfaces.ControllerParameterMetadata = {};
         let parameterMetadataList: interfaces.ParameterMetadata[] = [];
         let parameterMetadata: interfaces.ParameterMetadata = {
             index: index,
+            injectRoot: parameterName === undefined,
             parameterName: parameterName,
             type: type
         };
