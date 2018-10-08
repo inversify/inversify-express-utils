@@ -201,7 +201,6 @@ export class InversifyExpressServer {
                     next: express.NextFunction
                 ) {
                     (m as any).httpContext = _self._getHttpContext(req);
-                    (m as any)._container = _self._container;
                     m.handler(req, res, next);
                 };
             }
@@ -245,15 +244,12 @@ export class InversifyExpressServer {
             try {
                 let args = this.extractParameters(req, res, next, parameterMetadata);
 
-                // We use a childContainer for each request so we can be
-                // sure that the binding is unique for each HTTP request
-                let childContainer = this._container.createChild();
                 const httpContext = this._getHttpContext(req);
-                childContainer.bind<interfaces.HttpContext>(TYPE.HttpContext)
+                httpContext.container.bind<interfaces.HttpContext>(TYPE.HttpContext)
                     .toConstantValue(httpContext);
 
                 // invoke controller's action
-                const value = await childContainer.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
+                const value = await httpContext.container.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
 
                 if (value instanceof HttpResponseMessage) {
                     await this.handleHttpResponseMessage(value, res);
@@ -274,7 +270,7 @@ export class InversifyExpressServer {
         };
     }
 
-    private _getHttpContext(req: express.Request) {
+    private _getHttpContext(req: express.Request): interfaces.HttpContext {
         return Reflect.getMetadata(
             METADATA_KEY.httpContext,
             req
@@ -290,6 +286,9 @@ export class InversifyExpressServer {
         return {
             request: req,
             response: res,
+            // We use a childContainer for each request so we can be
+            // sure that the binding is unique for each HTTP request
+            container: this._container.createChild(),
             user: principal
         };
     }
