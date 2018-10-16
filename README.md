@@ -259,7 +259,7 @@ Binds a method parameter to request.query or to a specific query parameter if a 
 
 ### `@requestBody()`
 
-Binds a method parameter to request.body or to a specific body property if a name is passed. If the bodyParser middleware is not used on the express app, this will bind the method parameter to the express request object.
+Binds a method parameter to the request.body. If the bodyParser middleware is not used on the express app, this will bind the method parameter to the express request object.
 
 ### `@requestHeaders(name: string)`
 
