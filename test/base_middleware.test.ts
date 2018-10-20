@@ -1,11 +1,10 @@
 import { expect } from "chai";
 import * as async from "async";
 import * as express from "express";
-import { Container, injectable, inject } from "inversify";
+import { Container, injectable, inject, optional } from "inversify";
 import * as supertest from "supertest";
 import {
     InversifyExpressServer,
-    TYPE,
     controller,
     httpGet,
     BaseMiddleware,
@@ -27,10 +26,6 @@ describe("BaseMiddleware", () => {
             LoggerMiddleware: Symbol.for("LoggerMiddleware"),
             SomeDependency: Symbol.for("SomeDependency")
         };
-
-        interface SomeDependency {
-            name: string;
-        }
 
         let principalInstanceCount = 0;
 
@@ -152,16 +147,10 @@ describe("BaseMiddleware", () => {
         const TRACE_HEADER = "X-Trace-Id";
 
         const TYPES = {
-            TraceId: Symbol.for("TraceId"),
             TraceIdValue: Symbol.for("TraceIdValue"),
             TracingMiddleware: Symbol.for("TracingMiddleware"),
             Service: Symbol.for("Service"),
         };
-
-        class TraceId {
-            constructor(public readonly value: string) {
-            }
-        }
 
         @injectable()
         class TracingMiddleware extends BaseMiddleware {
@@ -171,21 +160,23 @@ describe("BaseMiddleware", () => {
                 res: express.Response,
                 next: express.NextFunction
             ) {
-                this.bind<string>(TYPES.TraceIdValue)
-                    .toConstantValue(`${ req.header(TRACE_HEADER) }`);
-                next();
+                setTimeout(() => {
+                    this.bind<string>(TYPES.TraceIdValue)
+                        .toConstantValue(`${ req.header(TRACE_HEADER) }`);
+                    next();
+                }, someTimeBetween(0, 500));
             }
         }
 
         @injectable()
         class Service {
-            constructor(@inject(TYPES.TraceId) private readonly traceID: TraceId) {
+            constructor(@inject(TYPES.TraceIdValue) private readonly traceID: string) {
             }
 
             public doSomethingThatRequiresTheTraceID() {
                 return new Promise((resolve, reject) => {
                     setTimeout(() => {
-                        resolve(this.traceID.value);
+                        resolve(this.traceID);
                     }, someTimeBetween(0, 500));
                 });
             }
@@ -212,10 +203,6 @@ describe("BaseMiddleware", () => {
         container.bind<TracingMiddleware>(TYPES.TracingMiddleware).to(TracingMiddleware);
         container.bind<Service>(TYPES.Service).to(Service);
         container.bind<string>(TYPES.TraceIdValue).toConstantValue(undefined as any);
-        container.bind<TraceId>(TYPES.TraceId).toDynamicValue((context) => {
-            const traceIdValue = context.container.get<string>(TYPES.TraceIdValue);
-            return new TraceId(traceIdValue);
-        }).inRequestScope();
 
         const api = new InversifyExpressServer(container).build();
 
@@ -238,6 +225,72 @@ describe("BaseMiddleware", () => {
             done(err);
         });
     });
+
+    it("Should not allow services injected into a HTTP request scope to be accessible outside the request scope", (done) => {
+
+        const TYPES = {
+            Transaction: Symbol.for("Transaction"),
+            TransactionMiddleware: Symbol.for("TransactionMiddleware"),
+        };
+
+        class TransactionMiddleware extends BaseMiddleware {
+
+            private count = 0;
+
+            public handler(
+                req: express.Request,
+                res: express.Response,
+                next: express.NextFunction
+            ) {
+                this.bind<string>(TYPES.Transaction)
+                    .toConstantValue(`I am transaction #${++this.count}\n`);
+                next();
+            }
+        }
+
+        @controller("/")
+        class TransactionTestController extends BaseHttpController {
+
+            constructor(@inject(TYPES.Transaction) @optional() private transaction: string) {
+                super();
+            }
+
+            @httpGet(
+                "/1",
+                TYPES.TransactionMiddleware
+            )
+            public getTest1() {
+                return this.transaction;
+            }
+
+            @httpGet(
+                "/2" // <= No middleware!
+            )
+            public getTest2() {
+                return this.transaction;
+            }
+        }
+
+        const container = new Container();
+
+        container.bind<TransactionMiddleware>(TYPES.TransactionMiddleware).to(TransactionMiddleware);
+        const app = new InversifyExpressServer(container).build();
+
+        supertest(app)
+            .get("/1")
+            .expect(200, "I am transaction #1", () => {
+
+              supertest(app)
+                .get("/1")
+                .expect(200, "I am transaction #2", () => {
+
+                supertest(app)
+                      .get("/2")
+                      .expect(200, "", () => done());
+                });
+        });
+
+  });
 });
 
 function run(parallelRuns: number, test: (executionId: number) => PromiseLike<any>, done: (error?: Error) => void) {
