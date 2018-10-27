@@ -5,7 +5,6 @@ import { Container, injectable, inject, optional } from "inversify";
 import * as supertest from "supertest";
 import {
     InversifyExpressServer,
-    TYPE,
     controller,
     httpGet,
     BaseMiddleware,
@@ -27,10 +26,6 @@ describe("BaseMiddleware", () => {
             LoggerMiddleware: Symbol.for("LoggerMiddleware"),
             SomeDependency: Symbol.for("SomeDependency")
         };
-
-        interface SomeDependency {
-            name: string;
-        }
 
         let principalInstanceCount = 0;
 
@@ -152,16 +147,10 @@ describe("BaseMiddleware", () => {
         const TRACE_HEADER = "X-Trace-Id";
 
         const TYPES = {
-            TraceId: Symbol.for("TraceId"),
             TraceIdValue: Symbol.for("TraceIdValue"),
             TracingMiddleware: Symbol.for("TracingMiddleware"),
             Service: Symbol.for("Service"),
         };
-
-        class TraceId {
-            constructor(public readonly value: string) {
-            }
-        }
 
         @injectable()
         class TracingMiddleware extends BaseMiddleware {
@@ -179,13 +168,13 @@ describe("BaseMiddleware", () => {
 
         @injectable()
         class Service {
-            constructor(@inject(TYPES.TraceId) private readonly traceID: TraceId) {
+            constructor(@inject(TYPES.TraceIdValue) private readonly traceID: string) {
             }
 
             public doSomethingThatRequiresTheTraceID() {
                 return new Promise((resolve, reject) => {
                     setTimeout(() => {
-                        resolve(this.traceID.value);
+                        resolve(this.traceID);
                     }, someTimeBetween(0, 500));
                 });
             }
@@ -212,10 +201,6 @@ describe("BaseMiddleware", () => {
         container.bind<TracingMiddleware>(TYPES.TracingMiddleware).to(TracingMiddleware);
         container.bind<Service>(TYPES.Service).to(Service);
         container.bind<string>(TYPES.TraceIdValue).toConstantValue(undefined as any);
-        container.bind<TraceId>(TYPES.TraceId).toDynamicValue((context) => {
-            const traceIdValue = context.container.get<string>(TYPES.TraceIdValue);
-            return new TraceId(traceIdValue);
-        }).inRequestScope();
 
         const api = new InversifyExpressServer(container).build();
 
@@ -293,9 +278,14 @@ describe("BaseMiddleware", () => {
             .get("/1")
             .expect(200, "I am transaction #1", () => {
 
-            supertest(app)
-                  .get("/2")
-                  .expect(200, "", () => done());
+              supertest(app)
+                .get("/1")
+                .expect(200, "I am transaction #2", () => {
+
+                supertest(app)
+                      .get("/2")
+                      .expect(200, "", () => done());
+                });
         });
 
   });
