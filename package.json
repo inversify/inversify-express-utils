@@ -50,7 +50,7 @@
     "mocha": "5.2.0",
     "moq.ts": "^2.7.3",
     "prettyjson": "1.2.1",
-    "publish-please": "4.0.1",
+    "publish-please": "5.1.1",
     "reflect-metadata": "0.1.12",
     "run-sequence": "2.2.1",
     "sinon": "6.0.1",
