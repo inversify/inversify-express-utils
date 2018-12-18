@@ -1,7 +1,8 @@
-import * as express from "express";
 import { inject, injectable, decorate } from "inversify";
 import { interfaces } from "./interfaces";
 import { TYPE, METADATA_KEY, PARAMETER_TYPE } from "./constants";
+import { Handler, NextFunction, Request, Response } from "express";
+import HttpContext = interfaces.HttpContext;
 
 export const injectHttpContext = inject(TYPE.HttpContext);
 
@@ -128,5 +129,29 @@ export function params(type: PARAMETER_TYPE, parameterName?: string) {
         }
         metadataList[methodName] = parameterMetadataList;
         Reflect.defineMetadata(METADATA_KEY.controllerParameter, metadataList, target.constructor);
+    };
+}
+
+export function isAuthenticated (pass = true): any {
+    return function (target: any, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>) {
+        const fn = descriptor.value as Handler;
+        descriptor.value = async function (_request: Request, _response: Response, _next: NextFunction) {
+            const context: HttpContext = Reflect.getMetadata(
+                METADATA_KEY.httpContext,
+                _request
+            );
+            const _isAuthenticated = (await context.user.isAuthenticated());
+            if (_isAuthenticated && pass) {
+                return fn.call(this, _request, _response)
+            } else {
+                _response
+                  .status(403)
+                  .send({ error: "The user is not authenticated." });
+
+                return _response;
+            }
+        };
+
+        return descriptor;
     };
 }

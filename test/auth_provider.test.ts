@@ -11,6 +11,8 @@ import {
     interfaces
 } from "../src/index";
 import { cleanUpMetadata } from "../src/utils";
+import { isAuthenticated } from "../src/decorators";
+import AuthProvider = interfaces.AuthProvider;
 
 describe("AuthProvider", () => {
 
@@ -19,7 +21,7 @@ describe("AuthProvider", () => {
         done();
     });
 
-    it("Should be able to access current user via HttpContext", (done) => {
+    xit("Should be able to access current user via HttpContext", (done) => {
 
         interface SomeDependency {
             name: string;
@@ -94,6 +96,88 @@ describe("AuthProvider", () => {
             .get("/")
             .expect(200, `SomeDependency!@test.com & SomeDependency!`, done);
 
+    });
+
+    describe("Principal`s decorators", () => {
+        class Principal implements interfaces.Principal {
+            public details: any;
+            public constructor(details: any) {
+                this.details = details;
+            }
+            public isAuthenticated() {
+                return Promise.resolve<boolean>(!!this.details._id);
+            }
+            public isResourceOwner(resourceId: any) {
+                return Promise.resolve<boolean>(resourceId === 1111);
+            }
+            public isInRole(role: string) {
+                return Promise.resolve<boolean>(role === "admin");
+            }
+        }
+
+        interface IUserDetails {
+            _id: number;
+        }
+
+        @injectable()
+        class CustomAuthProvider implements interfaces.AuthProvider {
+
+            @inject("UserDetails") private readonly _details: IUserDetails;
+
+            public getUser(
+                req: express.Request,
+                res: express.Response,
+                next: express.NextFunction
+            ) {
+                const principal = new Principal(this._details);
+                return Promise.resolve(principal);
+            }
+        }
+
+        @controller("/")
+        class TestController extends BaseHttpController {
+            @httpGet("/")
+            @isAuthenticated()
+            public async getTest() {
+                return this.ok("OK")
+            }
+        }
+
+        const container = new Container();
+        container.bind<IUserDetails>("UserDetails")
+            .toConstantValue({ _id: 1 });
+
+
+        const server = new InversifyExpressServer(
+            container,
+            null,
+            null,
+            null,
+            CustomAuthProvider
+        );
+        const app = server.build();
+        const authProvider = container.get<CustomAuthProvider>(TYPE.AuthProvider);
+
+        it("Rejected", (done) => {
+          container.rebind<IUserDetails>("UserDetails")
+                .toConstantValue({ _id: 0});
+          expect(true).eq(true);
+
+          supertest(app)
+            .get("/")
+            .expect(403)
+            .end(done);
+        });
+
+        it("Accepted", (done) => {
+            container.rebind<IUserDetails>("UserDetails")
+                .toConstantValue({ _id: 1});
+            expect(true).eq(true);
+
+            supertest(app)
+                .get("/")
+                .expect(200, `"OK"`, done);
+        });
     });
 
 });
