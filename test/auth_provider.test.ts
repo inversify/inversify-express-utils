@@ -21,7 +21,7 @@ describe("AuthProvider", () => {
         done();
     });
 
-    xit("Should be able to access current user via HttpContext", (done) => {
+    it("Should be able to access current user via HttpContext", (done) => {
 
         interface SomeDependency {
             name: string;
