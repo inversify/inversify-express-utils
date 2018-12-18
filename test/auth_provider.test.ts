@@ -72,8 +72,8 @@ describe("AuthProvider", () => {
                 if (this.httpContext.user !== null) {
                     const email = this.httpContext.user.details.email;
                     const name = this._someDependency.name;
-                    const isAuthenticated = await this.httpContext.user.isAuthenticated();
-                    expect(isAuthenticated).eq(true);
+                    const _isAuthenticated = await this.httpContext.user.isAuthenticated();
+                    expect(_isAuthenticated).eq(true);
                     return `${email} & ${name}`;
                 }
             }
@@ -139,7 +139,7 @@ describe("AuthProvider", () => {
             @httpGet("/")
             @isAuthenticated()
             public async getTest() {
-                return this.ok("OK")
+                return this.ok("OK");
             }
         }
 

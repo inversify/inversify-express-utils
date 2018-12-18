@@ -142,7 +142,7 @@ export function isAuthenticated (pass = true): any {
             );
             const _isAuthenticated = (await context.user.isAuthenticated());
             if (_isAuthenticated && pass) {
-                return fn.call(this, _request, _response)
+                return fn.call(this, _request, _response);
             } else {
                 _response
                   .status(403)
