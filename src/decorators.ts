@@ -132,7 +132,11 @@ export function params(type: PARAMETER_TYPE, parameterName?: string) {
     };
 }
 
-export function isAuthenticated (pass = true): any {
+export interface IContextAcessAdapterFn {
+    (context: HttpContext): Promise<boolean>;
+}
+
+export function httpContextAccessDecoratorFactory(implementation: IContextAcessAdapterFn) {
     return function (target: any, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>) {
         const fn = descriptor.value as Handler;
         descriptor.value = async function (_request: Request, _response: Response, _next: NextFunction) {
@@ -140,13 +144,13 @@ export function isAuthenticated (pass = true): any {
                 METADATA_KEY.httpContext,
                 _request
             );
-            const _isAuthenticated = (await context.user.isAuthenticated());
-            if (_isAuthenticated && pass) {
+            const hasAccess = await implementation(context);
+            if (hasAccess) {
                 return fn.call(this, _request, _response);
             } else {
                 _response
-                  .status(403)
-                  .send({ error: "The user is not authenticated." });
+                    .status(403)
+                    .send({ error: "The user is not authenticated." });
 
                 return _response;
             }
@@ -155,3 +159,22 @@ export function isAuthenticated (pass = true): any {
         return descriptor;
     };
 }
+
+export function isAuthenticated (pass = true): any {
+    return httpContextAccessDecoratorFactory(async (context) => {
+        return (await context.user.isAuthenticated() && pass);
+    });
+}
+
+export function inRole (role: string, pass = true): any {
+    return httpContextAccessDecoratorFactory(async (context) => {
+        return (await context.user.isInRole(role) && pass);
+    });
+}
+
+export function isResourceOwner (resorceId: string, pass = true): any {
+    return httpContextAccessDecoratorFactory(async (context) => {
+        return (await context.user.isResourceOwner(resorceId) && pass);
+    });
+}
+

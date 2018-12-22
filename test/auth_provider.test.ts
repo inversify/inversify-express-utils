@@ -11,7 +11,7 @@ import {
     interfaces
 } from "../src/index";
 import { cleanUpMetadata } from "../src/utils";
-import { isAuthenticated } from "../src/decorators";
+import {httpContextAccessDecoratorFactory, inRole, isAuthenticated, isResourceOwner} from "../src/decorators";
 import AuthProvider = interfaces.AuthProvider;
 
 describe("AuthProvider", () => {
@@ -108,15 +108,17 @@ describe("AuthProvider", () => {
                 return Promise.resolve<boolean>(!!this.details._id);
             }
             public isResourceOwner(resourceId: any) {
-                return Promise.resolve<boolean>(resourceId === 1111);
+                return Promise.resolve<boolean>(this.details.resourceIds.indexOf(resourceId) > -1);
             }
             public isInRole(role: string) {
-                return Promise.resolve<boolean>(role === "admin");
+                return Promise.resolve<boolean>(this.details.roles.indexOf(role) > -1);
             }
         }
 
         interface IUserDetails {
             _id: number;
+            resourceIds?: string[];
+            roles?: string[];
         }
 
         @injectable()
@@ -134,11 +136,35 @@ describe("AuthProvider", () => {
             }
         }
 
+        function userExists (pass = true): any {
+            return httpContextAccessDecoratorFactory(async (context) => {
+                return (await context.user.isAuthenticated() && pass);
+            });
+        }
+
         @controller("/")
         class TestController extends BaseHttpController {
-            @httpGet("/")
+            @httpGet("userExists")
+            @userExists()
+            public async userExists() {
+                return this.ok("OK");
+            }
+
+            @httpGet("isAuthenticated")
             @isAuthenticated()
-            public async getTest() {
+            public async isAuthenticated() {
+                return this.ok("OK");
+            }
+
+            @httpGet("isResourceOwner")
+            @isResourceOwner("2301")
+            public async isResourceOwner() {
+                return this.ok("OK");
+            }
+
+            @httpGet("inRole")
+            @inRole("admin")
+            public async inRole() {
                 return this.ok("OK");
             }
         }
@@ -158,25 +184,104 @@ describe("AuthProvider", () => {
         const app = server.build();
         const authProvider = container.get<CustomAuthProvider>(TYPE.AuthProvider);
 
-        it("Rejected", (done) => {
-          container.rebind<IUserDetails>("UserDetails")
-                .toConstantValue({ _id: 0});
-          expect(true).eq(true);
+        describe("Custom decorator", () => {
+            it("Rejected", (done) => {
+                container.rebind<IUserDetails>("UserDetails")
+                    .toConstantValue({ _id: 0});
+                expect(true).eq(true);
 
-          supertest(app)
-            .get("/")
-            .expect(403)
-            .end(done);
+                supertest(app)
+                    .get("/userExists")
+                    .expect(403)
+                    .end(done);
+            });
+
+            it("Accepted", (done) => {
+                container.rebind<IUserDetails>("UserDetails")
+                    .toConstantValue({ _id: 1});
+                expect(true).eq(true);
+
+                supertest(app)
+                    .get("/userExists")
+                    .expect(200, `"OK"`, done);
+            });
         });
 
-        it("Accepted", (done) => {
-            container.rebind<IUserDetails>("UserDetails")
-                .toConstantValue({ _id: 1});
-            expect(true).eq(true);
+        describe("IsAuthenticated", () => {
+            it("Rejected", (done) => {
+                container.rebind<IUserDetails>("UserDetails")
+                    .toConstantValue({ _id: 0});
+                expect(true).eq(true);
 
-            supertest(app)
-                .get("/")
-                .expect(200, `"OK"`, done);
+                supertest(app)
+                    .get("/isAuthenticated")
+                    .expect(403)
+                    .end(done);
+            });
+
+            it("Accepted", (done) => {
+                container.rebind<IUserDetails>("UserDetails")
+                    .toConstantValue({ _id: 1});
+                expect(true).eq(true);
+
+                supertest(app)
+                    .get("/isAuthenticated")
+                    .expect(200, `"OK"`, done);
+            });
+        });
+
+        describe("IsResorceOwner", () => {
+            it("Rejected", (done) => {
+                container.rebind<IUserDetails>("UserDetails").toConstantValue({
+                    _id: 1,
+                    resourceIds: ["2909"]
+                });
+                expect(true).eq(true);
+
+                supertest(app)
+                    .get("/isResourceOwner")
+                    .expect(403)
+                    .end(done);
+            });
+
+            it("Accepted", (done) => {
+                container.rebind<IUserDetails>("UserDetails").toConstantValue({
+                    _id: 1,
+                    resourceIds: ["2301"]
+                });
+                expect(true).eq(true);
+
+                supertest(app)
+                    .get("/isResourceOwner")
+                    .expect(200, `"OK"`, done);
+            });
+        });
+
+        describe("IsRole", () => {
+            it("Rejected", (done) => {
+                container.rebind<IUserDetails>("UserDetails").toConstantValue({
+                    _id: 1,
+                    roles: ["manager"]
+                });
+                expect(true).eq(true);
+
+                supertest(app)
+                    .get("/inRole")
+                    .expect(403)
+                    .end(done);
+            });
+
+            it("Accepted", (done) => {
+                container.rebind<IUserDetails>("UserDetails").toConstantValue({
+                    _id: 1,
+                    roles: ["admin"]
+                });
+                expect(true).eq(true);
+
+                supertest(app)
+                    .get("/inRole")
+                    .expect(200, `"OK"`, done);
+            });
         });
     });
 
