@@ -63,6 +63,7 @@ namespace interfaces {
     export interface HttpContext {
         request: express.Request;
         response: express.Response;
+        container: inversifyInterfaces.Container;
         user: Principal;
     }
 
