@@ -51,7 +51,7 @@
     "moq.ts": "^2.7.3",
     "prettyjson": "1.2.1",
     "publish-please": "5.4.3",
-    "reflect-metadata": "0.1.12",
+    "reflect-metadata": "0.1.13",
     "run-sequence": "2.2.1",
     "sinon": "6.0.1",
     "source-map-support": "0.5.6",
