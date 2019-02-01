@@ -30,7 +30,7 @@
     "@types/body-parser": "1.17.0",
     "@types/chai": "4.1.4",
     "@types/cookie-parser": "1.4.1",
-    "@types/express": "4.16.0",
+    "@types/express": "4.16.1",
     "@types/mocha": "5.2.3",
     "@types/prettyjson": "0.0.28",
     "@types/sinon": "7.0.1",
