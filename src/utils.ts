@@ -48,6 +48,13 @@ export function getControllerParameterMetadata(constructor: any) {
     return parameterMetadata;
 }
 
+export function getControllerMethodMiddlewares(constructor: any): Map<string, interfaces.Middleware[]> {
+    return Reflect.getMetadata(
+        METADATA_KEY.controllerMethodMiddleware,
+        constructor
+    );
+}
+
 export function cleanUpMetadata() {
     Reflect.defineMetadata(
         METADATA_KEY.controller,
@@ -58,4 +65,14 @@ export function cleanUpMetadata() {
 
 export function instanceOfIHttpActionResult(value: any): value is interfaces.IHttpActionResult {
     return value != null && typeof value.executeAsync === "function";
+}
+
+export function getOrCreateMetadata<T>(key: string, target: object, creator: () => T): T {
+    if (!Reflect.hasMetadata(key, target)) {
+        let value = creator()
+        Reflect.defineMetadata(key, value, target);
+        return value;
+    }
+
+    return Reflect.getMetadata(key, target);
 }

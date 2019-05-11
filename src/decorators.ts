@@ -1,15 +1,15 @@
-import * as express from "express";
 import { inject, injectable, decorate } from "inversify";
 import { interfaces } from "./interfaces";
 import { TYPE, METADATA_KEY, PARAMETER_TYPE } from "./constants";
+import { getOrCreateMetadata } from "./utils";
 
 export const injectHttpContext = inject(TYPE.HttpContext);
 
-export function controller(path: string, ...middleware: interfaces.Middleware[]) {
+export function controller(path: string, ...middlewares: interfaces.Middleware[]) {
     return function (target: any) {
 
         let currentMetadata: interfaces.ControllerMetadata = {
-            middleware: middleware,
+            middleware: middlewares,
             path: path,
             target: target
         };
@@ -39,54 +39,69 @@ export function controller(path: string, ...middleware: interfaces.Middleware[])
     };
 }
 
-export function all(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("all", path, ...middleware);
+export function all(path: string, ...middlewares: interfaces.Middleware[]): interfaces.HandlerDecorator {
+    return httpMethod("all", path, ...middlewares);
 }
 
-export function httpGet(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("get", path, ...middleware);
+export function httpGet(path: string, ...middlewares: interfaces.Middleware[]): interfaces.HandlerDecorator {
+    return httpMethod("get", path, ...middlewares);
 }
 
-export function httpPost(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("post", path, ...middleware);
+export function httpPost(path: string, ...middlewares: interfaces.Middleware[]): interfaces.HandlerDecorator {
+    return httpMethod("post", path, ...middlewares);
 }
 
-export function httpPut(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("put", path, ...middleware);
+export function httpPut(path: string, ...middlewares: interfaces.Middleware[]): interfaces.HandlerDecorator {
+    return httpMethod("put", path, ...middlewares);
 }
 
-export function httpPatch(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("patch", path, ...middleware);
+export function httpPatch(path: string, ...middlewares: interfaces.Middleware[]): interfaces.HandlerDecorator {
+    return httpMethod("patch", path, ...middlewares);
 }
 
-export function httpHead(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("head", path, ...middleware);
+export function httpHead(path: string, ...middlewares: interfaces.Middleware[]): interfaces.HandlerDecorator {
+    return httpMethod("head", path, ...middlewares);
 }
 
-export function httpDelete(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
-    return httpMethod("delete", path, ...middleware);
+export function httpDelete(path: string, ...middlewares: interfaces.Middleware[]): interfaces.HandlerDecorator {
+    return httpMethod("delete", path, ...middlewares);
 }
 
-export function httpMethod(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+export function httpMethod(method: string, path: string, ...middlewares: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return function (target: any, key: string, value: any) {
 
         let metadata: interfaces.ControllerMethodMetadata = {
             key,
             method,
-            middleware,
             path,
             target
         };
 
-        let metadataList: interfaces.ControllerMethodMetadata[] = [];
-
-        if (!Reflect.hasMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
-            Reflect.defineMetadata(METADATA_KEY.controllerMethod, metadataList, target.constructor);
-        } else {
-            metadataList = Reflect.getMetadata(METADATA_KEY.controllerMethod, target.constructor);
-        }
+        let metadataList: interfaces.ControllerMethodMetadata[] = getOrCreateMetadata(
+            METADATA_KEY.controllerMethod,
+            target.constructor,
+            () => []
+        );
 
         metadataList.push(metadata);
+
+        middleware(...middlewares)(target, key);
+    };
+}
+
+export function middleware(...fns: interfaces.Middleware[]) {
+    return function (target: any, methodName: string) {
+        let controllerMiddlewareMap = getOrCreateMetadata(
+            METADATA_KEY.controllerMethodMiddleware,
+            target.constructor,
+            () => new Map<string, interfaces.Middleware[]>()
+        );
+
+        if (controllerMiddlewareMap.has(methodName)) {
+            controllerMiddlewareMap.get(methodName)!.push(...fns);
+        } else {
+            controllerMiddlewareMap.set(methodName, fns);
+        }
     };
 }
 

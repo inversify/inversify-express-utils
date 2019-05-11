@@ -8,7 +8,8 @@ import {
     getControllerMetadata,
     getControllerMethodMetadata,
     getControllerParameterMetadata,
-    instanceOfIHttpActionResult
+    instanceOfIHttpActionResult,
+    getControllerMethodMiddlewares
 } from "./utils";
 import {
     TYPE,
@@ -160,6 +161,7 @@ export class InversifyExpressServer {
             let controllerMetadata = getControllerMetadata(controller.constructor);
             let methodMetadata = getControllerMethodMetadata(controller.constructor);
             let parameterMetadata = getControllerParameterMetadata(controller.constructor);
+            let methodMiddlewares = getControllerMethodMiddlewares(controller.constructor);
 
             if (controllerMetadata && methodMetadata) {
 
@@ -171,7 +173,9 @@ export class InversifyExpressServer {
                         paramList = parameterMetadata[metadata.key] || [];
                     }
                     let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, metadata.key, paramList);
-                    let routeMiddleware = this.resolveMidleware(...metadata.middleware);
+
+                    let routeMiddleware = this.resolveMidleware(...(methodMiddlewares.get(metadata.key) || []));
+
                     this._router[metadata.method](
                         `${controllerMetadata.path}${metadata.path}`,
                         ...controllerMiddleware,
