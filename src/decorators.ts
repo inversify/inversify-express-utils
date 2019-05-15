@@ -97,8 +97,10 @@ export function middleware(...fns: interfaces.Middleware[]) {
             () => new Map<string, interfaces.Middleware[]>()
         );
 
-        if (controllerMiddlewareMap.has(methodName)) {
-            controllerMiddlewareMap.get(methodName)!.push(...fns);
+        let controllerMiddleware = controllerMiddlewareMap.get(methodName);
+
+        if (controllerMiddleware) {
+            controllerMiddleware.push(...fns);
         } else {
             controllerMiddlewareMap.set(methodName, fns);
         }
