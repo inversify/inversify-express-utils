@@ -44,12 +44,17 @@ describe("Unit Test: Controller Decorators", () => {
             METADATA_KEY.controllerMethod,
             TestController
         );
+        let methodMiddlewareMetadata: Map<string, interfaces.Middleware[]> = Reflect.getMetadata(
+            METADATA_KEY.controllerMethodMiddleware,
+            TestController
+        );
 
         expect(methodMetadata.length).eql(3);
 
         let metadata: interfaces.ControllerMethodMetadata = methodMetadata[0];
 
-        expect(metadata.middleware).eql(middleware);
+        expect(methodMiddlewareMetadata.get("test")!.length).eql(3);
+        expect(methodMiddlewareMetadata.get("test1")).eql(undefined);
         expect(metadata.path).eql(path);
         expect(metadata.target.constructor).eql(TestController);
         expect(metadata.key).eql("test");

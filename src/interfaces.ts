@@ -3,6 +3,8 @@ import { interfaces as inversifyInterfaces } from "inversify";
 import { PARAMETER_TYPE } from "./constants";
 import { HttpResponseMessage } from "./httpResponseMessage";
 
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 namespace interfaces {
 
     export type Middleware = (inversifyInterfaces.ServiceIdentifier<any> | express.RequestHandler);
@@ -13,7 +15,7 @@ namespace interfaces {
         target: any;
     }
 
-    export interface ControllerMethodMetadata extends ControllerMetadata {
+    export interface ControllerMethodMetadata extends Omit<ControllerMetadata, "middleware"> {
         method: string;
         key: string;
     }
