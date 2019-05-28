@@ -69,7 +69,7 @@ export function instanceOfIHttpActionResult(value: any): value is interfaces.IHt
 
 export function getOrCreateMetadata<T>(key: string, target: object, creator: () => T): T {
     if (!Reflect.hasMetadata(key, target)) {
-        let value = creator()
+        let value = creator();
         Reflect.defineMetadata(key, value, target);
         return value;
     }
