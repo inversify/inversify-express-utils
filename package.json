@@ -48,7 +48,7 @@
     "gulp-typescript": "5.0.0",
     "inversify": "5.0.1",
     "mocha": "5.2.0",
-    "moq.ts": "^2.7.3",
+    "moq.ts": "^3.0.0",
     "prettyjson": "1.2.1",
     "publish-please": "5.4.3",
     "reflect-metadata": "0.1.13",
