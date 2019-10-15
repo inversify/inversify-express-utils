@@ -10,7 +10,7 @@ import { injectable, Container } from "inversify";
 import { interfaces, InversifyExpressServer } from "../src";
 import {
     controller, httpMethod, all, httpGet, httpPost, httpPut, httpPatch,
-    httpHead, httpDelete, request, response, params, requestParam,
+    httpHead, httpDelete, httpOptions, request, response, params, requestParam,
     requestBody, queryParam, requestHeaders, cookies,
     next, principal
 } from "../src/decorators";
@@ -427,6 +427,26 @@ describe("Integration Tests:", () => {
 
             agent.delete("/")
                 .expect(200, "DELETE", function () {
+                    expect(spyA.calledOnce).to.eqls(true);
+                    expect(spyB.calledOnce).to.eqls(true);
+                    expect(spyC.calledOnce).to.eqls(true);
+                    expect(result).to.equal("abc");
+                    done();
+                });
+        });
+
+        it("should call method-level middleware correctly (OPTIONS)", (done) => {
+
+            @controller("/")
+            class TestController {
+                @httpOptions("/", spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send("OPTIONS"); }
+            }
+
+            server = new InversifyExpressServer(container);
+            let agent = supertest(server.build());
+
+            agent.options("/")
+                .expect(200, "OPTIONS", function () {
                     expect(spyA.calledOnce).to.eqls(true);
                     expect(spyB.calledOnce).to.eqls(true);
                     expect(spyC.calledOnce).to.eqls(true);
