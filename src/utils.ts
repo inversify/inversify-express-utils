@@ -21,7 +21,13 @@ export function getControllersFromMetadata() {
         METADATA_KEY.controller,
         Reflect
     ) || [];
+
     return arrayOfControllerMetadata.map((metadata) => metadata.target);
+}
+
+export function getMiddlewareMetadata(constructor: any, key: string): interfaces.Middleware[] {
+    const middlewareMetadata = Reflect.getMetadata(METADATA_KEY.middleware, constructor) || {};
+    return middlewareMetadata[key] || [];
 }
 
 export function getControllerMetadata(constructor: any) {
@@ -58,4 +64,13 @@ export function cleanUpMetadata() {
 
 export function instanceOfIHttpActionResult(value: any): value is interfaces.IHttpActionResult {
     return value != null && typeof value.executeAsync === "function";
+}
+
+export function getOrCreateMetadata<T>(key: string, target: object, defaultValue: T): T {
+    if (!Reflect.hasMetadata(key, target)) {
+        Reflect.defineMetadata(key, defaultValue, target);
+        return defaultValue;
+    }
+
+    return Reflect.getMetadata(key, target);
 }
