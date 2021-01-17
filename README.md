@@ -641,7 +641,7 @@ class Service {
 The `BaseMiddleware.bind()` method will bind the `TYPES.TraceIdValue` if it hasn't been bound yet or re-bind if it has
 already been bound.
 
-## Middleware decorators
+### Middleware decorators
 You can use the `@withMiddleware()` decorator to register middleware on controllers and handlers. For example: 
 ```typescript
 function authenticate() {
