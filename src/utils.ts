@@ -41,7 +41,7 @@ export function getControllerMethodMetadata(constructor: any) {
         METADATA_KEY.controllerMethod,
         Reflect.getPrototypeOf(constructor)
     );
-    if (genericMetadata !== undefined) {
+    if (genericMetadata !== undefined && methodMetadata !== undefined) {
         return methodMetadata.concat(genericMetadata);
     } else {
         return methodMetadata;
@@ -57,7 +57,7 @@ export function getControllerParameterMetadata(constructor: any) {
         METADATA_KEY.controllerParameter,
         Reflect.getPrototypeOf(constructor)
     );
-    if (genericMetadata !== undefined) {
+    if (genericMetadata !== undefined && parameterMetadata !== undefined) {
         return {...parameterMetadata, ...genericMetadata};
     } else {
         return parameterMetadata;
