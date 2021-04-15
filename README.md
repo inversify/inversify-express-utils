@@ -513,6 +513,49 @@ class UserDetailsController extends BaseHttpController {
 }
 ```
 
+### Decorators
+There are helpers for AuthProvider these are wrapped into decorators these are applied to action methods.
+Every decorator parameters correspond to method arguments with the equal name of the authenrication provider instance.
+```ts
+import { inRole, isAuthenticated, isResourceOwner } from 'inversify-express-utils';
+
+@controller("/")
+class TestController extends BaseHttpController {
+
+    @httpGet("isAuthenticated")
+    @isAuthenticated()
+    public async isAuthenticated() {
+        return this.ok("OK");
+    }
+
+    @httpGet("isResourceOwner")
+    @isResourceOwner("2301")
+    public async isResourceOwner() {
+        return this.ok("OK");
+    }
+
+    @httpGet("inRole")
+    @inRole("admin")
+    public async inRole() {
+        return this.ok("OK");
+    }
+}
+```
+
+#### Custom HttpContext access decorator
+if you need to define own access decorator that reuses the HttpContext reuse ```httpContextAccessDecoratorFactory```
+as it is in an example under.
+
+```ts
+import { httpContextAccessDecoratorFactory } from 'inversify-express-utils';
+
+function userExists (pass = true): any {
+    return httpContextAccessDecoratorFactory(async (context) => {
+        return (await context.user.isAuthenticated() && pass);
+    });
+}
+```
+
 ## BaseMiddleware
 
 Extending `BaseMiddleware` allow us to inject dependencies
