@@ -60,7 +60,7 @@
     "supertest": "4.0.2",
     "tslint": "5.19.0",
     "typescript": "^3.5.3",
-    "updates": "^8.5.3"
+    "updates": "^9.0.0"
   },
   "dependencies": {
     "express": "4.17.1",
