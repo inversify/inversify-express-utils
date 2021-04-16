@@ -187,7 +187,9 @@ export class InversifyExpressServer {
 
     private resolveMidleware(...middleware: interfaces.Middleware[]): express.RequestHandler[] {
         return middleware.map(middlewareItem => {
-            if (!this._container.isBound(middlewareItem)) {
+            if (!this._container.options.autoBindInjectable
+                    && !this._container.isBound(middlewareItem)
+                    || !this._container.get(middlewareItem)) {
                 return middlewareItem as express.RequestHandler;
             }
 
