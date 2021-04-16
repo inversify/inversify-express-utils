@@ -555,7 +555,6 @@ container.bind<LoggerMiddleware>(TYPES.LoggerMiddleware)
 We can then inject `TYPES.LoggerMiddleware` into one of our controllers.
 
 ```ts
-@injectable()
 @controller("/")
 class UserDetailsController extends BaseHttpController {
 
@@ -570,10 +569,6 @@ class UserDetailsController extends BaseHttpController {
         }
     }
 }
-
-container.bind<interfaces.Controller>(TYPE.Controller)
-         .to(UserDetailsController)
-         .whenTargetNamed("UserDetailsController");
 ```
 
 ### Request-scope services
