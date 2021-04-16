@@ -50,7 +50,7 @@
     "gulp-typescript": "5.0.1",
     "inversify": "5.0.1",
     "mocha": "6.2.0",
-    "moq.ts": "^3.0.0",
+    "moq.ts": "^5.0.2",
     "prettyjson": "1.2.1",
     "publish-please": "5.5.1",
     "reflect-metadata": "0.1.13",
