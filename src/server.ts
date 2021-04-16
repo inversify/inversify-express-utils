@@ -2,6 +2,7 @@ import * as express from "express";
 import * as inversify from "inversify";
 import { interfaces } from "./interfaces";
 import { BaseMiddleware } from "./index";
+import * as stream from "stream";
 import {
     getControllersFromMetadata,
     getControllersFromContainer,
@@ -19,17 +20,19 @@ import {
 } from "./constants";
 import { HttpResponseMessage } from "./httpResponseMessage";
 import { OutgoingHttpHeaders } from "http";
+import { StreamResult } from "./results/StreamResult";
+import { StreamContent } from "./content/streamContent";
 
 export class InversifyExpressServer {
 
-    private _router: express.Router;
-    private _container: inversify.interfaces.Container;
-    private _app: express.Application;
+    private readonly _router: express.Router;
+    private readonly _container: inversify.interfaces.Container;
+    private readonly _app: express.Application;
     private _configFn: interfaces.ConfigFunction;
     private _errorConfigFn: interfaces.ConfigFunction;
     private _routingConfig: interfaces.RoutingConfig;
-    private _AuthProvider: { new(): interfaces.AuthProvider };
-    private _forceControllers: boolean;
+    private readonly _AuthProvider: { new(): interfaces.AuthProvider };
+    private readonly _forceControllers: boolean;
 
     /**
      * Wrapper for the express server.
@@ -163,7 +166,7 @@ export class InversifyExpressServer {
 
             if (controllerMetadata && methodMetadata) {
 
-                let controllerMiddleware = this.resolveMidleware(...controllerMetadata.middleware);
+                let controllerMiddleware = this.resolveMiddleware(...controllerMetadata.middleware);
 
                 methodMetadata.forEach((metadata: interfaces.ControllerMethodMetadata) => {
                     let paramList: interfaces.ParameterMetadata[] = [];
@@ -171,7 +174,7 @@ export class InversifyExpressServer {
                         paramList = parameterMetadata[metadata.key] || [];
                     }
                     let handler: express.RequestHandler = this.handlerFactory(controllerMetadata.target.name, metadata.key, paramList);
-                    let routeMiddleware = this.resolveMidleware(...metadata.middleware);
+                    let routeMiddleware = this.resolveMiddleware(...metadata.middleware);
                     this._router[metadata.method](
                         `${controllerMetadata.path}${metadata.path}`,
                         ...controllerMiddleware,
@@ -185,7 +188,7 @@ export class InversifyExpressServer {
         this._app.use(this._routingConfig.rootPath, this._router);
     }
 
-    private resolveMidleware(...middleware: interfaces.Middleware[]): express.RequestHandler[] {
+    private resolveMiddleware(...middleware: interfaces.Middleware[]): express.RequestHandler[] {
         return middleware.map(middlewareItem => {
             if (!this._container.isBound(middlewareItem)) {
                 return middlewareItem as express.RequestHandler;
@@ -227,10 +230,15 @@ export class InversifyExpressServer {
         if (message.content !== undefined) {
             this.copyHeadersTo(message.content.headers, res);
 
-            res.status(message.statusCode)
-               // If the content is a number, ensure we change it to a string, else our content is treated
-               // as a statusCode rather than as the content of the Response
-               .send(await message.content.readAsStringAsync());
+            res.status(message.statusCode);
+
+            if (message.content.isStreamedResponse) {
+                (await (message.content as StreamContent).readAsStreamAsync()).pipe(res);
+            } else {
+                // If the content is a number, ensure we change it to a string, else our content is treated
+                // as a statusCode rather than as the content of the Response
+                res.send(await message.content.readAsStringAsync());
+            }
         } else {
             res.sendStatus(message.statusCode);
         }
@@ -252,8 +260,14 @@ export class InversifyExpressServer {
                 // invoke controller's action
                 const value = await httpContext.container.getNamed<any>(TYPE.Controller, controllerName)[key](...args);
 
+                // TODO Fix renders
                 if (value instanceof HttpResponseMessage) {
                     await this.handleHttpResponseMessage(value, res);
+                } else if (value instanceof StreamResult) {
+                    if (value.contentType) {
+                        res.setHeader("Content-type", value.contentType);
+                    }
+                    value.readableStream.pipe(res);
                 } else if (instanceOfIHttpActionResult(value)) {
                     const httpResponseMessage = await value.executeAsync();
                     await this.handleHttpResponseMessage(httpResponseMessage, res);
@@ -312,13 +326,13 @@ export class InversifyExpressServer {
     }
 
     private extractParameters(req: express.Request, res: express.Response, next: express.NextFunction,
-        params: interfaces.ParameterMetadata[]): any[] {
+                              params: interfaces.ParameterMetadata[]): any[] {
         let args: any[] = [];
         if (!params || !params.length) {
             return [req, res, next];
         }
 
-        params.forEach(({ type, index, parameterName, injectRoot }) => {
+        params.forEach(({type, index, parameterName, injectRoot}) => {
             switch (type) {
                 case PARAMETER_TYPE.REQUEST:
                     args[index] = req;
@@ -354,8 +368,10 @@ export class InversifyExpressServer {
         return args;
     }
 
-    private getParam(source: express.Request, paramType: string, injectRoot: boolean, name?: string, ) {
-        if (paramType === "headers" && name) { name = name.toLowerCase(); }
+    private getParam(source: express.Request, paramType: string, injectRoot: boolean, name?: string) {
+        if (paramType === "headers" && name) {
+            name = name.toLowerCase();
+        }
         let param = source[paramType];
 
         if (injectRoot) {

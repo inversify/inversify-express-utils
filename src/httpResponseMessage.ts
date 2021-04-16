@@ -1,5 +1,6 @@
 import { OutgoingHttpHeaders } from "http";
 import { HttpContent } from "./content/httpContent";
+import { StreamContent } from "./content/streamContent";
 
 export class HttpResponseMessage {
     private _content: HttpContent;
@@ -18,7 +19,7 @@ export class HttpResponseMessage {
         return this._content;
     }
 
-    public set content(value: HttpContent) {
+    public set content(value: HttpContent | StreamContent) {
         this._content = value;
     }
 

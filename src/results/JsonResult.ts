@@ -1,6 +1,6 @@
 import { interfaces } from "../interfaces";
 import { HttpResponseMessage } from "../httpResponseMessage";
-import { JsonContent } from "../content/jsonContent";
+import { JsonContent } from "..";
 import { BaseHttpController } from "../base_http_controller";
 
 export default class JsonResult implements interfaces.IHttpActionResult {
@@ -15,5 +15,4 @@ export default class JsonResult implements interfaces.IHttpActionResult {
     response.content = new JsonContent(this.json);
     return response;
   }
-
 }

@@ -19,6 +19,8 @@ import {
     JsonResult
 } from "./results";
 import { OK } from "http-status-codes";
+import * as stream from "stream";
+import { StreamResult } from "./results/StreamResult";
 
 @injectable()
 export class BaseHttpController {
@@ -72,5 +74,9 @@ export class BaseHttpController {
 
     protected json(content: any, statusCode: number = OK) {
         return new JsonResult(content, statusCode, this);
+    }
+
+    protected stream(readableStream: stream.Readable, contentType: string, statusCode = OK) {
+        return new StreamResult(readableStream, contentType, statusCode, this);
     }
 }
