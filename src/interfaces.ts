@@ -32,7 +32,7 @@ namespace interfaces {
     export interface Controller { }
 
     export interface HandlerDecorator {
-        (target: any, key: string, value: any): void;
+        (target: object, key: string, value?: any): void;
     }
 
     export interface ConfigFunction {
