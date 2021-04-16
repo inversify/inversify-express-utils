@@ -239,7 +239,7 @@ Registers the decorated controller method as a request handler for a particular 
 
 ### `@SHORTCUT(path, [middleware, ...])`
 
-Shortcut decorators which are simply wrappers for `@httpMethod`. Right now these include `@httpGet`, `@httpPost`, `@httpPut`, `@httpPatch`, `@httpHead`, `@httpDelete`, and `@All`. For anything more obscure, use `@httpMethod` (Or make a PR :smile:).
+Shortcut decorators which are simply wrappers for `@httpMethod`. Right now these include `@httpGet`, `@httpPost`, `@httpPut`, `@httpPatch`, `@httpHead`, `@httpDelete`, `@httpOptions`, and `@All`. For anything more obscure, use `@httpMethod` (Or make a PR :smile:).
 
 ### `@request()`
 
@@ -640,6 +640,25 @@ class Service {
 
 The `BaseMiddleware.bind()` method will bind the `TYPES.TraceIdValue` if it hasn't been bound yet or re-bind if it has
 already been bound.
+
+### Dealing with CORS
+
+If you access a route from a browser and experience a CORS problem, in other words, your browser stops at the
+OPTIONS request, you need to add a route for that method too. You need to write a method in your controller class to 
+handle the same route but for OPTIONS method, it can have empty body and no parameters though.
+
+```ts
+@controller("/api/example")
+class ExampleController extends BaseHttpController {
+    @httpGet("/:id")
+    public get(req: Request, res: Response) {
+        return {};
+    }
+
+    @httpOptions("/:id")
+    public options() { }
+}
+```
 
 ## Route Map
 

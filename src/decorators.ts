@@ -67,6 +67,10 @@ export function httpDelete(path: string, ...middleware: interfaces.Middleware[])
     return httpMethod("delete", path, ...middleware);
 }
 
+export function httpOptions(path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+    return httpMethod("options", path, ...middleware);
+}
+
 export function httpMethod(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return function (target: any, key: string, value: any) {
 

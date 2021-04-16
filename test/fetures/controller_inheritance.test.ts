@@ -10,7 +10,7 @@ import * as supertest from "supertest";
 import {
     controller, httpMethod, httpGet, request,
     response, requestParam, queryParam, requestHeaders,
-    httpDelete, httpPost, httpPut, requestBody
+    httpDelete, httpPost, httpPut, httpOptions, requestBody
 } from "../../src/decorators";
 import { cleanUpMetadata } from "../../src/utils";
 
@@ -63,6 +63,13 @@ function getDemoServer() {
             @requestParam("id") id: string
         ) {
             return { status: `BASE DELETE! ${id}` };
+        }
+
+        @httpOptions("/:id")
+        public options(
+            @requestParam("id") id: string
+        ) {
+            return { status: `BASE OPTIONS! ${id}` };
         }
 
     }
@@ -174,6 +181,20 @@ describe("Derived controller", () => {
             .expect(200)
             .then(res => {
                 expect(res.body.status).to.eql(`BASE DELETE! ${id}`);
+                done();
+            });
+
+    });
+
+    it("Can access methods decorated with @httpOptions from parent", (done) => {
+
+        const server = getDemoServer();
+        const id = 5;
+
+        supertest(server).options(`/api/v1/movies/${id}`)
+            .expect(200)
+            .then(res => {
+                expect(res.body.status).to.eql(`BASE OPTIONS! ${id}`);
                 done();
             });
 
