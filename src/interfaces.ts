@@ -7,6 +7,10 @@ namespace interfaces {
 
     export type Middleware = (inversifyInterfaces.ServiceIdentifier<any> | express.RequestHandler);
 
+    export interface MiddlewareMetaData {
+        [identifier: string]: Middleware[];
+    }
+
     export interface ControllerMetadata {
         path: string;
         middleware: Middleware[];

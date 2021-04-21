@@ -2,14 +2,40 @@ import * as express from "express";
 import { inject, injectable, decorate } from "inversify";
 import { interfaces } from "./interfaces";
 import { TYPE, METADATA_KEY, PARAMETER_TYPE } from "./constants";
+import { getMiddlewareMetadata, getOrCreateMetadata } from "./utils";
+
 
 export const injectHttpContext = inject(TYPE.HttpContext);
+
+function defineMiddlewareMetadata(target: any, metaDataKey: string, ...middleware: interfaces.Middleware[]) {
+    // We register decorated middleware meteadata in a map, e.g. { "TestController": [ your middleware here ] }
+    const middlewareMap: interfaces.MiddlewareMetaData = getOrCreateMetadata(METADATA_KEY.middleware, target, { });
+
+    if (!(metaDataKey in middlewareMap)) {
+        middlewareMap[metaDataKey] = [];
+    }
+    middlewareMap[metaDataKey].push(...middleware);
+    Reflect.defineMetadata(METADATA_KEY.middleware, middlewareMap, target);
+}
+
+export function withMiddleware(...middleware: interfaces.Middleware[]) {
+    return function(target: any, methodName?: string, descriptor?: PropertyDescriptor) {
+        if (methodName) {
+            defineMiddlewareMetadata(target, methodName, ...middleware);
+        } else {
+            defineMiddlewareMetadata(target.constructor, target.name, ...middleware);
+        }
+    };
+}
 
 export function controller(path: string, ...middleware: interfaces.Middleware[]) {
     return function (target: any) {
 
+        // Get the list of middleware registered with @middleware() decorators
+        const decoratedMiddleware = getMiddlewareMetadata(target.constructor, target.name);
+
         let currentMetadata: interfaces.ControllerMetadata = {
-            middleware: middleware,
+            middleware: middleware.concat(decoratedMiddleware),
             path: path,
             target: target
         };
@@ -35,7 +61,6 @@ export function controller(path: string, ...middleware: interfaces.Middleware[])
             newMetadata,
             Reflect
         );
-
     };
 }
 
@@ -70,21 +95,21 @@ export function httpDelete(path: string, ...middleware: interfaces.Middleware[])
 export function httpMethod(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
     return function (target: any, key: string, value: any) {
 
+        const decoratedMiddleware = getMiddlewareMetadata(target, key);
+
         let metadata: interfaces.ControllerMethodMetadata = {
             key,
             method,
-            middleware,
+            middleware: middleware.concat(decoratedMiddleware),
             path,
             target
         };
 
-        let metadataList: interfaces.ControllerMethodMetadata[] = [];
-
-        if (!Reflect.hasMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
-            Reflect.defineMetadata(METADATA_KEY.controllerMethod, metadataList, target.constructor);
-        } else {
-            metadataList = Reflect.getMetadata(METADATA_KEY.controllerMethod, target.constructor);
-        }
+        let metadataList: interfaces.ControllerMethodMetadata[] = getOrCreateMetadata(
+            METADATA_KEY.controllerMethod,
+            target.constructor,
+            []
+        );
 
         metadataList.push(metadata);
     };

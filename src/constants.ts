@@ -8,7 +8,8 @@ export const METADATA_KEY = {
     controller: "inversify-express-utils:controller",
     controllerMethod: "inversify-express-utils:controller-method",
     controllerParameter: "inversify-express-utils:controller-parameter",
-    httpContext: "inversify-express-utils:httpcontext"
+    httpContext: "inversify-express-utils:httpcontext",
+    middleware: "inversify-express-utils:middleware"
 };
 
 export enum PARAMETER_TYPE {
