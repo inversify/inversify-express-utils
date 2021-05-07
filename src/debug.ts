@@ -63,7 +63,7 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
                 }
             }
 
-            const details = {
+            const details: { route: string, args?: string[] } = {
                 route: `${method} ${controllerPath}${actionPath}`
             };
 
@@ -71,7 +71,7 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
                 details["args"] = args;
             }
 
-            return details as { route: string, args?: string[] };
+            return details;
 
         });
 

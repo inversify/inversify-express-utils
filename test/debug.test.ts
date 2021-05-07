@@ -1,19 +1,12 @@
 import { expect } from "chai";
-import * as express from "express";
-import { Container, injectable } from "inversify";
+import { Container } from "inversify";
 import * as prettyjson from "prettyjson";
-import { METADATA_KEY, PARAMETER_TYPE, TYPE } from "../src/constants";
 import { cleanUpMetadata } from "../src/utils";
 import {
-    interfaces,
     InversifyExpressServer,
     controller,
-    httpMethod,
     httpGet,
-    request,
-    response,
     requestParam,
-    queryParam,
     httpPost,
     httpDelete,
     getRouteInfo,
@@ -69,7 +62,7 @@ describe("Debug utils", () => {
         };
 
         let server = new InversifyExpressServer(container);
-        let app = server.build();
+        server.build();
 
         const routeInfo = getRouteInfo(container);
 
@@ -77,28 +70,28 @@ describe("Debug utils", () => {
             prettyjson.render({ CONTROLLERS: routeInfo })
         );
 
-        expect(routeInfo[0].controller).to.eq(TYPES.OrderController);
-        expect(routeInfo[0].endpoints[0].route).to.eq("GET /api/order/");
-        expect(routeInfo[0].endpoints[0].args).to.eq(undefined);
-        expect(routeInfo[0].endpoints[1].route).to.eq("POST /api/order/");
-        expect(routeInfo[0].endpoints[1].args).to.eq(undefined);
-        expect(routeInfo[0].endpoints[2].route).to.eq("DELETE /api/order/:id");
+        expect(routeInfo[0]?.controller).to.eq(TYPES.OrderController);
+        expect(routeInfo[0]?.endpoints[0]?.route).to.eq("GET /api/order/");
+        expect(routeInfo[0]?.endpoints[0]?.args).to.eq(undefined);
+        expect(routeInfo[0]?.endpoints[1]?.route).to.eq("POST /api/order/");
+        expect(routeInfo[0]?.endpoints[1]?.args).to.eq(undefined);
+        expect(routeInfo[0]?.endpoints[2]?.route).to.eq("DELETE /api/order/:id");
 
-        const arg1 = routeInfo[0].endpoints[2].args;
+        const arg1 = routeInfo[0]?.endpoints[2]?.args;
         if (arg1 !== undefined) {
             expect(arg1[0]).to.eq("@requestParam id");
         } else {
             expect(true).to.eq(false, "This line should never be executed!");
         }
 
-        expect(routeInfo[1].controller).to.eq(TYPES.UserController);
-        expect(routeInfo[1].endpoints[0].route).to.eq("GET /api/user/");
-        expect(routeInfo[1].endpoints[1].args).to.eq(undefined);
-        expect(routeInfo[1].endpoints[1].route).to.eq("POST /api/user/");
-        expect(routeInfo[1].endpoints[1].args).to.eq(undefined);
-        expect(routeInfo[1].endpoints[2].route).to.eq("DELETE /api/user/:id");
+        expect(routeInfo[1]?.controller).to.eq(TYPES.UserController);
+        expect(routeInfo[1]?.endpoints[0]?.route).to.eq("GET /api/user/");
+        expect(routeInfo[1]?.endpoints[1]?.args).to.eq(undefined);
+        expect(routeInfo[1]?.endpoints[1]?.route).to.eq("POST /api/user/");
+        expect(routeInfo[1]?.endpoints[1]?.args).to.eq(undefined);
+        expect(routeInfo[1]?.endpoints[2]?.route).to.eq("DELETE /api/user/:id");
 
-        const arg2 = routeInfo[1].endpoints[2].args;
+        const arg2 = routeInfo[1]?.endpoints[2]?.args;
         if (arg2 !== undefined) {
             expect(arg2[0]).to.eq("@requestParam id");
         } else {
@@ -128,7 +121,7 @@ describe("Debug utils", () => {
         };
 
         let server = new InversifyExpressServer(container);
-        let app = server.build();
+        server.build();
 
         const routeInfo = getRouteInfo(container);
 
@@ -138,11 +131,11 @@ describe("Debug utils", () => {
 
         console.log(routeInfo);
 
-        expect(routeInfo[0].controller).to.eq(TYPES.OrderController);
-        expect(routeInfo[0].endpoints[0].route).to.eq("GET /api/order/");
-        expect(routeInfo[0].endpoints[0].args).to.eq(undefined);
-        expect(routeInfo[0].endpoints[1].route).to.eq("POST /api/order/");
-        expect(routeInfo[0].endpoints[1].args).to.eq(undefined);
+        expect(routeInfo[0]?.controller).to.eq(TYPES.OrderController);
+        expect(routeInfo[0]?.endpoints[0]?.route).to.eq("GET /api/order/");
+        expect(routeInfo[0]?.endpoints[0]?.args).to.eq(undefined);
+        expect(routeInfo[0]?.endpoints[1]?.route).to.eq("POST /api/order/");
+        expect(routeInfo[0]?.endpoints[1]?.args).to.eq(undefined);
 
     });
 

@@ -25,7 +25,6 @@
         "noPropertyAccessFromIndexSignature": true,
         "noResolve": false,
         "noUncheckedIndexedAccess": true,
-        "noUnusedLocals": true,
         "noUnusedParameters": false,
         "preserveConstEnums": true,
         "removeComments": true,
