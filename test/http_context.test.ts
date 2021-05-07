@@ -1,13 +1,10 @@
 import { expect } from "chai";
-import * as express from "express";
-import { Container, injectable, inject } from "inversify";
+import { Container, inject } from "inversify";
 import * as supertest from "supertest";
 import {
     InversifyExpressServer,
-    TYPE,
     controller,
     httpGet,
-    BaseHttpController,
     interfaces,
     injectHttpContext
 } from "../src/index";
@@ -29,8 +26,8 @@ describe("HttpContex", () => {
         @controller("/")
         class TestController {
 
-            @injectHttpContext private readonly _httpContext: interfaces.HttpContext;
-            @inject("SomeDependency") private readonly _someDependency: SomeDependency;
+            @injectHttpContext private readonly _httpContext!: interfaces.HttpContext;
+            @inject("SomeDependency") private readonly _someDependency!: SomeDependency;
 
             @httpGet("/")
             public async getTest() {
@@ -45,7 +42,7 @@ describe("HttpContex", () => {
         const container = new Container();
 
         container.bind<SomeDependency>("SomeDependency")
-                .toConstantValue({ name: "SomeDependency!" });
+            .toConstantValue({ name: "SomeDependency!" });
 
         const server = new InversifyExpressServer(container);
 

@@ -1,15 +1,10 @@
 import { expect } from "chai";
-import * as express from "express";
-import { interfaces } from "../../src/interfaces";
 import * as bodyParser from "body-parser";
-import { METADATA_KEY, PARAMETER_TYPE } from "../../src/constants";
 import { InversifyExpressServer } from "../../src/server";
 import { Container, injectable } from "inversify";
-import { TYPE } from "../../src/constants";
 import * as supertest from "supertest";
 import {
-    controller, httpMethod, httpGet, request,
-    response, requestParam, queryParam, requestHeaders,
+    controller, httpGet, requestParam,
     httpDelete, httpPost, httpPut, requestBody
 } from "../../src/decorators";
 import { cleanUpMetadata } from "../../src/utils";

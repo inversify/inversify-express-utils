@@ -7,7 +7,7 @@ export class JsonContent extends HttpContent {
 
   constructor(content: any);
   constructor(content: any, mediaType: string);
-  constructor(content: any, private mediaType: string = DEFAULT_MEDIA_TYPE) {
+  constructor(content: any, mediaType: string = DEFAULT_MEDIA_TYPE) {
     super();
 
     this.content = JSON.stringify(content);

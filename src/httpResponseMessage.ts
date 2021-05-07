@@ -2,7 +2,7 @@ import { OutgoingHttpHeaders } from "http";
 import { HttpContent } from "./content/httpContent";
 
 export class HttpResponseMessage {
-    private _content: HttpContent;
+    private _content!: HttpContent;
 
     private _headers: OutgoingHttpHeaders = {};
 
@@ -22,7 +22,7 @@ export class HttpResponseMessage {
         this._content = value;
     }
 
-    private _statusCode: number;
+    private _statusCode!: number;
 
     public get statusCode(): number {
         return this._statusCode;

@@ -23,6 +23,20 @@ export enum PARAMETER_TYPE {
     PRINCIPAL
 }
 
+export enum HTTP_VERBS_ENUM {
+    all = "ALL",
+    connect = "CONNECT",
+    delete = "DELETE",
+    get = "GET",
+    head = "HEAD",
+    options = "OPTIONS",
+    patch = "PATCH",
+    post = "POST",
+    propfind = "PROPFIND",
+    put = "PUT",
+    trace = "TRACE"
+}
+
 export const DUPLICATED_CONTROLLER_NAME = (name: string) =>
     `Two controllers cannot have the same name: ${name}`;
 

@@ -10,7 +10,7 @@ import { injectable, Container } from "inversify";
 import { interfaces, InversifyExpressServer } from "../src";
 import {
     controller, httpMethod, all, httpGet, httpPost, httpPut, httpPatch,
-    httpHead, httpDelete, request, response, params, requestParam,
+    httpHead, httpDelete, request, response, requestParam,
     requestBody, queryParam, requestHeaders, cookies,
     next, principal
 } from "../src/decorators";
@@ -127,7 +127,7 @@ describe("Integration Tests:", () => {
                     return new Promise(((resolve) => {
                         setTimeout(() => {
                             nextFunc();
-                            resolve();
+                            resolve(null);
                         }, 100, "GET");
                     }));
                 }
@@ -274,7 +274,7 @@ describe("Integration Tests:", () => {
         it("should work for controller methods who's return value is falsey", (done) => {
             @controller("/user")
             class TestController {
-                @httpDelete("/") private async delete(): Promise<void> {
+                @httpDelete("/") public async delete(): Promise<void> {
                     return;
                 }
             }
@@ -628,7 +628,7 @@ describe("Integration Tests:", () => {
             @controller("/")
             class TestController {
                 @httpGet(":id") public getTest(@request() req: express.Request) {
-                    return req.params.id;
+                    return req.params["id"];
                 }
             }
 
@@ -745,7 +745,6 @@ describe("Integration Tests:", () => {
             @controller("/")
             class TestController {
                 @httpGet("/") public getTest(@next() nextFunc: any) {
-                    let err = new Error("foo");
                     return nextFunc();
                 }
                 @httpGet("/") public getResult() {

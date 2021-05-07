@@ -4,7 +4,6 @@ import { Container, injectable, inject } from "inversify";
 import * as supertest from "supertest";
 import {
     InversifyExpressServer,
-    TYPE,
     controller,
     httpGet,
     BaseHttpController,
@@ -43,7 +42,7 @@ describe("AuthProvider", () => {
 
         @injectable()
         class CustomAuthProvider implements interfaces.AuthProvider {
-            @inject("SomeDependency") private readonly _someDependency: SomeDependency;
+            @inject("SomeDependency") private readonly _someDependency!: SomeDependency;
             public getUser(
                 req: express.Request,
                 res: express.Response,
@@ -63,7 +62,7 @@ describe("AuthProvider", () => {
         @controller("/")
         class TestController extends BaseHttpController {
 
-            @inject("SomeDependency") private readonly _someDependency: SomeDependency;
+            @inject("SomeDependency") private readonly _someDependency!: SomeDependency;
 
             @httpGet("/")
             public async getTest() {
@@ -73,6 +72,8 @@ describe("AuthProvider", () => {
                     const isAuthenticated = await this.httpContext.user.isAuthenticated();
                     expect(isAuthenticated).eq(true);
                     return `${email} & ${name}`;
+                } else {
+                    return null;
                 }
             }
         }
@@ -80,7 +81,7 @@ describe("AuthProvider", () => {
         const container = new Container();
 
         container.bind<SomeDependency>("SomeDependency")
-                .toConstantValue({ name: "SomeDependency!" });
+            .toConstantValue({ name: "SomeDependency!" });
 
         const server = new InversifyExpressServer(
             container,

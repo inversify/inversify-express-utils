@@ -1,14 +1,11 @@
 import { expect } from "chai";
 import * as express from "express";
-import { interfaces } from "../src/interfaces";
-import { METADATA_KEY, PARAMETER_TYPE } from "../src/constants";
 import { InversifyExpressServer } from "../src/server";
-import { Container, injectable } from "inversify";
-import { TYPE } from "../src/constants";
+import { Container } from "inversify";
 import * as supertest from "supertest";
 import * as cookieParser from "cookie-parser";
 import {
-    controller, httpMethod, httpGet, request,
+    controller, httpGet, request,
     response, requestParam, queryParam, requestHeaders, cookies
 } from "../src/decorators";
 import { cleanUpMetadata } from "../src/utils";
