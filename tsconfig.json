@@ -1,28 +1,45 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "module": "commonjs",
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "alwaysStrict": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "jsx": "react",
         "lib": [
             "es6",
             "dom"
         ],
+        "module": "commonjs",
         "types": [
             "node",
             "mocha",
             "reflect-metadata"
         ],
         "moduleResolution": "node",
-        "sourceMap": true,
-        "jsx": "react",
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
+        "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noPropertyAccessFromIndexSignature": true,
         "noResolve": false,
+        "noUncheckedIndexedAccess": true,
+        "noUnusedLocals": true,
         "noUnusedParameters": false,
-        "noUnusedLocals": false,
+        "preserveConstEnums": true,
+        "removeComments": true,
+        "sourceMap": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
         "strictNullChecks": true,
-    }
+        "strictPropertyInitialization": true,
+        "suppressImplicitAnyIndexErrors": false,
+        "typeRoots": [
+            "node_modules/@types"
+        ]
+    },
+    "exclude": [
+        "node_modules"
+    ]
 }
