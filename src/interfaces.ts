@@ -70,6 +70,16 @@ namespace interfaces {
     export interface IHttpActionResult {
         executeAsync(): Promise<HttpResponseMessage>;
     }
+
+    export interface RouteDetails {
+        route: string;
+        args?: string[];
+    }
+
+    export interface RouteInfo {
+        controller: any;
+        endpoints: RouteDetails[];
+    }
 }
 
 export { interfaces };
