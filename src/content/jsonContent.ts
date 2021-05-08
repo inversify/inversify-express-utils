@@ -5,14 +5,12 @@ const DEFAULT_MEDIA_TYPE = "application/json";
 export class JsonContent extends HttpContent {
   private content: string;
 
-  constructor(content: any);
-  constructor(content: any, mediaType: string);
-  constructor(content: any, mediaType: string = DEFAULT_MEDIA_TYPE) {
+  constructor(content: any) {
     super();
 
     this.content = JSON.stringify(content);
 
-    this.headers["content-type"] = mediaType;
+    this.headers["content-type"] = DEFAULT_MEDIA_TYPE;
   }
 
   public readAsStringAsync() {
