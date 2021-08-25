@@ -516,7 +516,7 @@ class UserDetailsController extends BaseHttpController {
 ## BaseMiddleware
 
 Extending `BaseMiddleware` allow us to inject dependencies
-and to be access the current `HttpContext` in Express middleware function.
+and to access the current `HttpContext` in Express middleware function.
 
 ```ts
 import { BaseMiddleware } from "inversify-express-utils";

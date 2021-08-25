@@ -12,6 +12,21 @@ var gulp = require("gulp"),
     sourcemaps = require("gulp-sourcemaps");
 
 //******************************************************************************
+//* CLEAN
+//******************************************************************************
+gulp.task("clean", function () {
+    return del([
+        "src/**/*.js",
+        "test/**/*.test.js",
+        "src/*.js",
+        "test/*.test.js",
+        "lib",
+        "es",
+        "amd"
+    ]);
+});
+
+//******************************************************************************
 //* LINT
 //******************************************************************************
 gulp.task("lint", function () {
@@ -120,17 +135,6 @@ gulp.task("build-test", function () {
         .pipe(gulp.dest("test/"));
 });
 
-gulp.task("mocha", function () {
-    return gulp.src([
-        "node_modules/reflect-metadata/Reflect.js",
-        "test/**/*.test.js"
-    ])
-        .pipe(mocha({
-            ui: "bdd"
-        }))
-        .pipe(istanbul.writeReports());
-});
-
 gulp.task("istanbul:hook", function () {
     return gulp.src(["src/**/*.js"])
         // Covering files
@@ -139,23 +143,42 @@ gulp.task("istanbul:hook", function () {
         .pipe(istanbul.hookRequire());
 });
 
-gulp.task("test", function (cb) {
-    runSequence("istanbul:hook", "mocha", cb);
-});
+gulp.task("mocha", gulp.series("istanbul:hook", function () {
+    return gulp.src([
+        "node_modules/reflect-metadata/Reflect.js",
+        "test/**/*.test.js"
+    ])
+        .pipe(mocha({ ui: "bdd" }))
+        .on("error", function (err) {
+            console.log(err);
+            process.exit(1);
+        })
+        .pipe(istanbul.writeReports());
 
-gulp.task("build", function (cb) {
-    runSequence(
-        "lint", ["build-src", "build-es", "build-lib", "build-dts"], // tests + build es and lib
+}));
+
+gulp.task(
+    "test",
+    gulp.series(
+        "mocha"
+    )
+);
+
+gulp.task(
+    "build",
+    gulp.series("lint",
+        gulp.parallel(
+            "build-src",
+            "build-es",
+            "build-lib",
+            "build-dts"),
         "build-test",
-        cb);
-});
+    ));
 
 //******************************************************************************
 //* DEFAULT
 //******************************************************************************
-gulp.task("default", function (cb) {
-    runSequence(
-        "build",
-        "test",
-        cb);
-});
+gulp.task("default", gulp.series(
+    "build",
+    "test",
+));
