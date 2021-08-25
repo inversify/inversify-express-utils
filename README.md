@@ -516,7 +516,7 @@ class UserDetailsController extends BaseHttpController {
 ## BaseMiddleware
 
 Extending `BaseMiddleware` allow us to inject dependencies
-and to be access the current `HttpContext` in Express middleware function.
+and to access the current `HttpContext` in Express middleware function.
 
 ```ts
 import { BaseMiddleware } from "inversify-express-utils";
@@ -555,7 +555,6 @@ container.bind<LoggerMiddleware>(TYPES.LoggerMiddleware)
 We can then inject `TYPES.LoggerMiddleware` into one of our controllers.
 
 ```ts
-@injectable()
 @controller("/")
 class UserDetailsController extends BaseHttpController {
 
@@ -570,10 +569,6 @@ class UserDetailsController extends BaseHttpController {
         }
     }
 }
-
-container.bind<interfaces.Controller>(TYPE.Controller)
-         .to(UserDetailsController)
-         .whenTargetNamed("UserDetailsController");
 ```
 
 ### Request-scope services
