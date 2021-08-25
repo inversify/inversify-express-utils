@@ -9,7 +9,7 @@ export default class CreatedNegotiatedContentResult<T> implements interfaces.IHt
 
     public async executeAsync() {
         const response = new HttpResponseMessage(CREATED);
-        response.content = new StringContent(JSON.stringify(this.content), "application/json");
+        response.content = new StringContent(JSON.stringify(this.content));
         response.headers["location"] = this.location.toString();
         return response;
     }

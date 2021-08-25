@@ -8,7 +8,7 @@ export default class OkNegotiatedContentResult<T> implements interfaces.IHttpAct
 
     public async executeAsync() {
         const response = new HttpResponseMessage(OK);
-        response.content = new StringContent(JSON.stringify(this.content), "application/json");
+        response.content = new StringContent(JSON.stringify(this.content));
         return response;
     }
 }
