@@ -9,7 +9,8 @@ import {
     httpGet,
     BaseMiddleware,
     BaseHttpController,
-    interfaces
+    interfaces,
+    response
 } from "../src/index";
 import { cleanUpMetadata } from "../src/utils";
 
@@ -289,6 +290,43 @@ describe("BaseMiddleware", () => {
                       .expect(200, "", () => done());
                 });
         });
+
+  });
+
+  it("Should resolve middlewares if autoBindInjectable is set to true", (done) => {
+
+        @injectable()
+        class AutoBoundMiddleware extends BaseMiddleware {
+
+            public handler(
+                req: express.Request,
+                res: express.Response,
+                next: express.NextFunction
+            ) {
+                res.locals.value = "This was auto bound";
+                next();
+            }
+        }
+
+        @controller("/autobind")
+        class AutoBoundMiddlewareTestController extends BaseHttpController {
+
+            @httpGet(
+                "/",
+                AutoBoundMiddleware
+            )
+            public getTest(@response() res: express.Response) {
+                return res.locals.value;
+            }
+        }
+
+        const container = new Container({ autoBindInjectable: true });
+
+        const app = new InversifyExpressServer(container).build();
+
+        supertest(app)
+            .get("/autobind")
+            .expect(200, "This was auto bound", () => done());
 
   });
 });
