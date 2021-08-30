@@ -1,47 +1,43 @@
-import { expect } from "chai";
-import * as sinon from "sinon";
-import * as express from "express";
-import { InversifyExpressServer } from "../src/server";
-import { controller } from "../src/decorators";
-import { Container } from "inversify";
-import { cleanUpMetadata } from "../src/utils";
-import { HttpResponseMessage } from "../src";
-import { Mock, Times } from "moq.ts";
+import {expect} from 'chai';
+import * as sinon from 'sinon';
+import * as express from 'express';
+import {Container} from 'inversify';
+import {Mock, Times} from 'moq.ts';
+import {InversifyExpressServer} from '../src/server';
+import {controller} from '../src/decorators';
+import {cleanUpMetadata} from '../src/utils';
+import {HttpResponseMessage} from '../src';
 
-describe("Unit Test: InversifyExpressServer", () => {
-
-    beforeEach((done) => {
+describe('Unit Test: InversifyExpressServer', () => {
+    beforeEach(done => {
         cleanUpMetadata();
         done();
     });
 
-    it("should call the configFn before the errorConfigFn", (done) => {
-
-        let middleware = function (
+    it('should call the configFn before the errorConfigFn', done => {
+        const middleware = (
             req: express.Request,
             res: express.Response,
-            next: express.NextFunction
-        ) {
-            return;
-        };
+            next: express.NextFunction,
+        ) => {};
 
-        let configFn = sinon.spy((app: express.Application) => {
+        const configFn = sinon.spy((app: express.Application) => {
             app.use(middleware);
         });
 
-        let errorConfigFn = sinon.spy((app: express.Application) => {
+        const errorConfigFn = sinon.spy((app: express.Application) => {
             app.use(middleware);
         });
 
-        let container = new Container();
+        const container = new Container();
 
-        @controller("/")
+        @controller('/')
         class TestController { }
 
-        let server = new InversifyExpressServer(container);
+        const server = new InversifyExpressServer(container);
 
         server.setConfig(configFn)
-            .setErrorConfig(errorConfigFn);
+        .setErrorConfig(errorConfigFn);
 
         expect(configFn.called).to.eq(false);
         expect(errorConfigFn.called).to.eq(false);
@@ -54,47 +50,43 @@ describe("Unit Test: InversifyExpressServer", () => {
         done();
     });
 
-    it("Should allow to pass a custom Router instance as config", () => {
+    it('Should allow to pass a custom Router instance as config', () => {
+        const container = new Container();
 
-        let container = new Container();
-
-        let customRouter = express.Router({
+        const customRouter = express.Router({
             caseSensitive: false,
             mergeParams: false,
-            strict: false
+            strict: false,
         });
 
-        let serverWithDefaultRouter = new InversifyExpressServer(container);
-        let serverWithCustomRouter = new InversifyExpressServer(container, customRouter);
+        const serverWithDefaultRouter = new InversifyExpressServer(container);
+        const serverWithCustomRouter = new InversifyExpressServer(container, customRouter);
 
         expect((serverWithDefaultRouter as any)._router === customRouter).to.eq(false);
         expect((serverWithCustomRouter as any)._router === customRouter).to.eqls(true);
-
     });
 
-    it("Should allow to provide custom routing configuration", () => {
+    it('Should allow to provide custom routing configuration', () => {
+        const container = new Container();
 
-        let container = new Container();
-
-        let routingConfig = {
-            rootPath: "/such/root/path"
+        const routingConfig = {
+            rootPath: '/such/root/path',
         };
 
-        let serverWithDefaultConfig = new InversifyExpressServer(container);
-        let serverWithCustomConfig = new InversifyExpressServer(container, null, routingConfig);
+        const serverWithDefaultConfig = new InversifyExpressServer(container);
+        const serverWithCustomConfig = new InversifyExpressServer(container, null, routingConfig);
 
         expect((serverWithCustomConfig as any)._routingConfig).to.eq(routingConfig);
         expect((serverWithDefaultConfig as any)._routingConfig).to.not.eql(
-            (serverWithCustomConfig as any)._routingConfig
+            (serverWithCustomConfig as any)._routingConfig,
         );
-
     });
 
-    it("Should allow to provide a custom express application", () => {
-        let container = new Container();
-        let app = express();
-        let serverWithDefaultApp = new InversifyExpressServer(container);
-        let serverWithCustomApp = new InversifyExpressServer(container, null, null, app);
+    it('Should allow to provide a custom express application', () => {
+        const container = new Container();
+        const app = express();
+        const serverWithDefaultApp = new InversifyExpressServer(container);
+        const serverWithCustomApp = new InversifyExpressServer(container, null, null, app);
         expect((serverWithCustomApp as any)._app).to.eq(app);
         expect((serverWithDefaultApp as any)._app).to.not.eql((serverWithCustomApp as any)._app);
     });
@@ -102,13 +94,16 @@ describe("Unit Test: InversifyExpressServer", () => {
     // TODO Fix this somehow ??
     // https://www.npmjs.com/package/moq.ts/v/3.0.0?activeTab=readme#mock-behavior
     // Now Obsolete
-    xit("Should handle a HttpResponseMessage that has no content", () => {
-        let container = new Container();
-        let server = new InversifyExpressServer(container);
+    xit('Should handle a HttpResponseMessage that has no content', () => {
+        const container = new Container();
+        const server = new InversifyExpressServer(container);
 
-        let httpResponseMessageWithoutContent = new HttpResponseMessage(404);
-        let mockResponse = new Mock<express.Response>();
-        (server as any).handleHttpResponseMessage(httpResponseMessageWithoutContent, mockResponse.object());
+        const httpResponseMessageWithoutContent = new HttpResponseMessage(404);
+        const mockResponse = new Mock<express.Response>();
+        (server as any).handleHttpResponseMessage(
+            httpResponseMessageWithoutContent,
+            mockResponse.object(),
+        );
 
         mockResponse.verify(instance => instance.sendStatus(404), Times.Once());
     });

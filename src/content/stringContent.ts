@@ -1,15 +1,15 @@
-import { HttpContent } from "./httpContent";
+import {HttpContent} from './httpContent';
 
-const DEFAULT_MEDIA_TYPE = "text/plain";
+const DEFAULT_MEDIA_TYPE = 'text/plain';
 
 export class StringContent extends HttpContent {
-  constructor(private content: string) {
-    super();
+    constructor(private content: string) {
+        super();
 
-    this.headers["content-type"] = DEFAULT_MEDIA_TYPE;
-  }
+        this.headers['content-type'] = DEFAULT_MEDIA_TYPE;
+    }
 
-  public readAsStringAsync() {
-    return Promise.resolve(this.content);
-  }
+    public readAsStringAsync(): Promise<string> {
+        return Promise.resolve(this.content);
+    }
 }
