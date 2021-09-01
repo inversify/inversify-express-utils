@@ -68,7 +68,7 @@ describe("BaseMiddleware", () => {
 
         @injectable()
         class LoggerMiddleware extends BaseMiddleware {
-            @inject(TYPES.SomeDependency) private readonly _someDependency: SomeDependency;
+            @inject(TYPES.SomeDependency) private readonly _someDependency!: SomeDependency;
             public handler(
                 req: express.Request,
                 res: express.Response,
@@ -98,6 +98,8 @@ describe("BaseMiddleware", () => {
                     const isAuthenticated = await this.httpContext.user.isAuthenticated();
                     logEntries.push(`${email} => isAuthenticated() => ${isAuthenticated}`);
                     return `${email}`;
+                } else {
+                    return null;
                 }
             }
         }
@@ -105,10 +107,10 @@ describe("BaseMiddleware", () => {
         const container = new Container();
 
         container.bind<SomeDependency>(TYPES.SomeDependency)
-                .toConstantValue({ name: "SomeDependency!" });
+            .toConstantValue({ name: "SomeDependency!" });
 
         container.bind<LoggerMiddleware>(TYPES.LoggerMiddleware)
-                 .to(LoggerMiddleware);
+            .to(LoggerMiddleware);
 
         const server = new InversifyExpressServer(
             container,
@@ -162,7 +164,7 @@ describe("BaseMiddleware", () => {
             ) {
                 setTimeout(() => {
                     this.bind<string>(TYPES.TraceIdValue)
-                        .toConstantValue(`${ req.header(TRACE_HEADER) }`);
+                        .toConstantValue(`${req.header(TRACE_HEADER)}`);
                     next();
                 }, someTimeBetween(0, 500));
             }
@@ -212,15 +214,15 @@ describe("BaseMiddleware", () => {
         run(expectedRequests, (executionId: number) => {
             return supertest(api)
                 .get("/")
-                .set(TRACE_HEADER, `trace-id-${ executionId }`)
-                .expect(200, `trace-id-${ executionId }`)
+                .set(TRACE_HEADER, `trace-id-${executionId}`)
+                .expect(200, `trace-id-${executionId}`)
                 .then(res => {
                     handledRequests++;
                 });
-        }, (err?: Error) => {
+        }, (err?: Error | null | undefined) => {
             expect(handledRequests).eq(
                 expectedRequests,
-                `Only ${ handledRequests } out of ${ expectedRequests } have been handled correctly`
+                `Only ${handledRequests} out of ${expectedRequests} have been handled correctly`
             );
             done(err);
         });
@@ -280,21 +282,22 @@ describe("BaseMiddleware", () => {
             .get("/1")
             .expect(200, "I am transaction #1", () => {
 
-              supertest(app)
-                .get("/1")
-                .expect(200, "I am transaction #2", () => {
-
                 supertest(app)
-                      .get("/2")
-                      .expect(200, "", () => done());
-                });
-        });
+                    .get("/1")
+                    .expect(200, "I am transaction #2", () => {
 
-  });
+                        supertest(app)
+                            .get("/2")
+                            .expect(200, "", () => done());
+                    });
+            });
+
+    });
 });
 
-function run(parallelRuns: number, test: (executionId: number) => PromiseLike<any>, done: (error?: Error) => void) {
-    const testTaskNo = (id: number) => function(cb: (err?: Error) => void) {
+
+function run(parallelRuns: number, test: (executionId: number) => PromiseLike<any>, done: (error?: Error | null | undefined) => void) {
+    const testTaskNo = (id: number) => function (cb: (err?: Error | null | undefined) => void) {
         test(id).then(cb, cb);
     };
 

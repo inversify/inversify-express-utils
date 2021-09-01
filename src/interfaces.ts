@@ -1,6 +1,6 @@
 import * as express from "express";
 import { interfaces as inversifyInterfaces } from "inversify";
-import { PARAMETER_TYPE } from "./constants";
+import { HTTP_VERBS_ENUM, PARAMETER_TYPE } from "./constants";
 import { HttpResponseMessage } from "./httpResponseMessage";
 
 namespace interfaces {
@@ -14,7 +14,7 @@ namespace interfaces {
     }
 
     export interface ControllerMethodMetadata extends ControllerMetadata {
-        method: string;
+        method: keyof typeof HTTP_VERBS_ENUM;
         key: string;
     }
 
@@ -69,6 +69,16 @@ namespace interfaces {
 
     export interface IHttpActionResult {
         executeAsync(): Promise<HttpResponseMessage>;
+    }
+
+    export interface RouteDetails {
+        route: string;
+        args?: string[];
+    }
+
+    export interface RouteInfo {
+        controller: any;
+        endpoints: RouteDetails[];
     }
 }
 

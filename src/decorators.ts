@@ -1,7 +1,6 @@
-import * as express from "express";
 import { inject, injectable, decorate } from "inversify";
 import { interfaces } from "./interfaces";
-import { TYPE, METADATA_KEY, PARAMETER_TYPE } from "./constants";
+import { TYPE, METADATA_KEY, PARAMETER_TYPE, HTTP_VERBS_ENUM } from "./constants";
 
 export const injectHttpContext = inject(TYPE.HttpContext);
 
@@ -67,7 +66,11 @@ export function httpDelete(path: string, ...middleware: interfaces.Middleware[])
     return httpMethod("delete", path, ...middleware);
 }
 
-export function httpMethod(method: string, path: string, ...middleware: interfaces.Middleware[]): interfaces.HandlerDecorator {
+export function httpMethod(
+    method: keyof typeof HTTP_VERBS_ENUM,
+    path: string,
+    ...middleware: interfaces.Middleware[]
+): interfaces.HandlerDecorator {
     return function (target: any, key: string, value: any) {
 
         let metadata: interfaces.ControllerMethodMetadata = {
@@ -107,7 +110,7 @@ function paramDecoratorFactory(parameterType: PARAMETER_TYPE): (name?: string) =
 }
 
 export function params(type: PARAMETER_TYPE, parameterName?: string) {
-    return function (target: Object, methodName: string, index: number) {
+    return function (target: Object, methodName: string | symbol, index: number) {
 
         let metadataList: interfaces.ControllerParameterMetadata = {};
         let parameterMetadataList: interfaces.ParameterMetadata[] = [];
@@ -122,11 +125,11 @@ export function params(type: PARAMETER_TYPE, parameterName?: string) {
         } else {
             metadataList = Reflect.getMetadata(METADATA_KEY.controllerParameter, target.constructor);
             if (metadataList.hasOwnProperty(methodName)) {
-                parameterMetadataList = metadataList[methodName];
+                parameterMetadataList = metadataList[methodName as string] as interfaces.ParameterMetadata[];
             }
             parameterMetadataList.unshift(parameterMetadata);
         }
-        metadataList[methodName] = parameterMetadataList;
+        metadataList[methodName as string] = parameterMetadataList;
         Reflect.defineMetadata(METADATA_KEY.controllerParameter, metadataList, target.constructor);
     };
 }

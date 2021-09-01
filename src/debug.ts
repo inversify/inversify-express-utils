@@ -8,7 +8,7 @@ import {
     getControllerParameterMetadata
 } from "./utils";
 
-export function getRouteInfo(container: inversifyInterfaces.Container) {
+export function getRouteInfo(container: inversifyInterfaces.Container): interfaces.RouteInfo[] {
 
     const raw = getRawMetadata(container);
 
@@ -63,7 +63,7 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
                 }
             }
 
-            const details = {
+            const details: interfaces.RouteDetails = {
                 route: `${method} ${controllerPath}${actionPath}`
             };
 
@@ -71,7 +71,7 @@ export function getRouteInfo(container: inversifyInterfaces.Container) {
                 details["args"] = args;
             }
 
-            return details as { route: string, args?: string[] };
+            return details;
 
         });
 
