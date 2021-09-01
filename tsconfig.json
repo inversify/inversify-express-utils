@@ -1,18 +1,28 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "lib": ["es6", "dom"],
-        "types": ["express", "inversify", "mocha", "reflect-metadata"],
-        "sourceMap": true,
         "module": "commonjs",
+        "lib": [
+            "es6",
+            "dom"
+        ],
+        "types": [
+            "node",
+            "mocha",
+            "reflect-metadata"
+        ],
         "moduleResolution": "node",
-        "isolatedModules": false,
+        "sourceMap": true,
         "jsx": "react",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "noImplicitAny": true,
+        "removeComments": true,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
+        "noResolve": false,
+        "noUnusedParameters": false,
+        "noUnusedLocals": false,
         "strictNullChecks": true,
     }
 }
