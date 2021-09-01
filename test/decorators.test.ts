@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 import {controller, httpMethod, params} from '../src/decorators';
 import {HTTP_VERBS_ENUM, METADATA_KEY, PARAMETER_TYPE} from '../src/constants';
 import {
@@ -21,9 +20,9 @@ describe('Unit Test: Controller Decorators', () => {
             TestController,
         );
 
-        expect(controllerMetadata.middleware).eql(middleware);
-        expect(controllerMetadata.path).eql(path);
-        expect(controllerMetadata.target).eql(TestController);
+        expect(controllerMetadata.middleware).toEqual(middleware);
+        expect(controllerMetadata.path).toEqual(path);
+        expect(controllerMetadata.target).toEqual(TestController);
         done();
     });
 
@@ -48,15 +47,15 @@ describe('Unit Test: Controller Decorators', () => {
             TestController,
         );
 
-        expect(methodMetadata.length).eql(3);
+        expect(methodMetadata.length).toEqual(3);
 
         const metadata: ControllerMethodMetadata | undefined = methodMetadata[0];
 
-        expect(metadata?.middleware).eql(middleware);
-        expect(metadata?.path).eql(path);
-        expect(metadata?.target.constructor).eql(TestController);
-        expect(metadata?.key).eql('test');
-        expect(metadata?.method).eql(method);
+        expect(metadata?.middleware).toEqual(middleware);
+        expect(metadata?.path).toEqual(path);
+        expect(metadata?.target.constructor).toEqual(TestController);
+        expect(metadata?.key).toEqual('test');
+        expect(metadata?.method).toEqual(method);
         done();
     });
 
@@ -80,14 +79,16 @@ describe('Unit Test: Controller Decorators', () => {
             METADATA_KEY.controllerParameter,
             TestController,
         );
-        expect(methodMetadataList['test']).to.eqls(true);
 
-        const metadataList: Array<ParameterMetadata> | undefined = methodMetadataList[methodName];
-        expect(metadataList?.length).eql(2);
+        expect(methodMetadataList['test'] && true).toEqual(true);
 
-        const paramaterMetadata: ParameterMetadata | undefined = metadataList?.[0];
-        expect(paramaterMetadata?.index).eql(0);
-        expect(paramaterMetadata?.parameterName).eql('id');
+        const paramaterMetadataList:
+        Array<ParameterMetadata> | undefined = methodMetadataList[methodName];
+        expect(paramaterMetadataList?.length).toEqual(2);
+
+        const paramaterMetadata: ParameterMetadata | undefined = paramaterMetadataList?.[0];
+        expect(paramaterMetadata?.index).toEqual(0);
+        expect(paramaterMetadata?.parameterName).toEqual('id');
         done();
     });
 });

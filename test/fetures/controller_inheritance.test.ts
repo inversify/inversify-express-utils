@@ -1,7 +1,6 @@
-import {expect} from 'chai';
-import * as bodyParser from 'body-parser';
 import {Container, injectable} from 'inversify';
 import * as supertest from 'supertest';
+import {json, urlencoded} from 'express';
 import {InversifyExpressServer} from '../../src/server';
 import {
     controller, httpGet, requestParam,
@@ -73,8 +72,8 @@ function getDemoServer() {
     const app = new InversifyExpressServer(container);
 
     app.setConfig(a => {
-        a.use(bodyParser.json());
-        a.use(bodyParser.urlencoded({extended: true}));
+        a.use(json());
+        a.use(urlencoded({extended: true}));
     });
 
     const server = app.build();
@@ -94,7 +93,7 @@ describe('Derived controller', () => {
         supertest(server).get('/api/v1/movies')
         .expect(200)
         .then(res => {
-            expect(res.body.status).to.eql('BASE GET!');
+            expect(res.body.status).toEqual('BASE GET!');
             done();
         });
     });
@@ -106,7 +105,7 @@ describe('Derived controller', () => {
         supertest(server).get(`/api/v1/movies/${ id }`)
         .expect(200)
         .then(res => {
-            expect(res.body.status).to.eql(`BASE GET BY ID! ${ id }`);
+            expect(res.body.status).toEqual(`BASE GET BY ID! ${ id }`);
             done();
         });
     });
@@ -122,8 +121,8 @@ describe('Derived controller', () => {
         .set('Accept', 'application/json')
         .expect(200)
         .then(res => {
-            expect(res.body.status).to.eql(status);
-            expect(res.body.args).to.eql(movie);
+            expect(res.body.status).toEqual(status);
+            expect(res.body.args).toEqual(movie);
             done();
         });
     });
@@ -139,8 +138,8 @@ describe('Derived controller', () => {
         .set('Accept', 'application/json')
         .expect(200)
         .then(res => {
-            expect(res.body.status).to.eql(`BASE PUT! ${ id }`);
-            expect(res.body.args).to.eql(movie);
+            expect(res.body.status).toEqual(`BASE PUT! ${ id }`);
+            expect(res.body.args).toEqual(movie);
             done();
         });
     });
@@ -152,7 +151,7 @@ describe('Derived controller', () => {
         supertest(server).delete(`/api/v1/movies/${ id }`)
         .expect(200)
         .then(res => {
-            expect(res.body.status).to.eql(`BASE DELETE! ${ id }`);
+            expect(res.body.status).toEqual(`BASE DELETE! ${ id }`);
             done();
         });
     });
@@ -165,7 +164,7 @@ describe('Derived controller', () => {
         supertest(server).delete(`/api/v1/movies/${ movieId }/actors/${ actorId }`)
         .expect(200)
         .then(res => {
-            expect(res.body.status).to.eql(`DERIVED DELETE ACTOR! ${ movieId } ${ actorId }`);
+            expect(res.body.status).toEqual(`DERIVED DELETE ACTOR! ${ movieId } ${ actorId }`);
             done();
         });
     });

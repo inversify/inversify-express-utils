@@ -1,14 +1,15 @@
-import 'reflect-metadata';
-import * as sinon from 'sinon';
 import * as supertest from 'supertest';
-import {expect} from 'chai';
 import * as inversify from 'inversify';
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
+import {
+    Request,
+    Response,
+    Router,
+    NextFunction,
+    RequestHandler,
+    json,
+} from 'express';
 import * as cookieParser from 'cookie-parser';
 import {injectable, Container} from 'inversify';
-import * as Bluebird from 'bluebird';
-import {it, describe, beforeEach} from 'mocha';
 import {InversifyExpressServer} from '../src';
 import * as interfaces from '../src/interfaces';
 import {
@@ -47,7 +48,7 @@ describe('Integration Tests:', () => {
         it('should work for async controller methods', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response) {
+                @httpGet('/') public getTest(req: Request, res: Response) {
                     return new Promise((resolve => {
                         setTimeout(resolve, 100, 'GET');
                     }));
@@ -63,40 +64,8 @@ describe('Integration Tests:', () => {
         it('should work for async controller methods that fails', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response) {
+                @httpGet('/') public getTest(req: Request, res: Response) {
                     return new Promise(((resolve, reject) => {
-                        setTimeout(reject, 100, 'GET');
-                    }));
-                }
-            }
-
-            server = new InversifyExpressServer(container);
-            supertest(server.build())
-            .get('/')
-            .expect(500, done);
-        });
-
-        it('should work for async controller methods using non-native Bluebird promise', done => {
-            @controller('/')
-            class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response) {
-                    return new Bluebird((resolve => {
-                        setTimeout(resolve, 100, 'GET');
-                    }));
-                }
-            }
-
-            server = new InversifyExpressServer(container);
-            supertest(server.build())
-            .get('/')
-            .expect(200, 'GET', done);
-        });
-
-        it('should work for async controller methods, using non-native Bluebird promise, that fails', done => {
-            @controller('/')
-            class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response) {
-                    return new Bluebird(((resolve, reject) => {
                         setTimeout(reject, 100, 'GET');
                     }));
                 }
@@ -111,11 +80,11 @@ describe('Integration Tests:', () => {
         it('should work for methods which call nextFunc()', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
+                @httpGet('/') public getTest(req: Request, res: Response, nextFunc: NextFunction) {
                     nextFunc();
                 }
 
-                @httpGet('/') public getTest2(req: express.Request, res: express.Response) {
+                @httpGet('/') public getTest2(req: Request, res: Response) {
                     return 'GET';
                 }
             }
@@ -129,7 +98,7 @@ describe('Integration Tests:', () => {
         it('should work for async methods which call nextFunc()', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
+                @httpGet('/') public getTest(req: Request, res: Response, nextFunc: NextFunction) {
                     return new Promise((resolve => {
                         setTimeout(() => {
                             nextFunc();
@@ -138,7 +107,7 @@ describe('Integration Tests:', () => {
                     }));
                 }
 
-                @httpGet('/') public getTest2(req: express.Request, res: express.Response) {
+                @httpGet('/') public getTest2(req: Request, res: Response) {
                     return 'GET';
                 }
             }
@@ -152,11 +121,11 @@ describe('Integration Tests:', () => {
         it('should work for async methods called by nextFunc()', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
+                @httpGet('/') public getTest(req: Request, res: Response, nextFunc: NextFunction) {
                     return nextFunc;
                 }
 
-                @httpGet('/') public getTest2(req: express.Request, res: express.Response) {
+                @httpGet('/') public getTest2(req: Request, res: Response) {
                     return new Promise((resolve => {
                         setTimeout(resolve, 100, 'GET');
                     }));
@@ -172,12 +141,12 @@ describe('Integration Tests:', () => {
         it('should work for each shortcut decorator', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response) { res.send('GET'); }
-                @httpPost('/') public postTest(req: express.Request, res: express.Response) { res.send('POST'); }
-                @httpPut('/') public putTest(req: express.Request, res: express.Response) { res.send('PUT'); }
-                @httpPatch('/') public patchTest(req: express.Request, res: express.Response) { res.send('PATCH'); }
-                @httpHead('/') public headTest(req: express.Request, res: express.Response) { res.send('HEAD'); }
-                @httpDelete('/') public deleteTest(req: express.Request, res: express.Response) { res.send('DELETE'); }
+                @httpGet('/') public getTest(req: Request, res: Response) { res.send('GET'); }
+                @httpPost('/') public postTest(req: Request, res: Response) { res.send('POST'); }
+                @httpPut('/') public putTest(req: Request, res: Response) { res.send('PUT'); }
+                @httpPatch('/') public patchTest(req: Request, res: Response) { res.send('PATCH'); }
+                @httpHead('/') public headTest(req: Request, res: Response) { res.send('HEAD'); }
+                @httpDelete('/') public deleteTest(req: Request, res: Response) { res.send('DELETE'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -196,7 +165,7 @@ describe('Integration Tests:', () => {
         it('should work for more obscure HTTP methods using the httpMethod decorator', done => {
             @controller('/')
             class TestController {
-                @httpMethod('propfind', '/') public getTest(req: express.Request, res: express.Response) { res.send('PROPFIND'); }
+                @httpMethod('propfind', '/') public getTest(req: Request, res: Response) { res.send('PROPFIND'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -210,7 +179,7 @@ describe('Integration Tests:', () => {
 
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response) { return result; }
+                @httpGet('/') public getTest(req: Request, res: Response) { return result; }
             }
 
             server = new InversifyExpressServer(container);
@@ -227,7 +196,7 @@ describe('Integration Tests:', () => {
                 }
             }
 
-            const customRouter = express.Router({
+            const customRouter = Router({
                 caseSensitive: true,
             });
 
@@ -285,35 +254,36 @@ describe('Integration Tests:', () => {
     describe('Middleware:', () => {
         let result: string;
         const middleware: any = {
-            a(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
+            a(req: Request, res: Response, nextFunc: NextFunction) {
                 result += 'a';
                 nextFunc();
             },
-            b(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
+            b(req: Request, res: Response, nextFunc: NextFunction) {
                 result += 'b';
                 nextFunc();
             },
-            c(req: express.Request, res: express.Response, nextFunc: express.NextFunction) {
+            c(req: Request, res: Response, nextFunc: NextFunction) {
                 result += 'c';
                 nextFunc();
             },
         };
-        const spyA = sinon.spy(middleware, 'a');
-        const spyB = sinon.spy(middleware, 'b');
-        const spyC = sinon.spy(middleware, 'c');
+
+        const spyA = jest.fn().mockImplementation(middleware.a);
+        const spyB = jest.fn().mockImplementation(middleware.b);
+        const spyC = jest.fn().mockImplementation(middleware.c);
 
         beforeEach(done => {
+            spyA.mockClear();
+            spyB.mockClear();
+            spyC.mockClear();
             result = '';
-            spyA.resetHistory();
-            spyB.resetHistory();
-            spyC.resetHistory();
             done();
         });
 
         it('should call method-level middleware correctly (GET)', done => {
             @controller('/')
             class TestController {
-                @httpGet('/', spyA, spyB, spyC) public getTest(req: express.Request, res: express.Response) { res.send('GET'); }
+                @httpGet('/', spyA, spyB, spyC) public getTest(req: Request, res: Response) { res.send('GET'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -321,10 +291,10 @@ describe('Integration Tests:', () => {
 
             agent.get('/')
             .expect(200, 'GET', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -332,7 +302,7 @@ describe('Integration Tests:', () => {
         it('should call method-level middleware correctly (POST)', done => {
             @controller('/')
             class TestController {
-                @httpPost('/', spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send('POST'); }
+                @httpPost('/', spyA, spyB, spyC) public postTest(req: Request, res: Response) { res.send('POST'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -340,10 +310,10 @@ describe('Integration Tests:', () => {
 
             agent.post('/')
             .expect(200, 'POST', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -351,7 +321,7 @@ describe('Integration Tests:', () => {
         it('should call method-level middleware correctly (PUT)', done => {
             @controller('/')
             class TestController {
-                @httpPut('/', spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send('PUT'); }
+                @httpPut('/', spyA, spyB, spyC) public postTest(req: Request, res: Response) { res.send('PUT'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -359,10 +329,10 @@ describe('Integration Tests:', () => {
 
             agent.put('/')
             .expect(200, 'PUT', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -370,7 +340,7 @@ describe('Integration Tests:', () => {
         it('should call method-level middleware correctly (PATCH)', done => {
             @controller('/')
             class TestController {
-                @httpPatch('/', spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send('PATCH'); }
+                @httpPatch('/', spyA, spyB, spyC) public postTest(req: Request, res: Response) { res.send('PATCH'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -378,10 +348,10 @@ describe('Integration Tests:', () => {
 
             agent.patch('/')
             .expect(200, 'PATCH', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -389,7 +359,7 @@ describe('Integration Tests:', () => {
         it('should call method-level middleware correctly (HEAD)', done => {
             @controller('/')
             class TestController {
-                @httpHead('/', spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send('HEAD'); }
+                @httpHead('/', spyA, spyB, spyC) public postTest(req: Request, res: Response) { res.send('HEAD'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -397,10 +367,10 @@ describe('Integration Tests:', () => {
 
             agent.head('/')
             .expect(200, 'HEAD', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -408,7 +378,7 @@ describe('Integration Tests:', () => {
         it('should call method-level middleware correctly (DELETE)', done => {
             @controller('/')
             class TestController {
-                @httpDelete('/', spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send('DELETE'); }
+                @httpDelete('/', spyA, spyB, spyC) public postTest(req: Request, res: Response) { res.send('DELETE'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -416,10 +386,10 @@ describe('Integration Tests:', () => {
 
             agent.delete('/')
             .expect(200, 'DELETE', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -427,7 +397,7 @@ describe('Integration Tests:', () => {
         it('should call method-level middleware correctly (ALL)', done => {
             @controller('/')
             class TestController {
-                @all('/', spyA, spyB, spyC) public postTest(req: express.Request, res: express.Response) { res.send('ALL'); }
+                @all('/', spyA, spyB, spyC) public postTest(req: Request, res: Response) { res.send('ALL'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -435,10 +405,10 @@ describe('Integration Tests:', () => {
 
             agent.get('/')
             .expect(200, 'ALL', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -446,17 +416,17 @@ describe('Integration Tests:', () => {
         it('should call controller-level middleware correctly', done => {
             @controller('/', spyA, spyB, spyC)
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response) { res.send('GET'); }
+                @httpGet('/') public getTest(req: Request, res: Response) { res.send('GET'); }
             }
 
             server = new InversifyExpressServer(container);
             supertest(server.build())
             .get('/')
             .expect(200, 'GET', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -464,7 +434,7 @@ describe('Integration Tests:', () => {
         it('should call server-level middleware correctly', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response) { res.send('GET'); }
+                @httpGet('/') public getTest(req: Request, res: Response) { res.send('GET'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -478,10 +448,10 @@ describe('Integration Tests:', () => {
             supertest(server.build())
             .get('/')
             .expect(200, 'GET', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -489,7 +459,7 @@ describe('Integration Tests:', () => {
         it('should call all middleware in correct order', done => {
             @controller('/', spyB)
             class TestController {
-                @httpGet('/', spyC) public getTest(req: express.Request, res: express.Response) { res.send('GET'); }
+                @httpGet('/', spyC) public getTest(req: Request, res: Response) { res.send('GET'); }
             }
 
             server = new InversifyExpressServer(container);
@@ -501,10 +471,10 @@ describe('Integration Tests:', () => {
             supertest(server.build())
             .get('/')
             .expect(200, 'GET', () => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(spyC.calledOnce).to.eqls(true);
-                expect(result).to.equal('abc');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(spyC).toHaveBeenCalledTimes(1);
+                expect(result).toBe('abc');
                 done();
             });
         });
@@ -515,11 +485,11 @@ describe('Integration Tests:', () => {
 
             @controller('/', symbolId, strId)
             class TestController {
-                @httpGet('/') public getTest(req: express.Request, res: express.Response) { res.send('GET'); }
+                @httpGet('/') public getTest(req: Request, res: Response) { res.send('GET'); }
             }
 
-            container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
-            container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
+            container.bind<RequestHandler>(symbolId).toConstantValue(spyA);
+            container.bind<RequestHandler>(strId).toConstantValue(spyB);
 
             server = new InversifyExpressServer(container);
 
@@ -528,9 +498,9 @@ describe('Integration Tests:', () => {
             return agent.get('/')
             .expect(200, 'GET')
             .then(() => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(result).to.equal('ab');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(result).toBe('ab');
             });
         });
 
@@ -541,11 +511,11 @@ describe('Integration Tests:', () => {
             @controller('/')
             class TestController {
                 @httpGet('/', symbolId, strId)
-                public getTest(req: express.Request, res: express.Response) { res.send('GET'); }
+                public getTest(req: Request, res: Response) { res.send('GET'); }
             }
 
-            container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
-            container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
+            container.bind<RequestHandler>(symbolId).toConstantValue(spyA);
+            container.bind<RequestHandler>(strId).toConstantValue(spyB);
 
             server = new InversifyExpressServer(container);
 
@@ -554,9 +524,9 @@ describe('Integration Tests:', () => {
             return agent.get('/')
             .expect(200, 'GET')
             .then(() => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(result).to.equal('ab');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(result).toBe('ab');
             });
         });
 
@@ -567,11 +537,11 @@ describe('Integration Tests:', () => {
             @controller('/', symbolId)
             class TestController {
                 @httpGet('/', strId)
-                public getTest(req: express.Request, res: express.Response) { res.send('GET'); }
+                public getTest(req: Request, res: Response) { res.send('GET'); }
             }
 
-            container.bind<express.RequestHandler>(symbolId).toConstantValue(spyA);
-            container.bind<express.RequestHandler>(strId).toConstantValue(spyB);
+            container.bind<RequestHandler>(symbolId).toConstantValue(spyA);
+            container.bind<RequestHandler>(strId).toConstantValue(spyB);
 
             server = new InversifyExpressServer(container);
 
@@ -580,9 +550,9 @@ describe('Integration Tests:', () => {
             return agent.get('/')
             .expect(200, 'GET')
             .then(() => {
-                expect(spyA.calledOnce).to.eqls(true);
-                expect(spyB.calledOnce).to.eqls(true);
-                expect(result).to.equal('ab');
+                expect(spyA).toHaveBeenCalledTimes(1);
+                expect(spyB).toHaveBeenCalledTimes(1);
+                expect(result).toBe('ab');
             });
         });
     });
@@ -591,7 +561,7 @@ describe('Integration Tests:', () => {
             @controller('/')
             class TestController {
                 // tslint:disable-next-line:max-line-length
-                @httpGet(':id') public getTest(@requestParam('id') id: string, req: express.Request, res: express.Response) {
+                @httpGet(':id') public getTest(@requestParam('id') id: string, req: Request, res: Response) {
                     return id;
                 }
             }
@@ -605,7 +575,7 @@ describe('Integration Tests:', () => {
         it('should bind a method parameter to the request object', done => {
             @controller('/')
             class TestController {
-                @httpGet(':id') public getTest(@request() req: express.Request) {
+                @httpGet(':id') public getTest(@request() req: Request) {
                     return req.params['id'];
                 }
             }
@@ -619,7 +589,7 @@ describe('Integration Tests:', () => {
         it('should bind a method parameter to the response object', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(@response() res: express.Response) {
+                @httpGet('/') public getTest(@response() res: Response) {
                     return res.send('foo');
                 }
             }
@@ -656,7 +626,7 @@ describe('Integration Tests:', () => {
             server = new InversifyExpressServer(container);
             const body = {foo: 'bar'};
             server.setConfig(app => {
-                app.use(bodyParser.json());
+                app.use(json());
             });
             supertest(server.build())
             .post('/')
@@ -697,7 +667,7 @@ describe('Integration Tests:', () => {
         it('should bind a method parameter to a cookie', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getCookie(@cookies('Cookie') cookie: any, req: express.Request, res: express.Response) {
+                @httpGet('/') public getCookie(@cookies('Cookie') cookie: any, req: Request, res: Response) {
                     return cookie;
                 }
             }
@@ -755,9 +725,9 @@ describe('Integration Tests:', () => {
             @injectable()
             class CustomAuthProvider implements interfaces.AuthProvider {
                 public async getUser(
-                    req: express.Request,
-                    res: express.Response,
-                    nextFunc: express.NextFunction,
+                    req: Request,
+                    res: Response,
+                    nextFunc: NextFunction,
                 ): Promise<interfaces.Principal> {
                     return Promise.resolve({
                         details: 'something',

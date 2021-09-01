@@ -1,5 +1,4 @@
-import {expect} from 'chai';
-import * as express from 'express';
+import {Request, Response} from 'express';
 import {Container} from 'inversify';
 import * as supertest from 'supertest';
 import * as cookieParser from 'cookie-parser';
@@ -22,30 +21,27 @@ describe('Unit Test: Previous bugs', () => {
         @controller('/api/test')
         class TestController {
             @httpGet('/')
-            public get(
-            @request() req: express.Request,
-                @response() res: express.Response,
-            ) {
-                expect(req.url).not.to.eql(undefined);
-                expect((req as any).setHeader).to.eql(undefined);
+            public get(@request() req: Request, @response() res: Response): void {
+                expect(req.url).not.toEqual(undefined);
+                expect((req as any).setHeader).toEqual(undefined);
                 // eslint-disable-next-line @typescript-eslint/unbound-method
-                expect(res.setHeader).not.to.eql(undefined);
-                expect((res as any).url).to.eql(undefined);
+                expect(res.setHeader).not.toEqual(undefined);
+                expect((res as any).url).toEqual(undefined);
                 res.json([{id: 1}, {id: 2}]);
             }
 
             @httpGet('/:id')
             public getById(
-            @requestParam('id') id: string,
-                @request() req: express.Request,
-                @response() res: express.Response,
-            ) {
-                expect(id).to.eql('5');
-                expect(req.url).not.to.eql(undefined);
-                expect((req as any).setHeader).to.eql(undefined);
+                @requestParam('id') id: string,
+                    @request() req: Request,
+                    @response() res: Response,
+            ): void {
+                expect(id).toEqual('5');
+                expect(req.url).not.toEqual(undefined);
+                expect((req as any).setHeader).toEqual(undefined);
                 // eslint-disable-next-line @typescript-eslint/unbound-method
-                expect(res.setHeader).not.to.eql(undefined);
-                expect((res as any).url).to.eql(undefined);
+                expect(res.setHeader).not.toEqual(undefined);
+                expect((res as any).url).toEqual(undefined);
                 res.json({id});
             }
         }
@@ -57,9 +53,9 @@ describe('Unit Test: Previous bugs', () => {
         .expect('Content-Type', /json/)
         .expect(200)
         .then(response1 => {
-            expect(Array.isArray(response1.body)).to.eql(true);
-            expect(response1.body[0].id).to.eql(1);
-            expect(response1.body[1].id).to.eql(2);
+            expect(Array.isArray(response1.body)).toEqual(true);
+            expect(response1.body[0].id).toEqual(1);
+            expect(response1.body[1].id).toEqual(2);
         })
         .catch(done);
 
@@ -67,8 +63,8 @@ describe('Unit Test: Previous bugs', () => {
         .expect('Content-Type', /json/)
         .expect(200)
         .then(response2 => {
-            expect(Array.isArray(response2.body)).to.eql(false);
-            expect(response2.body.id).to.eql('5');
+            expect(Array.isArray(response2.body)).toEqual(false);
+            expect(response2.body.id).toEqual('5');
             done();
         })
         .catch(done);
@@ -81,8 +77,8 @@ describe('Unit Test: Previous bugs', () => {
         class TestController {
             @httpGet('/')
             public get(
-            @request() req: express.Request,
-                @response() res: express.Response,
+            @request() req: Request,
+                @response() res: Response,
                 @queryParam('empty') empty: string,
                 @queryParam('test') test: string,
             ) {
@@ -97,8 +93,8 @@ describe('Unit Test: Previous bugs', () => {
         .expect('Content-Type', /json/)
         .expect(200)
         .then(response1 => {
-            expect(response1.body.test).to.eql('testquery');
-            expect(response1.body.empty).to.eq(undefined);
+            expect(response1.body.test).toEqual('testquery');
+            expect(response1.body.empty).toBeUndefined();
             done();
         })
         .catch(done);
@@ -111,8 +107,8 @@ describe('Unit Test: Previous bugs', () => {
         class TestController {
             @httpGet('/')
             public get(
-            @request() req: express.Request,
-                @response() res: express.Response,
+            @request() req: Request,
+                @response() res: Response,
                 @requestHeaders('TestHead') test: string,
                 @requestHeaders('empty') empty: string,
             ) {
@@ -128,8 +124,8 @@ describe('Unit Test: Previous bugs', () => {
         .set('TestHead', 'foo')
         .expect(200)
         .then(response1 => {
-            expect(response1.body.test).to.eql('foo');
-            expect(response1.body.empty).to.eq(undefined);
+            expect(response1.body.test).toEqual('foo');
+            expect(response1.body.empty).toBeUndefined();
             done();
         })
         .catch(done);
@@ -143,8 +139,8 @@ describe('Unit Test: Previous bugs', () => {
             class TestController {
                 @httpGet('/:id/:other')
                 public get(
-                @request() req: express.Request,
-                    @response() res: express.Response,
+                @request() req: Request,
+                    @response() res: Response,
                     @requestParam() params: any,
                 ) {
                     return {...params};
@@ -158,8 +154,8 @@ describe('Unit Test: Previous bugs', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                expect(res.body.id).to.eql('23');
-                expect(res.body.other).to.eq('andMe');
+                expect(res.body.id).toEqual('23');
+                expect(res.body.other).toBe('andMe');
                 done();
             })
             .catch(done);
@@ -172,8 +168,8 @@ describe('Unit Test: Previous bugs', () => {
             class TestController {
                 @httpGet('/')
                 public get(
-                @request() req: express.Request,
-                    @response() res: express.Response,
+                @request() req: Request,
+                    @response() res: Response,
                     @queryParam() query: any,
                 ) {
                     return {...query};
@@ -187,8 +183,8 @@ describe('Unit Test: Previous bugs', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                expect(res.body.id).to.eql('23');
-                expect(res.body.other).to.eq('andMe');
+                expect(res.body.id).toEqual('23');
+                expect(res.body.other).toBe('andMe');
                 done();
             })
             .catch(done);
@@ -201,8 +197,8 @@ describe('Unit Test: Previous bugs', () => {
             class TestController {
                 @httpGet('/')
                 public get(
-                @request() req: express.Request,
-                    @response() res: express.Response,
+                @request() req: Request,
+                    @response() res: Response,
                     @cookies() cookie: any,
                 ) {
                     return {...cookie};
@@ -221,8 +217,8 @@ describe('Unit Test: Previous bugs', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                expect(res.body.id).to.eql('23');
-                expect(res.body.other).to.eq('andMe');
+                expect(res.body.id).toEqual('23');
+                expect(res.body.other).toBe('andMe');
                 done();
             })
             .catch(done);
@@ -235,8 +231,8 @@ describe('Unit Test: Previous bugs', () => {
             class TestController {
                 @httpGet('/')
                 public get(
-                @request() req: express.Request,
-                    @response() res: express.Response,
+                @request() req: Request,
+                    @response() res: Response,
                     @requestHeaders() headers: any,
                 ) {
                     return {...headers};
@@ -253,8 +249,8 @@ describe('Unit Test: Previous bugs', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                expect(res.body.id).to.eql('23');
-                expect(res.body.other).to.eq('andMe');
+                expect(res.body.id).toEqual('23');
+                expect(res.body.other).toBe('andMe');
                 done();
             })
             .catch(done);

@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 import {Container, inject} from 'inversify';
 import * as supertest from 'supertest';
 import {
@@ -39,7 +38,7 @@ describe('BaseHttpController', () => {
                 const headerVal = this.httpContext.request.headers['x-custom'];
                 const {name} = this._someDependency;
                 const isAuthenticated = await this.httpContext.user.isAuthenticated();
-                expect(isAuthenticated).eq(false);
+                expect(isAuthenticated).toBe(false);
                 return `${ headerVal } & ${ name }`;
             }
         }

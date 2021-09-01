@@ -1,6 +1,5 @@
-import {expect} from 'chai';
-import * as async from 'async';
 import * as express from 'express';
+import * as async from 'async';
 import {
     Container, injectable, inject, optional,
 } from 'inversify';
@@ -125,23 +124,11 @@ describe('BaseMiddleware', () => {
         supertest(server.build())
         .get('/')
         .expect(200, 'test@test.com', () => {
-            expect(principalInstanceCount).eq(
-                1,
-                'Only one instance of HttpContext should be created per HTTP request!',
-            );
-            expect(logEntries.length).eq(3);
-            expect(logEntries[0]).eq(
-                'Hello from controller middleware!',
-                'Expected controller action to be invoked 1st!',
-            );
-            expect(logEntries[1]).eq(
-                'test@test.com => / SomeDependency!',
-                'Expected action middleare to be invoked 2nd!',
-            );
-            expect(logEntries[2]).eq(
-                'test@test.com => isAuthenticated() => true',
-                'Expected action to be invoked 3rd!',
-            );
+            expect(principalInstanceCount).toBe(1);
+            expect(logEntries.length).toBe(3);
+            expect(logEntries[0]).toBe('Hello from controller middleware!');
+            expect(logEntries[1]).toBe('test@test.com => / SomeDependency!');
+            expect(logEntries[2]).toBe('test@test.com => isAuthenticated() => true');
             done();
         });
     });
@@ -216,11 +203,8 @@ describe('BaseMiddleware', () => {
         .expect(200, `trace-id-${ executionId }`)
         .then(res => {
             handledRequests += 1;
-        }), (err?: Error | null | undefined) => {
-            expect(handledRequests).eq(
-                expectedRequests,
-                `Only ${ handledRequests } out of ${ expectedRequests } have been handled correctly`,
-            );
+        }), (err: Error | null | undefined) => {
+            expect(handledRequests).toBe(expectedRequests);
             done(err);
         });
     });
