@@ -1,9 +1,9 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { NOT_FOUND } from "http-status-codes";
-import { interfaces } from "../interfaces";
+import {StatusCodes} from 'http-status-codes';
+import {HttpResponseMessage} from '../httpResponseMessage';
+import {IHttpActionResult} from '../interfaces';
 
-export default class NotFoundResult implements interfaces.IHttpActionResult {
-    public async executeAsync() {
-        return new HttpResponseMessage(NOT_FOUND);
+export class NotFoundResult implements IHttpActionResult {
+    public async executeAsync(): Promise<HttpResponseMessage> {
+        return new HttpResponseMessage(StatusCodes.NOT_FOUND);
     }
 }

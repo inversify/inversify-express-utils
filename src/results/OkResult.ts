@@ -1,10 +1,9 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { OK } from "http-status-codes";
-import { interfaces } from "../interfaces";
+import {StatusCodes} from 'http-status-codes';
+import {HttpResponseMessage} from '../httpResponseMessage';
+import {IHttpActionResult} from '../interfaces';
 
-export default class OkResult implements interfaces.IHttpActionResult {
-
-    public async executeAsync() {
-        return new HttpResponseMessage(OK);
+export class OkResult implements IHttpActionResult {
+    public async executeAsync(): Promise<HttpResponseMessage> {
+        return new HttpResponseMessage(StatusCodes.OK);
     }
 }

@@ -1,10 +1,10 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { interfaces } from "../interfaces";
+import {HttpResponseMessage} from '../httpResponseMessage';
+import {IHttpActionResult} from '../interfaces';
 
-export default class StatusCodeResult implements interfaces.IHttpActionResult {
+export class StatusCodeResult implements IHttpActionResult {
     constructor(private statusCode: number) { }
 
-    public async executeAsync() {
+    public async executeAsync(): Promise<HttpResponseMessage> {
         return new HttpResponseMessage(this.statusCode);
     }
 }

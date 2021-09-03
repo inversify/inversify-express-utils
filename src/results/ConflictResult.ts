@@ -1,9 +1,9 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { CONFLICT } from "http-status-codes";
-import { interfaces } from "../interfaces";
+import {StatusCodes} from 'http-status-codes';
+import {HttpResponseMessage} from '../httpResponseMessage';
+import {IHttpActionResult} from '../interfaces';
 
-export default class ConflictResult implements interfaces.IHttpActionResult {
-    public async executeAsync() {
-        return new HttpResponseMessage(CONFLICT);
+export class ConflictResult implements IHttpActionResult {
+    public async executeAsync(): Promise<HttpResponseMessage> {
+        return new HttpResponseMessage(StatusCodes.CONFLICT);
     }
 }
