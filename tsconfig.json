@@ -14,8 +14,8 @@
         "module": "commonjs",
         "types": [
             "node",
-            "mocha",
-            "reflect-metadata"
+            "reflect-metadata",
+            "jest"
         ],
         "moduleResolution": "node",
         "noFallthroughCasesInSwitch": true,

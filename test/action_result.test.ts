@@ -1,5 +1,4 @@
-import {expect} from 'chai';
-import * as httpStatusCodes from 'http-status-codes';
+import {StatusCodes} from 'http-status-codes';
 import * as results from '../src/results';
 import {HttpResponseMessage} from '../src/httpResponseMessage';
 
@@ -8,7 +7,8 @@ describe('ActionResults', () => {
         it('should respond with an HTTP 200', async () => {
             const actionResult = new results.OkResult();
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.OK);
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.OK);
         });
     });
 
@@ -19,10 +19,11 @@ describe('ActionResults', () => {
             };
             const actionResult = new results.OkNegotiatedContentResult(content);
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.OK);
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.OK);
             expect(
                 await responseMessage.content.readAsStringAsync(),
-            ).to.eq(JSON.stringify(content));
+            ).toBe(JSON.stringify(content));
         });
     });
 
@@ -30,7 +31,8 @@ describe('ActionResults', () => {
         it('should respond with an HTTP 400', async () => {
             const actionResult = new results.BadRequestResult();
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.BAD_REQUEST);
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -39,8 +41,9 @@ describe('ActionResults', () => {
             const message = 'uh oh!';
             const actionResult = new results.BadRequestErrorMessageResult(message);
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.BAD_REQUEST);
-            expect(await responseMessage.content.readAsStringAsync()).to.eq(message);
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.BAD_REQUEST);
+            expect(await responseMessage.content.readAsStringAsync()).toBe(message);
         });
     });
 
@@ -48,7 +51,8 @@ describe('ActionResults', () => {
         it('should respond with an HTTP 409', async () => {
             const actionResult = new results.ConflictResult();
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.CONFLICT);
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.CONFLICT);
         });
     });
 
@@ -58,23 +62,27 @@ describe('ActionResults', () => {
             const content = {
                 foo: 'bar',
             };
+
             const actionResult = new results.CreatedNegotiatedContentResult(uri, content);
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.CREATED);
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.CREATED);
             expect(
                 await responseMessage.content.readAsStringAsync(),
-            ).to.eq(JSON.stringify(content));
-            expect(responseMessage.headers['location']).to.eq(uri);
+            ).toBe(JSON.stringify(content));
+            expect(responseMessage.headers['location']).toBe(uri);
         });
     });
 
     describe('ExceptionResult', () => {
         it('should respond with an HTTP 500 and the error message', async () => {
             const error = new Error('foo');
+
             const actionResult = new results.ExceptionResult(error);
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.INTERNAL_SERVER_ERROR);
-            expect(await responseMessage.content.readAsStringAsync()).to.eq('Error: foo');
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
+            expect(await responseMessage.content.readAsStringAsync()).toBe('Error: foo');
         });
     });
 
@@ -82,7 +90,8 @@ describe('ActionResults', () => {
         it('should respond with an HTTP 500', async () => {
             const actionResult = new results.InternalServerErrorResult();
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.INTERNAL_SERVER_ERROR);
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
         });
     });
 
@@ -90,7 +99,8 @@ describe('ActionResults', () => {
         it('should respond with an HTTP 404', async () => {
             const actionResult = new results.NotFoundResult();
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.NOT_FOUND);
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.NOT_FOUND);
         });
     });
 
@@ -99,8 +109,9 @@ describe('ActionResults', () => {
             const uri = 'http://foo/bar';
             const actionResult = new results.RedirectResult(uri);
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(httpStatusCodes.MOVED_TEMPORARILY);
-            expect(responseMessage.headers['location']).to.eq(uri);
+
+            expect(responseMessage.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+            expect(responseMessage.headers['location']).toBe(uri);
         });
     });
 
@@ -109,7 +120,7 @@ describe('ActionResults', () => {
             const responseMessage = new HttpResponseMessage(200);
             const actionResult = new results.ResponseMessageResult(responseMessage);
 
-            expect(await actionResult.executeAsync()).to.eq(responseMessage);
+            expect(await actionResult.executeAsync()).toBe(responseMessage);
         });
     });
 
@@ -117,7 +128,8 @@ describe('ActionResults', () => {
         it('should respond with the specified status code', async () => {
             const actionResult = new results.StatusCodeResult(417);
             const responseMessage = await actionResult.executeAsync();
-            expect(responseMessage.statusCode).to.eq(417);
+
+            expect(responseMessage.statusCode).toBe(417);
         });
     });
 });

@@ -1,8 +1,5 @@
-import {expect} from 'chai';
-import * as sinon from 'sinon';
 import * as express from 'express';
 import {Container} from 'inversify';
-import {Mock, Times} from 'moq.ts';
 import {InversifyExpressServer} from '../src/server';
 import {controller} from '../src/decorators';
 import {cleanUpMetadata} from '../src/utils';
@@ -21,11 +18,11 @@ describe('Unit Test: InversifyExpressServer', () => {
             next: express.NextFunction,
         ) => {};
 
-        const configFn = sinon.spy((app: express.Application) => {
+        const configFn = jest.fn((app: express.Application) => {
             app.use(middleware);
         });
 
-        const errorConfigFn = sinon.spy((app: express.Application) => {
+        const errorConfigFn = jest.fn((app: express.Application) => {
             app.use(middleware);
         });
 
@@ -39,14 +36,13 @@ describe('Unit Test: InversifyExpressServer', () => {
         server.setConfig(configFn)
         .setErrorConfig(errorConfigFn);
 
-        expect(configFn.called).to.eq(false);
-        expect(errorConfigFn.called).to.eq(false);
+        expect(configFn).not.toBeCalled();
+        expect(errorConfigFn).not.toBeCalled();
 
         server.build();
 
-        expect(configFn.calledOnce).to.eqls(true);
-        expect(errorConfigFn.calledOnce).to.eqls(true);
-        expect(configFn.calledBefore(errorConfigFn)).to.eqls(true);
+        expect(configFn).toHaveBeenCalledTimes(1);
+        expect(errorConfigFn).toHaveBeenCalledTimes(1);
         done();
     });
 
@@ -62,8 +58,8 @@ describe('Unit Test: InversifyExpressServer', () => {
         const serverWithDefaultRouter = new InversifyExpressServer(container);
         const serverWithCustomRouter = new InversifyExpressServer(container, customRouter);
 
-        expect((serverWithDefaultRouter as any)._router === customRouter).to.eq(false);
-        expect((serverWithCustomRouter as any)._router === customRouter).to.eqls(true);
+        expect((serverWithDefaultRouter as any)._router === customRouter).toBe(false);
+        expect((serverWithCustomRouter as any)._router === customRouter).toBe(true);
     });
 
     it('Should allow to provide custom routing configuration', () => {
@@ -76,8 +72,8 @@ describe('Unit Test: InversifyExpressServer', () => {
         const serverWithDefaultConfig = new InversifyExpressServer(container);
         const serverWithCustomConfig = new InversifyExpressServer(container, null, routingConfig);
 
-        expect((serverWithCustomConfig as any)._routingConfig).to.eq(routingConfig);
-        expect((serverWithDefaultConfig as any)._routingConfig).to.not.eql(
+        expect((serverWithCustomConfig as any)._routingConfig).toBe(routingConfig);
+        expect((serverWithDefaultConfig as any)._routingConfig).not.toEqual(
             (serverWithCustomConfig as any)._routingConfig,
         );
     });
@@ -87,24 +83,27 @@ describe('Unit Test: InversifyExpressServer', () => {
         const app = express();
         const serverWithDefaultApp = new InversifyExpressServer(container);
         const serverWithCustomApp = new InversifyExpressServer(container, null, null, app);
-        expect((serverWithCustomApp as any)._app).to.eq(app);
-        expect((serverWithDefaultApp as any)._app).to.not.eql((serverWithCustomApp as any)._app);
+        expect((serverWithCustomApp as any)._app).toBe(app);
+        expect((serverWithDefaultApp as any)._app).not.toEqual((serverWithCustomApp as any)._app);
     });
 
     // TODO Fix this somehow ??
     // https://www.npmjs.com/package/moq.ts/v/3.0.0?activeTab=readme#mock-behavior
     // Now Obsolete
-    xit('Should handle a HttpResponseMessage that has no content', () => {
+    it('Should handle a HttpResponseMessage that has no content', () => {
         const container = new Container();
         const server = new InversifyExpressServer(container);
 
         const httpResponseMessageWithoutContent = new HttpResponseMessage(404);
-        const mockResponse = new Mock<express.Response>();
+        const mockResponse: Partial<express.Response> = {
+            sendStatus: jest.fn(),
+        };
+
         (server as any).handleHttpResponseMessage(
             httpResponseMessageWithoutContent,
-            mockResponse.object(),
+            mockResponse,
         );
 
-        mockResponse.verify(instance => instance.sendStatus(404), Times.Once());
+        expect(mockResponse.sendStatus).toHaveBeenCalledWith(404);
     });
 });

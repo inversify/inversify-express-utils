@@ -1,5 +1,3 @@
-import {expect} from 'chai';
-import * as express from 'express';
 import {Container, injectable, inject} from 'inversify';
 import * as supertest from 'supertest';
 import {
@@ -44,11 +42,7 @@ describe('AuthProvider', () => {
         @injectable()
         class CustomAuthProvider implements interfaces.AuthProvider {
             @inject('SomeDependency') private readonly _someDependency!: SomeDependency;
-            public getUser(
-                req: express.Request,
-                res: express.Response,
-                next: express.NextFunction,
-            ) {
+            public getUser() {
                 const principal = new Principal({
                     email: `${ this._someDependency.name }@test.com`,
                 });
@@ -70,7 +64,7 @@ describe('AuthProvider', () => {
                     const {email} = this.httpContext.user.details;
                     const {name} = this._someDependency;
                     const isAuthenticated = await this.httpContext.user.isAuthenticated();
-                    expect(isAuthenticated).eq(true);
+                    expect(isAuthenticated).toEqual(true);
                     return `${ email } & ${ name }`;
                 }
                 return null;
