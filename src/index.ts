@@ -2,6 +2,7 @@ export * from './server';
 export * from './decorators';
 export * from './constants';
 export * from './interfaces';
+export * as interfaces from './interfaces';
 export * from './results';
 export * from './base_http_controller';
 export * from './base_middleware';
