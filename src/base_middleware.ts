@@ -1,14 +1,16 @@
-import * as express from "express";
-import { injectable, interfaces as inversifyInterfaces } from "inversify";
-import { interfaces } from "./interfaces";
+import * as express from 'express';
+import {injectable, interfaces as inversifyInterfaces} from 'inversify';
+import * as interfaces from './interfaces';
 
 @injectable()
 export abstract class BaseMiddleware implements BaseMiddleware {
     // httpContext is initialized when the middleware is invoked
     // see resolveMidleware in server.ts for more details
-    protected readonly httpContext: interfaces.HttpContext;
+    public httpContext!: interfaces.HttpContext;
 
-    protected bind<T>(serviceIdentifier: inversifyInterfaces.ServiceIdentifier<T>): inversifyInterfaces.BindingToSyntax<T> {
+    protected bind<T>(
+        serviceIdentifier: inversifyInterfaces.ServiceIdentifier<T>,
+    ): inversifyInterfaces.BindingToSyntax<T> {
         return this.httpContext.container.bind(serviceIdentifier);
     }
 

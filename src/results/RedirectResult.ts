@@ -1,15 +1,14 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { MOVED_TEMPORARILY } from "http-status-codes";
-import { interfaces } from "../interfaces";
-import { URL } from "url";
-import { BaseHttpController } from "../base_http_controller";
+import {StatusCodes} from 'http-status-codes';
+import {URL} from 'url';
+import {HttpResponseMessage} from '../httpResponseMessage';
+import {IHttpActionResult} from '../interfaces';
 
-export default class RedirectResult implements interfaces.IHttpActionResult {
-    constructor(private location: string | URL, private apiController: BaseHttpController) {}
+export class RedirectResult implements IHttpActionResult {
+    constructor(private location: string | URL) { }
 
-    public async executeAsync() {
-        const response = new HttpResponseMessage(MOVED_TEMPORARILY);
-        response.headers.location = this.location.toString();
+    public async executeAsync(): Promise<HttpResponseMessage> {
+        const response = new HttpResponseMessage(StatusCodes.MOVED_TEMPORARILY);
+        response.headers['location'] = this.location.toString();
         return response;
     }
 }

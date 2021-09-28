@@ -1,11 +1,10 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { interfaces } from "../interfaces";
-import { BaseHttpController } from "../base_http_controller";
+import {HttpResponseMessage} from '../httpResponseMessage';
+import {IHttpActionResult} from '../interfaces';
 
-export default class ResponseMessageResult implements interfaces.IHttpActionResult {
-    constructor(private message: HttpResponseMessage, private apiController: BaseHttpController) {}
+export class ResponseMessageResult implements IHttpActionResult {
+    constructor(private message: HttpResponseMessage) { }
 
-    public async executeAsync() {
+    public async executeAsync(): Promise<HttpResponseMessage> {
         return this.message;
     }
 }

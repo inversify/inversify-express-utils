@@ -1,8 +1,8 @@
-import { OutgoingHttpHeaders } from "http";
-import { HttpContent } from "./content/httpContent";
+import {OutgoingHttpHeaders} from 'http';
+import {HttpContent} from './content/httpContent';
 
 export class HttpResponseMessage {
-    private _content: HttpContent;
+    private _content!: HttpContent;
 
     private _headers: OutgoingHttpHeaders = {};
 
@@ -14,7 +14,7 @@ export class HttpResponseMessage {
         this._headers = headers;
     }
 
-    public get content() {
+    public get content(): HttpContent {
         return this._content;
     }
 
@@ -22,7 +22,7 @@ export class HttpResponseMessage {
         this._content = value;
     }
 
-    private _statusCode: number;
+    private _statusCode!: number;
 
     public get statusCode(): number {
         return this._statusCode;
@@ -30,7 +30,7 @@ export class HttpResponseMessage {
 
     public set statusCode(code: number) {
         if (code < 0 || code > 999) {
-            throw new Error(`${code} is not a valid status code`);
+            throw new Error(`${ code } is not a valid status code`);
         }
 
         this._statusCode = code;

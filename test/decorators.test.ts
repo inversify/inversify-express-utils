@@ -1,89 +1,94 @@
-import { expect } from "chai";
-import { controller, httpMethod, params } from "../src/decorators";
-import { interfaces } from "../src/interfaces";
-import { METADATA_KEY, PARAMETER_TYPE } from "../src/constants";
+import {controller, httpMethod, params} from '../src/decorators';
+import {HTTP_VERBS_ENUM, METADATA_KEY, PARAMETER_TYPE} from '../src/constants';
+import {
+    ControllerMetadata,
+    ControllerMethodMetadata,
+    ControllerParameterMetadata,
+    ParameterMetadata,
+} from '../src';
 
-describe("Unit Test: Controller Decorators", () => {
-
-    it("should add controller metadata to a class when decorated with @controller", (done) => {
-        let middleware = [function() { return; }, "foo", Symbol.for("bar")];
-        let path = "foo";
+describe('Unit Test: Controller Decorators', () => {
+    it('should add controller metadata to a class when decorated with @controller', done => {
+        const middleware = [() => {}, 'foo', Symbol.for('bar')];
+        const path = 'foo';
 
         @controller(path, ...middleware)
-        class TestController {}
+        class TestController { }
 
-        let controllerMetadata: interfaces.ControllerMetadata = Reflect.getMetadata(
+        const controllerMetadata: ControllerMetadata = Reflect.getMetadata(
             METADATA_KEY.controller,
-            TestController
+            TestController,
         );
 
-        expect(controllerMetadata.middleware).eql(middleware);
-        expect(controllerMetadata.path).eql(path);
-        expect(controllerMetadata.target).eql(TestController);
+        expect(controllerMetadata.middleware).toEqual(middleware);
+        expect(controllerMetadata.path).toEqual(path);
+        expect(controllerMetadata.target).toEqual(TestController);
         done();
     });
 
-
-    it("should add method metadata to a class when decorated with @httpMethod", (done) => {
-        let middleware = [function() { return; }, "bar", Symbol.for("baz")];
-        let path = "foo";
-        let method = "get";
+    it('should add method metadata to a class when decorated with @httpMethod', done => {
+        const middleware = [() => {}, 'bar', Symbol.for('baz')];
+        const path = 'foo';
+        const method: keyof typeof HTTP_VERBS_ENUM = 'get';
 
         class TestController {
             @httpMethod(method, path, ...middleware)
-            public test() { return; }
+            public test() { }
 
-            @httpMethod("foo", "bar")
-            public test2() { return; }
+            @httpMethod('foo' as unknown as keyof typeof HTTP_VERBS_ENUM, 'bar')
+            public test2() { }
 
-            @httpMethod("bar", "foo")
-            public test3() { return; }
+            @httpMethod('bar' as unknown as keyof typeof HTTP_VERBS_ENUM, 'foo')
+            public test3() { }
         }
 
-        let methodMetadata: interfaces.ControllerMethodMetadata[] = Reflect.getMetadata(
+        const methodMetadata: Array<ControllerMethodMetadata> = Reflect.getMetadata(
             METADATA_KEY.controllerMethod,
-            TestController
+            TestController,
         );
 
-        expect(methodMetadata.length).eql(3);
+        expect(methodMetadata.length).toEqual(3);
 
-        let metadata: interfaces.ControllerMethodMetadata = methodMetadata[0];
+        const metadata: ControllerMethodMetadata | undefined = methodMetadata[0];
 
-        expect(metadata.middleware).eql(middleware);
-        expect(metadata.path).eql(path);
-        expect(metadata.target.constructor).eql(TestController);
-        expect(metadata.key).eql("test");
-        expect(metadata.method).eql(method);
+        expect(metadata?.middleware).toEqual(middleware);
+        expect(metadata?.path).toEqual(path);
+        expect(metadata?.target.constructor).toEqual(TestController);
+        expect(metadata?.key).toEqual('test');
+        expect(metadata?.method).toEqual(method);
         done();
     });
 
-    it("should add parameter metadata to a class when decorated with @params", (done) => {
-        let middleware = [function() { return; }, "bar", Symbol.for("baz")];
-        let path = "foo";
-        let method = "get";
-        let methodName = "test";
+    it('should add parameter metadata to a class when decorated with @params', done => {
+        const middleware = [() => {}, 'bar', Symbol.for('baz')];
+        const path = 'foo';
+        const method: keyof typeof HTTP_VERBS_ENUM = 'get';
+        const methodName = 'test';
 
         class TestController {
             @httpMethod(method, path, ...middleware)
-            public test(@params(PARAMETER_TYPE.PARAMS, "id") id: any, @params(PARAMETER_TYPE.PARAMS, "cat") cat: any) { return; }
+            public test(@params(PARAMETER_TYPE.PARAMS, 'id') id: any, @params(PARAMETER_TYPE.PARAMS, 'cat') cat: any) { }
 
-            @httpMethod("foo", "bar")
-            public test2(@params(PARAMETER_TYPE.PARAMS, "dog")dog: any) { return; }
+            @httpMethod('foo' as unknown as keyof typeof HTTP_VERBS_ENUM, 'bar')
+            public test2(@params(PARAMETER_TYPE.PARAMS, 'dog') dog: any) { }
 
-            @httpMethod("bar", "foo")
-            public test3() { return; }
+            @httpMethod('bar' as unknown as keyof typeof HTTP_VERBS_ENUM, 'foo')
+            public test3() { }
         }
-        let methodMetadataList: interfaces.ControllerParameterMetadata =
-        Reflect.getMetadata(METADATA_KEY.controllerParameter, TestController);
-        expect(methodMetadataList.hasOwnProperty("test")).to.eqls(true);
+        const methodMetadataList: ControllerParameterMetadata = Reflect.getMetadata(
+            METADATA_KEY.controllerParameter,
+            TestController,
+        );
 
-        let paramaterMetadataList: interfaces.ParameterMetadata[] = methodMetadataList[methodName];
-        expect(paramaterMetadataList.length).eql(2);
+        expect(methodMetadataList['test'] && true).toEqual(true);
 
-        let paramaterMetadata: interfaces.ParameterMetadata = paramaterMetadataList[0];
-        expect(paramaterMetadata.index).eql(0);
-        expect(paramaterMetadata.parameterName).eql("id");
+        const paramaterMetadataList:
+        Array<ParameterMetadata> | undefined = methodMetadataList[methodName];
+        expect(paramaterMetadataList?.length).toEqual(2);
+
+        const paramaterMetadata: ParameterMetadata | undefined = paramaterMetadataList?.[0];
+        expect(paramaterMetadata?.index).toEqual(0);
+        expect(paramaterMetadata?.parameterName).toEqual('id');
         done();
     });
-
 });

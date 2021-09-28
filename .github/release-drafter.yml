@@ -1,0 +1,7 @@
+
+name-template: 'Next Release'
+tag-template: 'next'
+change-template: '- $TITLE #$NUMBER'
+no-changes-template: '- No changes yet'
+template: |
+  $CHANGES

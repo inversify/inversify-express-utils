@@ -1,18 +1,44 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "lib": ["es6", "dom"],
-        "types": ["express", "inversify", "mocha", "reflect-metadata"],
-        "sourceMap": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "isolatedModules": false,
-        "jsx": "react",
-        "experimentalDecorators": true,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "alwaysStrict": true,
         "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "jsx": "react",
+        "lib": [
+            "es6",
+            "dom"
+        ],
+        "module": "commonjs",
+        "types": [
+            "node",
+            "reflect-metadata",
+            "jest"
+        ],
+        "moduleResolution": "node",
+        "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noResolve": false,
+        "noUncheckedIndexedAccess": true,
+        "noUnusedParameters": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true,
+        "removeComments": true,
+        "sourceMap": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
         "strictNullChecks": true,
-    }
+        "strictPropertyInitialization": true,
+        "suppressImplicitAnyIndexErrors": false,
+        "typeRoots": [
+            "node_modules/@types"
+        ]
+    },
+    "exclude": [
+        "node_modules"
+    ]
 }

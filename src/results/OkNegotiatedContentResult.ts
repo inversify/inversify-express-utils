@@ -1,15 +1,14 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { OK } from "http-status-codes";
-import { interfaces } from "../interfaces";
-import { BaseHttpController } from "../base_http_controller";
-import { StringContent } from "../content/stringContent";
+import {StatusCodes} from 'http-status-codes';
+import {HttpResponseMessage} from '../httpResponseMessage';
+import {StringContent} from '../content/stringContent';
+import {IHttpActionResult} from '../interfaces';
 
-export default class OkNegotiatedContentResult<T> implements interfaces.IHttpActionResult {
-    constructor(private content: T, private apiController: BaseHttpController) {}
+export class OkNegotiatedContentResult<T> implements IHttpActionResult {
+    constructor(private content: T) { }
 
-    public async executeAsync() {
-        const response = new HttpResponseMessage(OK);
-        response.content = new StringContent(JSON.stringify(this.content), "application/json");
+    public async executeAsync(): Promise<HttpResponseMessage> {
+        const response = new HttpResponseMessage(StatusCodes.OK);
+        response.content = new StringContent(JSON.stringify(this.content));
         return response;
     }
 }

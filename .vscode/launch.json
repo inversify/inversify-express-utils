@@ -20,11 +20,19 @@
                 "${workspaceRoot}/test/**/*.test.js"
             ],
             "sourceMaps": true,
-            "outFiles": [
-                "${workspaceRoot}/test",
-                "${workspaceRoot}/src"
+            "protocol": "inspector"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Jest All",
+            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            "args": [
+                "--watch",
             ],
-            "internalConsoleOptions": "openOnSessionStart"
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true,
         }
     ]
 }
