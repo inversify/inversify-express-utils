@@ -1,5 +1,5 @@
 {
-  "name": "inversify-express-utils",
+  "name": "@namecheap/express-inversify",
   "version": "6.3.2",
   "description": "Some utilities for the development of express applications with Inversify",
   "main": "lib/index.js",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inversify/inversify-express-utils.git"
+    "url": "git+https://github.com/namecheap/express-inversify.git"
   },
   "keywords": [
     "InversifyJS",
@@ -31,9 +31,9 @@
   "author": "Cody Simms",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/inversify/inversify-express-utils/issues"
+    "url": "https://github.com/namecheap/express-inversify/issues"
   },
-  "homepage": "https://github.com/inversify/inversify-express-utils#readme",
+  "homepage": "https://github.com/namecheap/express-inversify#readme",
   "devDependencies": {
     "@types/async": "3.2.8",
     "@types/cookie-parser": "1.4.2",

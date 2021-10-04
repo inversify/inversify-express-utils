@@ -1,28 +1,18 @@
-# inversify-express-utils
+# express-inversify
 
-[![Join the chat at https://gitter.im/inversify/InversifyJS](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/inversify/InversifyJS?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://secure.travis-ci.org/inversify/inversify-express-utils.svg?branch=master)](https://travis-ci.org/inversify/inversify-express-utils)
-[![Test Coverage](https://codeclimate.com/github/inversify/inversify-express-utils/badges/coverage.svg)](https://codeclimate.com/github/inversify/inversify-express-utils/coverage)
-[![npm version](https://badge.fury.io/js/inversify-express-utils.svg)](http://badge.fury.io/js/inversify-express-utils)
-[![Dependencies](https://david-dm.org/inversify/inversify-express-utils.svg)](https://david-dm.org/inversify/inversify-express-utils#info=dependencies)
-[![img](https://david-dm.org/inversify/inversify-express-utils/dev-status.svg)](https://david-dm.org/inversify/inversify-express-utils/#info=devDependencies)
-[![img](https://david-dm.org/inversify/inversify-express-utils/peer-status.svg)](https://david-dm.org/inversify/inversify-express-utils/#info=peerDependenciess)
-[![Known Vulnerabilities](https://snyk.io/test/github/inversify/inversify-express-utils/badge.svg)](https://snyk.io/test/github/inversify/inversify-express-utils)
 
-[![NPM](https://nodei.co/npm/inversify-express-utils.png?downloads=true&downloadRank=true)](https://nodei.co/npm/inversify-express-utils/)
-[![NPM](https://nodei.co/npm-dl/inversify-express-utils.png?months=9&height=3)](https://nodei.co/npm/inversify-express-utils/)
 
 Some utilities for the development of express applications with Inversify.
 
 ## Installation
 
-You can install `inversify-express-utils` using npm:
+You can install `express-inversify` using npm:
 
 ```sh
-npm install inversify inversify-express-utils reflect-metadata --save
+npm install inversify express-inversify reflect-metadata --save
 ```
 
-The `inversify-express-utils` type definitions are included in the npm module and require TypeScript 2.0.
+The `express-inversify` type definitions are included in the npm module and require TypeScript 2.0.
 Please refer to the [InversifyJS documentation](https://github.com/inversify/InversifyJS#installation) to learn more about the installation process.
 
 ## The Basics
@@ -35,7 +25,7 @@ The following example will declare a controller that responds to `GET /foo'.
 
 ```ts
 import * as express from "express";
-import { interfaces, controller, httpGet, httpPost, httpDelete, request, queryParam, response, requestParam } from "inversify-express-utils";
+import { interfaces, controller, httpGet, httpPost, httpDelete, request, queryParam, response, requestParam } from "express-inversify";
 import { injectable, inject } from "inversify";
 
 @controller("/foo")
@@ -82,13 +72,13 @@ Then, pass the container to the InversifyExpressServer constructor. This will al
 Then just call server.build() to prepare your app.
 
 In order for the InversifyExpressServer to find your controllers, you must bind them to the `TYPE.Controller` service identifier and tag the binding with the controller's name.
-The `Controller` interface exported by inversify-express-utils is empty and solely for convenience, so feel free to implement your own if you want.
+The `Controller` interface exported by express-inversify is empty and solely for convenience, so feel free to implement your own if you want.
 
 ```ts
 import * as bodyParser from 'body-parser';
 
 import { Container } from 'inversify';
-import { interfaces, InversifyExpressServer, TYPE } from 'inversify-express-utils';
+import { interfaces, InversifyExpressServer, TYPE } from 'express-inversify';
 
 // declare metadata by @controller annotation
 import "./controllers/foo_controller";
@@ -122,7 +112,7 @@ Since the `inversify-express-util@5.0.0` release. The `@injectable` annotation i
 If you run the application multiple times within a shared runtime process (e.g. unit testing) you might need to clean up the existing metadata before each test.
 
 ```ts
-import { cleanUpMetadata } from "inversify-express-utils";
+import { cleanUpMetadata } from "express-inversify";
 
 describe("Some Component", () => {
 
@@ -137,9 +127,6 @@ describe("Some Component", () => {
 });
 ```
 
-You can find an example of this in [our unit tests](https://github.com/inversify/inversify-express-utils/blob/master/test/framework.test.ts#L25-L29).
-
-Inversify express utils will throw an exception if your application doesn't have controllers. You can disable this behaviour using the `forceControllers` option. You can find some examples of `forceControllers` in [our unit tests](https://github.com/inversify/inversify-express-utils/blob/master/test/issue_590.test.ts).
 
 ## InversifyExpressServer
 
@@ -287,7 +274,7 @@ The benefit of the latter two methods is that since your controller is no longer
 import { injectable, inject } from "inversify";
 import {
     controller, httpGet, BaseHttpController, HttpResponseMessage, StringContent
-} from "inversify-express-utils";
+} from "express-inversify";
 
 @controller("/")
 class ExampleController extends BaseHttpController {
@@ -319,7 +306,7 @@ On the BaseHttpController, we provide a litany of helper methods to ease returni
 import { injectable, inject } from "inversify";
 import {
     controller, httpGet, BaseHttpController
-} from "inversify-express-utils";
+} from "express-inversify";
 
 @controller("/")
 class ExampleController extends BaseHttpController {
@@ -337,7 +324,7 @@ This can be done by using the `json` helper method provided by `BaseHttpControll
 ```ts
 import {
     controller, httpGet, BaseHttpController
-} from "inversify-express-utils";
+} from "express-inversify";
 
 @controller("/")
 export class ExampleController extends BaseHttpController {
@@ -357,7 +344,7 @@ This gives you the flexability to create your own responses while keeping unit t
 import { expect } from "chai";
 
 import { ExampleController } from "./example-controller";
-import { results } from "inversify-express-utils";
+import { results } from "express-inversify";
 
 describe("ExampleController", () => {
     let controller: ExampleController;
@@ -388,7 +375,7 @@ in controllers derived from `BaseHttpController`.
 import { injectable, inject } from "inversify";
 import {
     controller, httpGet, BaseHttpController
-} from "inversify-express-utils";
+} from "express-inversify";
 
 @controller("/")
 class UserPreferencesController extends BaseHttpController {
@@ -410,7 +397,7 @@ using the `@injectHttpContext` decorator:
 import { injectable, inject } from "inversify";
 import {
     controller, httpGet, BaseHttpController, httpContext, interfaces
-} from "inversify-express-utils";
+} from "express-inversify";
 
 const authService = inject("AuthService")
 
@@ -445,7 +432,7 @@ The `AuthProvider` allow us to get a user (`Principal`):
 
 ```ts
 import { injectable, inject } from "inversify";
-import { interfaces } from "inversify-express-utils";
+import { interfaces } from "express-inversify";
 
 const authService = inject("AuthService");
 
@@ -519,7 +506,7 @@ Extending `BaseMiddleware` allow us to inject dependencies
 and to access the current `HttpContext` in Express middleware function.
 
 ```ts
-import { BaseMiddleware } from "inversify-express-utils";
+import { BaseMiddleware } from "express-inversify";
 
 @injectable()
 class LoggerMiddleware extends BaseMiddleware {
@@ -582,7 +569,7 @@ and make it available to our IoC services as `TYPES.TraceIdValue`:
 
 ```typescript
 import { inject, injectable } from "inversify";
-import { BaseHttpController, BaseMiddleware, controller, httpGet } from "inversify-express-utils";
+import { BaseHttpController, BaseMiddleware, controller, httpGet } from "express-inversify";
 import * as express from "express";
 
 const TYPES = {
@@ -677,7 +664,7 @@ class OrderController extends BaseHttpController {
 We can use the `prettyjson` function to see all the available enpoints:
 
 ```ts
-import { getRouteInfo } from "inversify-express-utils";
+import { getRouteInfo } from "express-inversify";
 import * as prettyjson from "prettyjson";
 
 // ...
