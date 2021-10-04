@@ -93,10 +93,13 @@ export function httpMethod(
 
         let metadataList: Array<ControllerMethodMetadata> = [];
 
-        if (!Reflect.hasMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
+        if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerMethod, target.constructor)) {
             Reflect.defineMetadata(METADATA_KEY.controllerMethod, metadataList, target.constructor);
         } else {
-            metadataList = Reflect.getMetadata(METADATA_KEY.controllerMethod, target.constructor);
+            metadataList = Reflect.getOwnMetadata(
+                METADATA_KEY.controllerMethod,
+                target.constructor,
+            );
         }
 
         metadataList.push(metadata);
@@ -137,10 +140,10 @@ export function params(type: PARAMETER_TYPE, parameterName?: string) {
             parameterName,
             type,
         };
-        if (!Reflect.hasMetadata(METADATA_KEY.controllerParameter, target.constructor)) {
+        if (!Reflect.hasOwnMetadata(METADATA_KEY.controllerParameter, target.constructor)) {
             parameterMetadataList.unshift(parameterMetadata);
         } else {
-            metadataList = Reflect.getMetadata(
+            metadataList = Reflect.getOwnMetadata(
                 METADATA_KEY.controllerParameter,
                 target.constructor,
             );

@@ -30,7 +30,7 @@ export function getControllersFromMetadata(): Array<new() => Controller> {
 }
 
 export function getControllerMetadata(constructor: any): ControllerMetadata {
-    const controllerMetadata: ControllerMetadata = Reflect.getMetadata(
+    const controllerMetadata: ControllerMetadata = Reflect.getOwnMetadata(
         METADATA_KEY.controller,
         constructor,
     );
@@ -40,20 +40,38 @@ export function getControllerMetadata(constructor: any): ControllerMetadata {
 export function getControllerMethodMetadata(
     constructor: any,
 ): Array<ControllerMethodMetadata> {
-    const methodMetadata: Array<ControllerMethodMetadata> = Reflect.getMetadata(
+    const methodMetadata: Array<ControllerMethodMetadata> = Reflect.getOwnMetadata(
         METADATA_KEY.controllerMethod,
         constructor,
     );
+    const genericMetadata = Reflect.getMetadata(
+        METADATA_KEY.controllerMethod,
+        Reflect.getPrototypeOf(constructor) as any,
+    );
+    if (genericMetadata !== undefined && methodMetadata !== undefined) {
+        return methodMetadata.concat(genericMetadata);
+    } if (genericMetadata !== undefined) {
+        return genericMetadata;
+    }
     return methodMetadata;
 }
 
 export function getControllerParameterMetadata(
     constructor: any,
 ): ControllerParameterMetadata {
-    const parameterMetadata: ControllerParameterMetadata = Reflect.getMetadata(
+    const parameterMetadata: ControllerParameterMetadata = Reflect.getOwnMetadata(
         METADATA_KEY.controllerParameter,
         constructor,
     );
+    const genericMetadata: ControllerParameterMetadata = Reflect.getMetadata(
+        METADATA_KEY.controllerParameter,
+        Reflect.getPrototypeOf(constructor) as any,
+    );
+    if (genericMetadata !== undefined && parameterMetadata !== undefined) {
+        return {...parameterMetadata, ...genericMetadata};
+    } if (genericMetadata !== undefined) {
+        return genericMetadata;
+    }
     return parameterMetadata;
 }
 

@@ -7,6 +7,7 @@ import {
     httpDelete, httpPost, httpPut, requestBody,
 } from '../../src/decorators';
 import {cleanUpMetadata} from '../../src/utils';
+import {getRouteInfo} from '../../src';
 
 function getDemoServer() {
     interface Movie {
@@ -65,7 +66,29 @@ function getDemoServer() {
         @requestParam('movieId') movieId: string,
             @requestParam('actorId') actorId: string,
         ) {
-            return {status: `DERIVED DELETE ACTOR! ${ movieId } ${ actorId }`};
+            return {status: `DERIVED DELETE ACTOR! MOVIECONTROLLER1 ${ movieId } ${ actorId }`};
+        }
+    }
+
+    @controller('/api/v1/movies2')
+    class MoviesController2 extends GenericController<Movie> {
+        @httpDelete('/:movieId2/actors/:actorId2')
+        public deleteActor(
+        @requestParam('movieId2') movieId: string,
+            @requestParam('actorId2') actorId: string,
+        ) {
+            return {status: `DERIVED DELETE ACTOR! MOVIECONTROLLER2 ${ movieId } ${ actorId }`};
+        }
+    }
+
+    @controller('/api/v1/movies3')
+    class MoviesController3 extends GenericController<Movie> {
+        @httpDelete('/:movieId3/actors/:actorId3')
+        public deleteActor(
+        @requestParam('movieId3') movieId: string,
+            @requestParam('actorId3') actorId: string,
+        ) {
+            return {status: `DERIVED DELETE ACTOR! MOVIECONTROLLER3 ${ movieId } ${ actorId }`};
         }
     }
 
@@ -164,7 +187,33 @@ describe('Derived controller', () => {
         supertest(server).delete(`/api/v1/movies/${ movieId }/actors/${ actorId }`)
         .expect(200)
         .then(res => {
-            expect(res.body.status).toEqual(`DERIVED DELETE ACTOR! ${ movieId } ${ actorId }`);
+            expect(res.body.status).toEqual(`DERIVED DELETE ACTOR! MOVIECONTROLLER1 ${ movieId } ${ actorId }`);
+            done();
+        });
+    });
+
+    it('Derived controller 2 can have its own methods', done => {
+        const server = getDemoServer();
+        const movieId = 5;
+        const actorId = 3;
+
+        supertest(server).delete(`/api/v1/movies2/${ movieId }/actors/${ actorId }`)
+        .expect(200)
+        .then(res => {
+            expect(res.body.status).toEqual(`DERIVED DELETE ACTOR! MOVIECONTROLLER2 ${ movieId } ${ actorId }`);
+            done();
+        });
+    });
+
+    it('Derived controller 3 can have its own methods', done => {
+        const server = getDemoServer();
+        const movieId = 5;
+        const actorId = 3;
+
+        supertest(server).delete(`/api/v1/movies3/${ movieId }/actors/${ actorId }`)
+        .expect(200)
+        .then(res => {
+            expect(res.body.status).toEqual(`DERIVED DELETE ACTOR! MOVIECONTROLLER3 ${ movieId } ${ actorId }`);
             done();
         });
     });
