@@ -7,6 +7,7 @@ module.exports = {
     warnOnUnsupportedTypeScriptVersion: false,
   },
   extends: [
+    'airbnb-base',
     'airbnb-typescript/base',
     'plugin:@typescript-eslint/recommended',
   ],
