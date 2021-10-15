@@ -3,7 +3,7 @@ export * from './decorators';
 export * from './constants';
 export * from './interfaces';
 export * as interfaces from './interfaces';
-export * from './results';
+export * as results from './results';
 export * from './base_http_controller';
 export * from './base_middleware';
 export * from './utils';
