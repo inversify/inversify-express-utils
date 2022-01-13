@@ -1,6 +1,7 @@
 import {inject, injectable, decorate} from 'inversify';
 import {
     Controller,
+    DecoratorTarget,
     Middleware,
     ControllerMetadata,
     HandlerDecorator,
@@ -18,7 +19,7 @@ import {
 export const injectHttpContext = inject(TYPE.HttpContext);
 
 export function controller(path: string, ...middleware: Array<Middleware>) {
-    return (target: any): void => {
+    return (target: NewableFunction): void => {
         const currentMetadata: ControllerMetadata = {
             middleware,
             path,
@@ -82,7 +83,7 @@ export function httpMethod(
     path: string,
     ...middleware: Array<Middleware>
 ): HandlerDecorator {
-    return (target: any, key: string): void => {
+    return (target: DecoratorTarget, key: string): void => {
         const metadata: ControllerMethodMetadata = {
             key,
             method,

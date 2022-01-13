@@ -4,6 +4,7 @@ import {
     ControllerMetadata,
     ControllerMethodMetadata,
     ControllerParameterMetadata,
+    DecoratorTarget,
     IHttpActionResult,
 } from './interfaces';
 import {METADATA_KEY, NO_CONTROLLERS_FOUND, TYPE} from './constants';
@@ -21,7 +22,7 @@ export function getControllersFromContainer(
     }
 }
 
-export function getControllersFromMetadata(): Array<new() => Controller> {
+export function getControllersFromMetadata(): Array<DecoratorTarget> {
     const arrayOfControllerMetadata: Array<ControllerMetadata> = Reflect.getMetadata(
         METADATA_KEY.controller,
         Reflect,
@@ -29,7 +30,7 @@ export function getControllersFromMetadata(): Array<new() => Controller> {
     return arrayOfControllerMetadata.map(metadata => metadata.target);
 }
 
-export function getControllerMetadata(constructor: any): ControllerMetadata {
+export function getControllerMetadata(constructor: NewableFunction): ControllerMetadata {
     const controllerMetadata: ControllerMetadata = Reflect.getOwnMetadata(
         METADATA_KEY.controller,
         constructor,
@@ -38,7 +39,7 @@ export function getControllerMetadata(constructor: any): ControllerMetadata {
 }
 
 export function getControllerMethodMetadata(
-    constructor: any,
+    constructor: NewableFunction,
 ): Array<ControllerMethodMetadata> {
     const methodMetadata: Array<ControllerMethodMetadata> = Reflect.getOwnMetadata(
         METADATA_KEY.controllerMethod,
@@ -46,7 +47,7 @@ export function getControllerMethodMetadata(
     );
     const genericMetadata = Reflect.getMetadata(
         METADATA_KEY.controllerMethod,
-        Reflect.getPrototypeOf(constructor) as any,
+        Reflect.getPrototypeOf(constructor) as NewableFunction,
     );
     if (genericMetadata !== undefined && methodMetadata !== undefined) {
         return methodMetadata.concat(genericMetadata);
@@ -57,7 +58,7 @@ export function getControllerMethodMetadata(
 }
 
 export function getControllerParameterMetadata(
-    constructor: any,
+    constructor: NewableFunction,
 ): ControllerParameterMetadata {
     const parameterMetadata: ControllerParameterMetadata = Reflect.getOwnMetadata(
         METADATA_KEY.controllerParameter,
@@ -65,7 +66,7 @@ export function getControllerParameterMetadata(
     );
     const genericMetadata: ControllerParameterMetadata = Reflect.getMetadata(
         METADATA_KEY.controllerParameter,
-        Reflect.getPrototypeOf(constructor) as any,
+        Reflect.getPrototypeOf(constructor) as NewableFunction,
     );
     if (genericMetadata !== undefined && parameterMetadata !== undefined) {
         return {...parameterMetadata, ...genericMetadata};
@@ -83,6 +84,6 @@ export function cleanUpMetadata(): void {
     );
 }
 
-export function instanceOfIHttpActionResult(value: any): value is IHttpActionResult {
-    return value != null && typeof value.executeAsync === 'function';
+export function instanceOfIHttpActionResult(value: unknown): value is IHttpActionResult {
+    return value != null && typeof (value as IHttpActionResult).executeAsync === 'function';
 }

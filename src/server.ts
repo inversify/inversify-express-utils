@@ -18,6 +18,7 @@ import {
     PARAMETER_TYPE,
     DUPLICATED_CONTROLLER_NAME,
 } from './constants';
+
 import {HttpResponseMessage} from './httpResponseMessage';
 
 export class InversifyExpressServer {
@@ -130,19 +131,21 @@ export class InversifyExpressServer {
 
     private registerControllers(): void {
         // Fake HttpContext is needed during registration
-        this._container.bind<interfaces.HttpContext>(TYPE.HttpContext).toConstantValue({} as any);
+        this._container
+        .bind<interfaces.HttpContext>(TYPE.HttpContext)
+        .toConstantValue({} as interfaces.HttpContext);
 
         const constructors = getControllersFromMetadata();
 
         constructors.forEach(constructor => {
-            const {name} = constructor;
+            const {name} = constructor as {name:string};
 
             if (this._container.isBoundNamed(TYPE.Controller, name)) {
                 throw new Error(DUPLICATED_CONTROLLER_NAME(name));
             }
 
             this._container.bind(TYPE.Controller)
-            .to(constructor)
+            .to(constructor as new (...args: Array<never>) => unknown)
             .whenTargetNamed(name);
         });
 
@@ -167,7 +170,7 @@ export class InversifyExpressServer {
                         paramList = parameterMetadata[metadata.key] || [];
                     }
                     const handler: express.RequestHandler = this.handlerFactory(
-                        controllerMetadata.target.name,
+                        (controllerMetadata.target as {name: string}).name,
                         metadata.key,
                         paramList,
                     );
@@ -241,23 +244,24 @@ export class InversifyExpressServer {
     }
 
     private handlerFactory(
-        controllerName: any,
+        controllerName: string,
         key: string,
         parameterMetadata: Array<interfaces.ParameterMetadata>,
     ): express.RequestHandler {
         return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
             try {
                 const args = this.extractParameters(req, res, next, parameterMetadata);
-
                 const httpContext = this._getHttpContext(req);
                 httpContext.container.bind<interfaces.HttpContext>(TYPE.HttpContext)
                 .toConstantValue(httpContext);
-
                 // invoke controller's action
+
+                // TODO: Cast this some how ??
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const value = await httpContext.container.getNamed<any>(
                     TYPE.Controller,
                     controllerName,
-                )[key](...args);
+                )?.[key](...args);
 
                 if (value instanceof HttpResponseMessage) {
                     await this.handleHttpResponseMessage(value, res);
@@ -313,10 +317,8 @@ export class InversifyExpressServer {
         return Promise.resolve<interfaces.Principal>({
             details: null,
             isAuthenticated: () => Promise.resolve(false),
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            isInRole: (role: string) => Promise.resolve(false),
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            isResourceOwner: (resourceId: any) => Promise.resolve(false),
+            isInRole: (_role: string) => Promise.resolve(false),
+            isResourceOwner: (_resourceId: unknown) => Promise.resolve(false),
         });
     }
 
@@ -325,8 +327,11 @@ export class InversifyExpressServer {
         res: express.Response,
         next: express.NextFunction,
         params: Array<interfaces.ParameterMetadata>,
-    ): Array<any> {
-        const args: Array<any> = [];
+    ):
+        Array<interfaces.ParameterMetadata> |
+        [express.Request, express.Response, express.NextFunction] |
+        Array<unknown> {
+        const args: Array<unknown> = [];
         if (!params || !params.length) {
             return [req, res, next];
         }

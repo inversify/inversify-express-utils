@@ -29,8 +29,8 @@ describe('BaseMiddleware', () => {
         let principalInstanceCount = 0;
 
         class Principal implements interfaces.Principal {
-            public details: any;
-            constructor(details: any) {
+            public details: unknown;
+            constructor(details: unknown) {
                 this.details = details;
             }
 
@@ -38,7 +38,7 @@ describe('BaseMiddleware', () => {
                 return Promise.resolve<boolean>(true);
             }
 
-            public isResourceOwner(resourceId: any) {
+            public isResourceOwner(resourceId: unknown) {
                 return Promise.resolve<boolean>(resourceId === 1111);
             }
 
@@ -76,7 +76,7 @@ describe('BaseMiddleware', () => {
                 res: express.Response,
                 next: express.NextFunction,
             ) {
-                const {email} = this.httpContext.user.details;
+                const {email} = this.httpContext.user.details as {email:string};
                 logEntries.push(`${ email } => ${ req.url } ${ this._someDependency.name }`);
                 next();
             }
@@ -96,7 +96,7 @@ describe('BaseMiddleware', () => {
             )
             public async getTest() {
                 if (this.httpContext.user !== null) {
-                    const {email} = this.httpContext.user.details;
+                    const {email} = this.httpContext.user.details as {email:string};
                     const isAuthenticated = await this.httpContext.user.isAuthenticated();
                     logEntries.push(`${ email } => isAuthenticated() => ${ isAuthenticated }`);
                     return `${ email }`;
@@ -190,7 +190,7 @@ describe('BaseMiddleware', () => {
 
         container.bind<TracingMiddleware>(TYPES.TracingMiddleware).to(TracingMiddleware);
         container.bind<Service>(TYPES.Service).to(Service);
-        container.bind<string>(TYPES.TraceIdValue).toConstantValue(undefined as any);
+        container.bind<string>(TYPES.TraceIdValue).toConstantValue('undefined');
 
         const api = new InversifyExpressServer(container).build();
 
@@ -274,11 +274,11 @@ describe('BaseMiddleware', () => {
 
 function run(
     parallelRuns: number,
-    test: (executionId: number) => PromiseLike<any>,
+    test: (executionId: number) => PromiseLike<unknown>,
     done: (error?: Error | null | undefined) => void,
 ) {
     const testTaskNo = (id: number) => (cb: (err?: Error | null | undefined) => void) => {
-        test(id).then(cb, cb);
+        test(id).then(cb as (value: unknown) => void | PromiseLike<void>, cb);
     };
 
     const testTasks = Array.from(

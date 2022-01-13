@@ -3,7 +3,8 @@ import {Container} from 'inversify';
 import {InversifyExpressServer} from '../src/server';
 import {controller} from '../src/decorators';
 import {cleanUpMetadata} from '../src/utils';
-import {HttpResponseMessage} from '../src';
+import {RoutingConfig} from '../src/interfaces';
+import {HttpResponseMessage} from '../src/httpResponseMessage';
 
 describe('Unit Test: InversifyExpressServer', () => {
     beforeEach(done => {
@@ -57,9 +58,12 @@ describe('Unit Test: InversifyExpressServer', () => {
 
         const serverWithDefaultRouter = new InversifyExpressServer(container);
         const serverWithCustomRouter = new InversifyExpressServer(container, customRouter);
+        type ServerWithRouting = {_router: express.Router};
 
-        expect((serverWithDefaultRouter as any)._router === customRouter).toBe(false);
-        expect((serverWithCustomRouter as any)._router === customRouter).toBe(true);
+        expect((serverWithDefaultRouter as unknown as ServerWithRouting)
+        ._router === customRouter).toBe(false);
+        expect((serverWithCustomRouter as unknown as ServerWithRouting)
+        ._router === customRouter).toBe(true);
     });
 
     it('Should allow to provide custom routing configuration', () => {
@@ -72,9 +76,13 @@ describe('Unit Test: InversifyExpressServer', () => {
         const serverWithDefaultConfig = new InversifyExpressServer(container);
         const serverWithCustomConfig = new InversifyExpressServer(container, null, routingConfig);
 
-        expect((serverWithCustomConfig as any)._routingConfig).toBe(routingConfig);
-        expect((serverWithDefaultConfig as any)._routingConfig).not.toEqual(
-            (serverWithCustomConfig as any)._routingConfig,
+        type ServerWithRoutingConfig = {_routingConfig: RoutingConfig};
+
+        expect((serverWithCustomConfig as unknown as ServerWithRoutingConfig)
+        ._routingConfig).toBe(routingConfig);
+        expect((serverWithDefaultConfig as unknown as ServerWithRoutingConfig)
+        ._routingConfig).not.toEqual(
+            (serverWithCustomConfig as unknown as ServerWithRoutingConfig)._routingConfig,
         );
     });
 
@@ -83,8 +91,12 @@ describe('Unit Test: InversifyExpressServer', () => {
         const app = express();
         const serverWithDefaultApp = new InversifyExpressServer(container);
         const serverWithCustomApp = new InversifyExpressServer(container, null, null, app);
-        expect((serverWithCustomApp as any)._app).toBe(app);
-        expect((serverWithDefaultApp as any)._app).not.toEqual((serverWithCustomApp as any)._app);
+
+        type ServerWithApp = {_app: Express.Application};
+
+        expect((serverWithCustomApp as unknown as ServerWithApp)._app).toBe(app);
+        expect((serverWithDefaultApp as unknown as ServerWithApp)._app).not
+        .toEqual((serverWithCustomApp as unknown as ServerWithApp)._app);
     });
 
     // TODO Fix this somehow ??
@@ -99,9 +111,16 @@ describe('Unit Test: InversifyExpressServer', () => {
             sendStatus: jest.fn(),
         };
 
-        (server as any).handleHttpResponseMessage(
+        interface ServerWithHttpResponseMessage {
+            handleHttpResponseMessage: (
+                message: HttpResponseMessage,
+                res: express.Response
+            ) => void;
+        }
+
+        (server as unknown as ServerWithHttpResponseMessage).handleHttpResponseMessage(
             httpResponseMessageWithoutContent,
-            mockResponse,
+            mockResponse as unknown as express.Response,
         );
 
         expect(mockResponse.sendStatus).toHaveBeenCalledWith(404);

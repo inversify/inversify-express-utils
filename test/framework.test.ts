@@ -7,6 +7,7 @@ import {
     NextFunction,
     RequestHandler,
     json,
+    CookieOptions,
 } from 'express';
 import * as cookieParser from 'cookie-parser';
 import {injectable, Container} from 'inversify';
@@ -253,7 +254,12 @@ describe('Integration Tests:', () => {
 
     describe('Middleware:', () => {
         let result: string;
-        const middleware: any = {
+        type Middleware = {
+            a: (req: Request, res: Response, nextFunc: NextFunction) => void;
+            b: (req: Request, res: Response, nextFunc: NextFunction) => void;
+            c: (req: Request, res: Response, nextFunc: NextFunction) => void;
+        };
+        const middleware: Middleware = {
             a(req: Request, res: Response, nextFunc: NextFunction) {
                 result += 'a';
                 nextFunc();
@@ -637,7 +643,7 @@ describe('Integration Tests:', () => {
         it('should bind a method parameter to the request headers', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(@requestHeaders('testhead') headers: any) {
+                @httpGet('/') public getTest(@requestHeaders('testhead') headers: Record<string, unknown>) {
                     return headers;
                 }
             }
@@ -652,7 +658,7 @@ describe('Integration Tests:', () => {
         it('should be case insensitive to request headers', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(@requestHeaders('TestHead') headers: any) {
+                @httpGet('/') public getTest(@requestHeaders('TestHead') headers: Record<string, unknown>) {
                     return headers;
                 }
             }
@@ -667,7 +673,7 @@ describe('Integration Tests:', () => {
         it('should bind a method parameter to a cookie', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getCookie(@cookies('Cookie') cookie: any, req: Request, res: Response) {
+                @httpGet('/') public getCookie(@cookies('Cookie') cookie: CookieOptions, req: Request, res: Response) {
                     return cookie;
                 }
             }
@@ -685,7 +691,7 @@ describe('Integration Tests:', () => {
         it('should bind a method parameter to the next function', done => {
             @controller('/')
             class TestController {
-                @httpGet('/') public getTest(@next() nextFunc: any) {
+                @httpGet('/') public getTest(@next() nextFunc: NewableFunction) {
                     return nextFunc();
                 }
 

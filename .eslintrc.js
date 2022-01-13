@@ -51,11 +51,18 @@ module.exports = {
         enforceForRenamedProperties: false,
       }],
     'strict': ['error', 'global'],
-    'template-curly-spacing': ['error', 'always'],
-
+    "object-curly-spacing": "off",
+    'eslint/object-curly-spacing': 'off',
+    'template-curly-spacing': [0, 'always'],
     'import/named': 'error',
     'import/prefer-default-export': 'off',
-
+    "@typescript-eslint/no-unused-vars": [
+      2,
+      {
+        "argsIgnorePattern": "_",
+        "ignoreRestSiblings": true
+      }
+    ],
     '@typescript-eslint/array-type': ['error', {
       default: 'generic',
     }],
@@ -106,15 +113,10 @@ module.exports = {
         format: ['UPPER_CASE'],
       }
     ],
-    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-parameter-properties': 'off',
     '@typescript-eslint/no-this-alias': 'error',
     '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', {
-      vars: 'all',
-      args: 'after-used',
-      ignoreRestSiblings: true,
-    }],
     '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
     '@typescript-eslint/object-curly-spacing': ['error', 'never'],
     '@typescript-eslint/prefer-function-type': 'error',

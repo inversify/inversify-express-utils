@@ -14,7 +14,7 @@ export function getRouteInfo(
     const raw = getRawMetadata(container);
 
     return raw.map(r => {
-        const controllerId = r.controllerMetadata.target.name;
+        const controllerId = (r.controllerMetadata.target as {name:string}).name;
 
         const endpoints = r.methodMetadata.map(m => {
             const method = m.method.toUpperCase();

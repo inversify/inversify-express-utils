@@ -3,12 +3,25 @@ import {interfaces as inversifyInterfaces} from 'inversify';
 import {HTTP_VERBS_ENUM, PARAMETER_TYPE} from './constants';
 import {HttpResponseMessage} from './httpResponseMessage';
 
-export type Middleware = (inversifyInterfaces.ServiceIdentifier<any> | express.RequestHandler);
+type Prototype<T> = {
+    [P in keyof T]: T[P] extends NewableFunction ? T[P] : T[P] | undefined;
+} & {
+    constructor: NewableFunction;
+};
+
+interface ConstructorFunction<T = Record<string, unknown>> {
+    new(...args: Array<unknown>): T;
+    prototype: Prototype<T>;
+}
+
+export type DecoratorTarget<T = unknown> = ConstructorFunction<T> | Prototype<T>;
+
+export type Middleware = (string | symbol | express.RequestHandler);
 
 export interface ControllerMetadata {
     path: string;
     middleware: Array<Middleware>;
-    target: any;
+    target: DecoratorTarget;
 }
 
 export interface ControllerMethodMetadata extends ControllerMetadata {
@@ -30,7 +43,11 @@ export interface ParameterMetadata {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Controller { }
 
-export type HandlerDecorator = (target: any, key: string, value: any) => void;
+export type HandlerDecorator = (
+    target: DecoratorTarget,
+    key: string,
+    value: unknown
+) => void;
 
 export type ConfigFunction = (app: express.Application) => void;
 
@@ -38,11 +55,11 @@ export interface RoutingConfig {
     rootPath: string;
 }
 
-export interface Principal {
-    details: any;
+export interface Principal<T=unknown> {
+    details: T;
     isAuthenticated(): Promise<boolean>;
     // Allows content-based auth
-    isResourceOwner(resourceId: any): Promise<boolean>;
+    isResourceOwner(resourceId: unknown): Promise<boolean>;
     // Allows role-based auth
     isInRole(role: string): Promise<boolean>;
 }
@@ -55,11 +72,11 @@ export interface AuthProvider {
     ): Promise<Principal>;
 }
 
-export interface HttpContext {
+export interface HttpContext<T=unknown> {
     request: express.Request;
     response: express.Response;
     container: inversifyInterfaces.Container;
-    user: Principal;
+    user: Principal<T>;
 }
 
 export interface IHttpActionResult {
@@ -72,7 +89,7 @@ export interface RouteDetails {
 }
 
 export interface RouteInfo {
-    controller: any;
+    controller: string;
     endpoints: Array<RouteDetails>;
 }
 

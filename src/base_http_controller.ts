@@ -70,7 +70,7 @@ export class BaseHttpController {
         return new StatusCodeResult(statusCode);
     }
 
-    protected json(content: any, statusCode: number = StatusCodes.OK): JsonResult {
+    protected json(content: unknown, statusCode: number = StatusCodes.OK): JsonResult {
         return new JsonResult(content, statusCode);
     }
 }

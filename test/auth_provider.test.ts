@@ -21,8 +21,8 @@ describe('AuthProvider', () => {
         }
 
         class Principal implements interfaces.Principal {
-            public details: any;
-            constructor(details: any) {
+            public details: unknown;
+            constructor(details: unknown) {
                 this.details = details;
             }
 
@@ -30,7 +30,7 @@ describe('AuthProvider', () => {
                 return Promise.resolve<boolean>(true);
             }
 
-            public isResourceOwner(resourceId: any) {
+            public isResourceOwner(resourceId: unknown) {
                 return Promise.resolve<boolean>(resourceId === 1111);
             }
 
@@ -61,7 +61,7 @@ describe('AuthProvider', () => {
             @httpGet('/')
             public async getTest() {
                 if (this.httpContext.user !== null) {
-                    const {email} = this.httpContext.user.details;
+                    const {email} = this.httpContext.user.details as {email: string};
                     const {name} = this._someDependency;
                     const isAuthenticated = await this.httpContext.user.isAuthenticated();
                     expect(isAuthenticated).toEqual(true);

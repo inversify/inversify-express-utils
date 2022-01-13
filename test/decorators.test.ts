@@ -67,10 +67,10 @@ describe('Unit Test: Controller Decorators', () => {
 
         class TestController {
             @httpMethod(method, path, ...middleware)
-            public test(@params(PARAMETER_TYPE.PARAMS, 'id') id: any, @params(PARAMETER_TYPE.PARAMS, 'cat') cat: any) { }
+            public test(@params(PARAMETER_TYPE.PARAMS, 'id') id: unknown, @params(PARAMETER_TYPE.PARAMS, 'cat') cat: Record<string, unknown>) { }
 
             @httpMethod('foo' as unknown as keyof typeof HTTP_VERBS_ENUM, 'bar')
-            public test2(@params(PARAMETER_TYPE.PARAMS, 'dog') dog: any) { }
+            public test2(@params(PARAMETER_TYPE.PARAMS, 'dog') dog: Record<string, unknown>) { }
 
             @httpMethod('bar' as unknown as keyof typeof HTTP_VERBS_ENUM, 'foo')
             public test3() { }

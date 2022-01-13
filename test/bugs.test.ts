@@ -23,10 +23,9 @@ describe('Unit Test: Previous bugs', () => {
             @httpGet('/')
             public get(@request() req: Request, @response() res: Response): void {
                 expect(req.url).not.toEqual(undefined);
-                expect((req as any).setHeader).toEqual(undefined);
-                // eslint-disable-next-line @typescript-eslint/unbound-method
-                expect(res.setHeader).not.toEqual(undefined);
-                expect((res as any).url).toEqual(undefined);
+                expect((req as unknown as {setHeader: undefined}).setHeader).toEqual(undefined);
+                expect((res as unknown as {setHeader: undefined}).setHeader).not.toEqual(undefined);
+                expect((res as unknown as {url:string | undefined}).url).toEqual(undefined);
                 res.json([{id: 1}, {id: 2}]);
             }
 
@@ -38,10 +37,9 @@ describe('Unit Test: Previous bugs', () => {
             ): void {
                 expect(id).toEqual('5');
                 expect(req.url).not.toEqual(undefined);
-                expect((req as any).setHeader).toEqual(undefined);
-                // eslint-disable-next-line @typescript-eslint/unbound-method
-                expect(res.setHeader).not.toEqual(undefined);
-                expect((res as any).url).toEqual(undefined);
+                expect((req as unknown as {setHeader: undefined}).setHeader).toEqual(undefined);
+                expect((res as unknown as {setHeader: undefined}).setHeader).not.toEqual(undefined);
+                expect((res as unknown as {url: string | undefined}).url).toEqual(undefined);
                 res.json({id});
             }
         }
@@ -141,7 +139,7 @@ describe('Unit Test: Previous bugs', () => {
                 public get(
                 @request() req: Request,
                     @response() res: Response,
-                    @requestParam() params: any,
+                    @requestParam() params: Record<string, unknown>,
                 ) {
                     return {...params};
                 }
@@ -170,7 +168,7 @@ describe('Unit Test: Previous bugs', () => {
                 public get(
                 @request() req: Request,
                     @response() res: Response,
-                    @queryParam() query: any,
+                    @queryParam() query: Record<string, unknown>,
                 ) {
                     return {...query};
                 }
@@ -199,7 +197,7 @@ describe('Unit Test: Previous bugs', () => {
                 public get(
                 @request() req: Request,
                     @response() res: Response,
-                    @cookies() cookie: any,
+                    @cookies() cookie: Record<string, unknown>,
                 ) {
                     return {...cookie};
                 }
@@ -233,7 +231,7 @@ describe('Unit Test: Previous bugs', () => {
                 public get(
                 @request() req: Request,
                     @response() res: Response,
-                    @requestHeaders() headers: any,
+                    @requestHeaders() headers: Record<string, unknown>,
                 ) {
                     return {...headers};
                 }
