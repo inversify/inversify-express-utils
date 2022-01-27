@@ -1,0 +1,20 @@
+{
+  "coverageDirectory": "<rootDir>/coverage",
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "setupFilesAfterEnv": [
+    "<rootDir>/test/helpers/jest.setup.ts"
+  ],
+  "testEnvironment": "node",
+  "testPathIgnorePatterns": [
+    "node_modules"
+  ],
+  "testRegex": ".test.ts$",
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  }
+}

@@ -1,100 +1,107 @@
-import * as express from 'express';
-import {interfaces as inversifyInterfaces} from 'inversify';
-import {HTTP_VERBS_ENUM, PARAMETER_TYPE} from './constants';
-import {HttpResponseMessage} from './httpResponseMessage';
+import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
+import { interfaces as inversifyInterfaces } from 'inversify';
+import { HTTP_VERBS_ENUM, PARAMETER_TYPE } from './constants';
+import { HttpResponseMessage } from './httpResponseMessage';
 
 type Prototype<T> = {
-    [P in keyof T]: T[P] extends NewableFunction ? T[P] : T[P] | undefined;
+  [P in keyof T]: T[P] extends NewableFunction ? T[P] : T[P] | undefined;
 } & {
-    constructor: NewableFunction;
+  constructor: NewableFunction;
 };
 
 interface ConstructorFunction<T = Record<string, unknown>> {
-    new(...args: Array<unknown>): T;
-    prototype: Prototype<T>;
+  new(...args: Array<unknown>): T;
+  prototype: Prototype<T>;
 }
 
-export type DecoratorTarget<T = unknown> = ConstructorFunction<T> | Prototype<T>;
+export type DecoratorTarget<T = unknown> =
+  ConstructorFunction<T> | Prototype<T>;
 
-export type Middleware = (string | symbol | express.RequestHandler);
+export type Middleware = (string | symbol | RequestHandler);
+
+
+export type ControllerHandler = (...params: Array<unknown>) => unknown;
+export type Controller = Record<string, ControllerHandler>;
 
 export interface ControllerMetadata {
-    path: string;
-    middleware: Array<Middleware>;
-    target: DecoratorTarget;
+  middleware: Array<Middleware>;
+  path: string;
+  target: DecoratorTarget;
 }
 
 export interface ControllerMethodMetadata extends ControllerMetadata {
-    method: keyof typeof HTTP_VERBS_ENUM;
-    key: string;
+  key: string;
+  method: keyof typeof HTTP_VERBS_ENUM;
 }
 
 export interface ControllerParameterMetadata {
-    [methodName: string]: Array<ParameterMetadata>;
+  [methodName: string]: Array<ParameterMetadata>;
 }
 
 export interface ParameterMetadata {
-    parameterName?: string;
-    injectRoot: boolean;
-    index: number;
-    type: PARAMETER_TYPE;
+  index: number;
+  injectRoot: boolean;
+  parameterName?: string | undefined;
+  type: PARAMETER_TYPE;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Controller { }
+export type ExtractedParameters =
+  | Array<ParameterMetadata>
+  | [Request, Response, NextFunction]
+  | Array<unknown>
 
 export type HandlerDecorator = (
-    target: DecoratorTarget,
-    key: string,
-    value: unknown
+  target: DecoratorTarget,
+  key: string,
+  value: unknown
 ) => void;
 
-export type ConfigFunction = (app: express.Application) => void;
+export type ConfigFunction = (app: Application) => void;
 
 export interface RoutingConfig {
-    rootPath: string;
+  rootPath: string;
 }
 
-export interface Principal<T=unknown> {
-    details: T;
-    isAuthenticated(): Promise<boolean>;
-    // Allows content-based auth
-    isResourceOwner(resourceId: unknown): Promise<boolean>;
-    // Allows role-based auth
-    isInRole(role: string): Promise<boolean>;
+export interface Principal<T = unknown> {
+  details: T;
+  isAuthenticated(): Promise<boolean>;
+  // Allows role-based auth
+  isInRole(role: string): Promise<boolean>;
+  // Allows content-based auth
+  isResourceOwner(resourceId: unknown): Promise<boolean>;
 }
 
 export interface AuthProvider {
-    getUser(
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-    ): Promise<Principal>;
+  getUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Principal>;
 }
 
-export interface HttpContext<T=unknown> {
-    request: express.Request;
-    response: express.Response;
-    container: inversifyInterfaces.Container;
-    user: Principal<T>;
+export interface HttpContext<T = unknown> {
+  container: inversifyInterfaces.Container;
+  request: Request;
+  response: Response;
+  user: Principal<T>;
 }
 
 export interface IHttpActionResult {
-    executeAsync(): Promise<HttpResponseMessage>;
+  executeAsync(): Promise<HttpResponseMessage>;
 }
 
 export interface RouteDetails {
-    route: string;
-    args?: Array<string>;
+  args?: Array<string>;
+  route: string;
 }
 
 export interface RouteInfo {
-    controller: string;
-    endpoints: Array<RouteDetails>;
+  controller: string;
+  endpoints: Array<RouteDetails>;
 }
 
 export interface RawMetadata {
-    controllerMetadata: ControllerMetadata,
-    methodMetadata: Array<ControllerMethodMetadata>,
-    parameterMetadata: ControllerParameterMetadata,
+  controllerMetadata: ControllerMetadata,
+  methodMetadata: Array<ControllerMethodMetadata>,
+  parameterMetadata: ControllerParameterMetadata,
 }
