@@ -255,13 +255,12 @@ export class InversifyExpressServer {
         const httpContext = this._getHttpContext(req);
         httpContext.container.bind<HttpContext>(TYPE.HttpContext)
           .toConstantValue(httpContext);
+
         // invoke controller's action
-        const service: Controller = httpContext.container.getNamed<Controller>(
+        const value = await (httpContext.container.getNamed<Controller>(
           TYPE.Controller,
           controllerName,
-        );
-        const controllerHandler = service[key] as ControllerHandler;
-        const value: unknown = await controllerHandler(...args);
+        )[key] as ControllerHandler)(...args);
 
         if (value instanceof HttpResponseMessage) {
           await this.handleHttpResponseMessage(value, res);

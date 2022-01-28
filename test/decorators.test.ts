@@ -3,6 +3,7 @@ import { HTTP_VERBS_ENUM, METADATA_KEY, PARAMETER_TYPE } from '../src/constants'
 import { ControllerMetadata, ControllerMethodMetadata, ControllerParameterMetadata, ParameterMetadata } from '../src';
 
 describe('Unit Test: Controller Decorators', () => {
+
   it('should add controller metadata to a class when decorated with @controller', done => {
     const middleware = [() => {
       //

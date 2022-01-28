@@ -236,17 +236,12 @@ describe('BaseMiddleware', () => {
         super();
       }
 
-      @httpGet(
-        '/1',
-        TYPES.TransactionMiddleware,
-      )
+      @httpGet('/1', TYPES.TransactionMiddleware)
       public getTest1() {
         return this.transaction;
       }
 
-      @httpGet(
-        '/2', // <= No middleware!
-      )
+      @httpGet('/2' /*<= No middleware!*/)
       public getTest2() {
         return this.transaction;
       }
