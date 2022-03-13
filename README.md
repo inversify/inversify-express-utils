@@ -477,15 +477,15 @@ The `Principal` interface allow us to:
 - Check if it is in a user role
 
 ```ts
-class Principal implements interfaces.Principal {
-    public details: any;
-    public constructor(details: any) {
+class Principal implements interfaces.Principal<T = unknown> {
+    public details: T;
+    public constructor(details: T) {
         this.details = details;
     }
     public isAuthenticated(): Promise<boolean> {
         return Promise.resolve(true);
     }
-    public isResourceOwner(resourceId: any): Promise<boolean> {
+    public isResourceOwner(resourceId: unknown): Promise<boolean> {
         return Promise.resolve(resourceId === 1111);
     }
     public isInRole(role: string): Promise<boolean> {
