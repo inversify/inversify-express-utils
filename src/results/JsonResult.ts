@@ -4,7 +4,7 @@ import type { IHttpActionResult } from '../interfaces';
 
 export class JsonResult implements IHttpActionResult {
   constructor(
-    public readonly json: unknown,
+    public readonly json: object,
     public readonly statusCode: number
   ) { }
 

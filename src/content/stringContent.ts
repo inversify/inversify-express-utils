@@ -9,7 +9,7 @@ export class StringContent extends HttpContent {
     this.headers['content-type'] = DEFAULT_MEDIA_TYPE;
   }
 
-  public readAsStringAsync(): Promise<string> {
+  public readAsync(): Promise<string> {
     return Promise.resolve(this.content);
   }
 }

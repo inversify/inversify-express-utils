@@ -234,7 +234,7 @@ export class InversifyExpressServer {
       res.status(message.statusCode)
         // If the content is a number, ensure we change it to a string, else our content is
         // treated as a statusCode rather than as the content of the Response
-        .send(await message.content.readAsStringAsync());
+        .send(await message.content.readAsync());
     } else {
       res.sendStatus(message.statusCode);
     }
