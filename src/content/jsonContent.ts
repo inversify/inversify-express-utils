@@ -5,13 +5,13 @@ const DEFAULT_MEDIA_TYPE = 'application/json';
 export class JsonContent<
   T extends Record<string, unknown>
 > extends HttpContent {
-  constructor(private content: T) {
+  constructor(private content: T | T[]) {
     super();
 
     this.headers['content-type'] = DEFAULT_MEDIA_TYPE;
   }
 
-  public readAsync(): Promise<T> {
+  public readAsync(): Promise<T | T[]> {
     return Promise.resolve(this.content);
   }
 }

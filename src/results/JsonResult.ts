@@ -6,7 +6,7 @@ export class JsonResult<
   T extends Record<string, unknown>
 > implements IHttpActionResult {
   constructor(
-    public readonly json: T,
+    public readonly json: T | T[],
     public readonly statusCode: number
   ) { }
 

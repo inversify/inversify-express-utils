@@ -62,7 +62,7 @@ export class BaseHttpController {
   }
 
   protected json<T extends Record<string, unknown>>(
-    content: T,
+    content: T | T[],
     statusCode: number = StatusCodes.OK
   ): JsonResult<T> {
     return new JsonResult(content, statusCode);
