@@ -6,7 +6,7 @@ describe('JsonContent', () => {
     expect(content.headers['content-type']).toBe('application/json');
   });
 
-  it('should respond with the stringified version of the object', done => {
+  it('should respond with the original object', done => {
     const mockObject = {
       count: 6,
       success: true,
@@ -15,8 +15,8 @@ describe('JsonContent', () => {
 
     const content = new JsonContent(mockObject);
 
-    void content.readAsStringAsync().then(value => {
-      expect(value).toBe(JSON.stringify(mockObject));
+    void content.readAsync().then(value => {
+      expect(value).toBe(mockObject);
       done();
     });
   });

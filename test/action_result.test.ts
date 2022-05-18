@@ -22,7 +22,7 @@ describe('ActionResults', () => {
 
       expect(responseMessage.statusCode).toBe(StatusCodes.OK);
       expect(
-        await responseMessage.content.readAsStringAsync(),
+        await responseMessage.content.readAsync(),
       ).toBe(JSON.stringify(content));
     });
   });
@@ -43,7 +43,7 @@ describe('ActionResults', () => {
       const responseMessage = await actionResult.executeAsync();
 
       expect(responseMessage.statusCode).toBe(StatusCodes.BAD_REQUEST);
-      expect(await responseMessage.content.readAsStringAsync()).toBe(message);
+      expect(await responseMessage.content.readAsync()).toBe(message);
     });
   });
 
@@ -68,7 +68,7 @@ describe('ActionResults', () => {
 
       expect(responseMessage.statusCode).toBe(StatusCodes.CREATED);
       expect(
-        await responseMessage.content.readAsStringAsync(),
+        await responseMessage.content.readAsync(),
       ).toBe(JSON.stringify(content));
       expect(responseMessage.headers['location']).toBe(uri);
     });
@@ -85,7 +85,7 @@ describe('ActionResults', () => {
         .toBe(StatusCodes.INTERNAL_SERVER_ERROR);
 
       expect(await responseMessage.content
-        .readAsStringAsync())
+        .readAsync())
         .toBe('Error: foo');
     });
   });

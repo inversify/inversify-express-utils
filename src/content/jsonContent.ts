@@ -2,18 +2,16 @@ import { HttpContent } from './httpContent';
 
 const DEFAULT_MEDIA_TYPE = 'application/json';
 
-export class JsonContent extends HttpContent {
-  private content: string;
-
-  constructor(content: unknown) {
+export class JsonContent<
+  T extends Record<string, unknown>
+> extends HttpContent {
+  constructor(private content: T | T[]) {
     super();
-
-    this.content = JSON.stringify(content);
 
     this.headers['content-type'] = DEFAULT_MEDIA_TYPE;
   }
 
-  public readAsStringAsync(): Promise<string> {
+  public readAsync(): Promise<T | T[]> {
     return Promise.resolve(this.content);
   }
 }

@@ -61,10 +61,10 @@ export class BaseHttpController {
     return new StatusCodeResult(statusCode);
   }
 
-  protected json(
-    content: unknown,
+  protected json<T extends Record<string, unknown>>(
+    content: T | T[],
     statusCode: number = StatusCodes.OK
-  ): JsonResult {
+  ): JsonResult<T> {
     return new JsonResult(content, statusCode);
   }
 }

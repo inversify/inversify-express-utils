@@ -7,5 +7,7 @@ export abstract class HttpContent {
     return this._headers;
   }
 
-  public abstract readAsStringAsync(): Promise<string>;
+  public abstract readAsync(): Promise<
+    string | Record<string, unknown> | Record<string, unknown>[]
+  >;
 }
