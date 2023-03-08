@@ -4,6 +4,7 @@ import { BaseMiddleware, Controller } from './index';
 import { getControllersFromMetadata, getControllersFromContainer, getControllerMetadata, getControllerMethodMetadata, getControllerParameterMetadata, instanceOfIHttpActionResult } from './utils';
 import { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH, PARAMETER_TYPE, DUPLICATED_CONTROLLER_NAME, } from './constants';
 import { HttpResponseMessage } from './httpResponseMessage';
+import { StreamContent } from './content/streamContent';
 
 import type { AuthProvider, ConfigFunction, ControllerHandler, ControllerMethodMetadata, ExtractedParameters, HttpContext, Middleware, ParameterMetadata, Principal, RoutingConfig } from './interfaces';
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -231,10 +232,15 @@ export class InversifyExpressServer {
     if (message.content !== undefined) {
       this.copyHeadersTo(message.content.headers, res);
 
-      res.status(message.statusCode)
+      res.status(message.statusCode);
+
+      if (message.content instanceof StreamContent) {
+        (await message.content.readAsync()).pipe(res);
+      } {
         // If the content is a number, ensure we change it to a string, else our content is
         // treated as a statusCode rather than as the content of the Response
-        .send(await message.content.readAsync());
+      res.send(await message.content.readAsync());
+      }
     } else {
       res.sendStatus(message.statusCode);
     }
