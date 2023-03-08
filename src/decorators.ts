@@ -20,7 +20,7 @@ export function controller(path: string, ...middleware: Array<Middleware>) {
     // the controllers in the application, the metadata cannot be
     // attached to a controller. It needs to be attached to a global
     // We attach metadata to the Reflect object itself to avoid
-    // declaring additonal globals. Also, the Reflect is avaiable
+    // declaring additional globals. Also, the Reflect is available
     // in both node and web browsers.
     const previousMetadata: Array<ControllerMetadata> = Reflect.getMetadata(
       METADATA_KEY.controller,

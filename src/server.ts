@@ -55,7 +55,7 @@ export class InversifyExpressServer {
   /**
    * Sets the configuration function to be applied to the application.
    * Note that the config function is not actually executed until a call to
-   * InversifyExpresServer.build().
+   * InversifyExpressServer.build().
    *
    * This method is chainable.
    *
@@ -69,7 +69,7 @@ export class InversifyExpressServer {
   /**
    * Sets the error handler configuration function to be applied to the application.
    * Note that the error config function is not actually executed until a call to
-   * InversifyExpresServer.build().
+   * InversifyExpressServer.build().
    *
    * This method is chainable.
    *
@@ -301,7 +301,7 @@ export class InversifyExpressServer {
   ): Promise<HttpContext> {
     const principal = await this._getCurrentUser(req, res, next);
     return {
-      // We use a childContainer for each request so we can be
+      // We use a childContainer for each request, so we can be
       // sure that the binding is unique for each HTTP request
       container: this._container.createChild(),
       request: req,
