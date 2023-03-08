@@ -20,7 +20,7 @@ describe('StreamContent', () => {
 
         const content = new StreamContent(stream, 'text/plain');
 
-        content.readAsync().then((readable: Readable) => {
+        void content.readAsync().then((readable: Readable) => {
             const chunks: Array<Buffer> = [];
 
             let buffer: Buffer | null = null;
