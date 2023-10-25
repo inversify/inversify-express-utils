@@ -1,5 +1,5 @@
 import type { OutgoingHttpHeaders } from 'node:http';
-import type { Readable } from 'node:stream';
+import type { Readable } from 'stream';
 
 export abstract class HttpContent {
   private _headers: OutgoingHttpHeaders = {};

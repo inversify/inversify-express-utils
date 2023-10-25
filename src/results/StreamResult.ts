@@ -1,4 +1,4 @@
-import { Readable } from 'node:stream';
+import { Readable } from 'stream';
 import { IHttpActionResult } from '../interfaces';
 import { HttpResponseMessage } from '../httpResponseMessage';
 import { StreamContent } from '../content/streamContent';

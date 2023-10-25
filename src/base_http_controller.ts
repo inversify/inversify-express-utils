@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { URL } from 'node:url';
-import { Readable } from 'node:stream';
+import { Readable } from 'stream';
 import { StatusCodes } from 'http-status-codes';
 import { injectHttpContext } from './decorators';
 import { HttpResponseMessage } from './httpResponseMessage';

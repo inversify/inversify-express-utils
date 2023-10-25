@@ -1,4 +1,4 @@
-import { Readable, Writable } from 'node:stream';
+import { Readable, Writable } from 'stream';
 import { StreamContent } from '../../src/content/streamContent';
 
 describe('StreamContent', () => {
