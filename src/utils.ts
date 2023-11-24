@@ -1,6 +1,6 @@
 import { interfaces } from 'inversify';
 import { METADATA_KEY, NO_CONTROLLERS_FOUND, TYPE } from './constants';
-import type { Controller, ControllerMetadata, ControllerMethodMetadata, ControllerParameterMetadata, DecoratorTarget, IHttpActionResult } from './interfaces';
+import type { Controller, ControllerMetadata, ControllerMethodMetadata, ControllerParameterMetadata, DecoratorTarget, IHttpActionResult, Middleware, MiddlewareMetaData } from './interfaces';
 
 export function getControllersFromContainer(
   container: interfaces.Container,
@@ -24,10 +24,19 @@ export function getControllersFromMetadata(): Array<DecoratorTarget> {
   return arrayOfControllerMetadata.map(metadata => metadata.target);
 }
 
+export function getMiddlewareMetadata(constructor: DecoratorTarget, key: string)
+: Array<Middleware> {
+  const middlewareMetadata = Reflect.getMetadata(
+    METADATA_KEY.middleware,
+    constructor
+  ) as MiddlewareMetaData || {};
+  return middlewareMetadata[key] || [];
+}
+
 export function getControllerMetadata(
   constructor: NewableFunction
 ): ControllerMetadata {
-  const controllerMetadata: ControllerMetadata = Reflect.getOwnMetadata(
+  const controllerMetadata: ControllerMetadata = Reflect.getMetadata(
     METADATA_KEY.controller,
     constructor,
   ) as ControllerMetadata;
@@ -89,4 +98,17 @@ export function instanceOfIHttpActionResult(
 ): value is IHttpActionResult {
   return value != null &&
     typeof (value as IHttpActionResult).executeAsync === 'function';
+}
+
+export function getOrCreateMetadata<T>(
+  key: string,
+  target: object,
+  defaultValue: T
+): T {
+  if (!Reflect.hasMetadata(key, target)) {
+      Reflect.defineMetadata(key, defaultValue, target);
+      return defaultValue;
+  }
+
+  return Reflect.getMetadata(key, target) as T;
 }

@@ -636,6 +636,61 @@ class Service {
 The `BaseMiddleware.bind()` method will bind the `TYPES.TraceIdValue` if it hasn't been bound yet or re-bind if it has
 already been bound.
 
+### Middleware decorators
+You can use the `@withMiddleware()` decorator to register middleware on controllers and handlers. For example: 
+```typescript
+function authenticate() {
+    return withMiddleware(
+        (req, res, next) => {
+            if (req.user === undefined) {
+                res.status(401).json({ errors: [ 'You must be logged in to access this resource.' ] })
+            }
+            next()
+        }
+    )
+}
+
+function authorizeRole(role: string) {
+    return withMiddleware(
+        (req, res, next) => {
+            if (!req.user.roles.includes(role)) {
+                res.status(403).json({ errors: [ 'Get out.' ] })
+            }
+            next()
+         }
+    )
+}
+
+@controller('/api/user')
+@authenticate()
+class UserController {
+
+    @httpGet('/admin/:id')
+    @authorizeRole('ADMIN')
+    public getById(@requestParam('id') id: string) {
+        ...
+    }
+}
+```
+You can also decorate controllers and handlers with middleware using BaseMiddleware identitifers: 
+```typescript
+class AuthenticationMiddleware extends BaseMiddleware {
+    handler(req, res, next) {
+        if (req.user === undefined) {
+            res.status(401).json({ errors: [ 'User is not logged in.' ] })
+        }
+    }
+}
+
+container.bind<BaseMiddleware>("AuthMiddleware").to(AuthenticationMiddleware)
+
+@controller('/api/users')
+@withMiddleware("AuthMiddleware")
+class UserController {
+    ...
+}
+```
+
 ## Route Map
 
 If we have some controllers like for example:

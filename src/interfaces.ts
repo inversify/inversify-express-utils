@@ -19,6 +19,9 @@ export type DecoratorTarget<T = unknown> =
 
 export type Middleware = (string | symbol | RequestHandler);
 
+export interface MiddlewareMetaData {
+  [identifier: string]: Array<Middleware>;
+}
 
 export type ControllerHandler = (...params: Array<unknown>) => unknown;
 export type Controller = Record<string, ControllerHandler>;

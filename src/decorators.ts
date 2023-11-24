@@ -1,14 +1,60 @@
 import { inject, injectable, decorate } from 'inversify';
 import { TYPE, METADATA_KEY, PARAMETER_TYPE, HTTP_VERBS_ENUM, } from './constants';
-import type { Controller, DecoratorTarget, Middleware, ControllerMetadata, HandlerDecorator, ControllerMethodMetadata, ControllerParameterMetadata, ParameterMetadata } from './interfaces';
-
+import type { Controller, DecoratorTarget, Middleware, ControllerMetadata, HandlerDecorator, ControllerMethodMetadata, ControllerParameterMetadata, ParameterMetadata, MiddlewareMetaData } from './interfaces';
+import { getMiddlewareMetadata, getOrCreateMetadata } from './utils';
 
 export const injectHttpContext = inject(TYPE.HttpContext);
 
+function defineMiddlewareMetadata(
+  target: DecoratorTarget,
+  metaDataKey: string,
+  ...middleware: Array<Middleware>
+): void {
+  // We register decorated middleware meteadata in a map, e.g. { "controller": [ middleware ] }
+  const middlewareMap: MiddlewareMetaData = getOrCreateMetadata(
+      METADATA_KEY.middleware, target,
+      { },
+  );
+
+  if (!(metaDataKey in middlewareMap)) {
+      middlewareMap[metaDataKey] = [];
+  }
+
+  middlewareMap[metaDataKey]?.push(...middleware);
+  Reflect.defineMetadata(METADATA_KEY.middleware, middlewareMap, target);
+}
+
+export function withMiddleware(...middleware: Array<Middleware>) {
+  return function (
+    target: DecoratorTarget | NewableFunction,
+    methodName?: string
+  ): void {
+      if (methodName) {
+          defineMiddlewareMetadata(target, methodName, ...middleware);
+      } else if (isNewableFunction(target)) {
+          defineMiddlewareMetadata(
+            target.constructor,
+            target.name,
+            ...middleware
+          );
+      }
+  };
+}
+
+function isNewableFunction(target: unknown): target is NewableFunction {
+  return typeof target === 'function' && target.prototype !== undefined;
+}
+
 export function controller(path: string, ...middleware: Array<Middleware>) {
   return (target: NewableFunction): void => {
+    // Get the list of middleware registered with @middleware() decorators
+    const decoratedMiddleware = getMiddlewareMetadata(
+      target.constructor,
+      target.name
+    );
+
     const currentMetadata: ControllerMetadata = {
-      middleware,
+      middleware: middleware.concat(decoratedMiddleware),
       path,
       target,
     };
@@ -92,13 +138,21 @@ export function httpMethod(
   ...middleware: Array<Middleware>
 ): HandlerDecorator {
   return (target: DecoratorTarget, key: string): void => {
+    const decoratedMiddleware = getMiddlewareMetadata(target, key);
+
     const metadata: ControllerMethodMetadata = {
       key,
       method,
-      middleware,
+      middleware: middleware.concat(decoratedMiddleware),
       path,
       target,
     };
+
+    // const metadataList = getOrCreateMetadata<Array<ControllerMethodMetadata>>(
+    //     METADATA_KEY.controllerMethod,
+    //     target.constructor,
+    //     [],
+    // );
 
     let metadataList: Array<ControllerMethodMetadata> = [];
 
