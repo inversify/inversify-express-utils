@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import express, { Application, NextFunction, Request, RequestHandler, Response, Router } from 'express';
 import { interfaces } from 'inversify';
 import { BaseMiddleware, Controller } from './index';
@@ -162,13 +164,15 @@ export class InversifyExpressServer {
           if (parameterMetadata) {
             paramList = parameterMetadata[metadata.key] || [];
           }
-          const handler: express.RequestHandler = this.handlerFactory(
+          const handler: RequestHandler = this.handlerFactory(
             (controllerMetadata.target as { name: string }).name,
             metadata.key,
             paramList,
           );
-          const routeMiddleware = this
-              .resolveMiddleware(...metadata.middleware);
+
+          const routeMiddleware = this.resolveMiddleware(
+            ...metadata.middleware
+          );
           this._router[metadata.method](
             `${controllerMetadata.path}${metadata.path}`,
             ...controllerMiddleware,
@@ -240,7 +244,7 @@ export class InversifyExpressServer {
       } {
         // If the content is a number, ensure we change it to a string, else our content is
         // treated as a statusCode rather than as the content of the Response
-      res.send(await message.content.readAsync());
+        res.send(await message.content.readAsync());
       }
     } else {
       res.sendStatus(message.statusCode);
@@ -251,7 +255,7 @@ export class InversifyExpressServer {
     controllerName: string,
     key: string,
     parameterMetadata: Array<ParameterMetadata>,
-  ): express.RequestHandler {
+  ): RequestHandler {
     return async (
       req: Request,
       res: Response,
@@ -391,15 +395,18 @@ export class InversifyExpressServer {
     source: Request,
     paramType: 'params' | 'query' | 'headers' | 'cookies',
     injectRoot: boolean,
-    name?: string,
-  ): Record<string, unknown> | unknown | undefined {
-    const key = paramType === 'headers' ? name?.toLowerCase() : name;
+    name?: string | symbol,
+  ): unknown {
+    const key = paramType === 'headers' ?
+      typeof name === 'symbol' ?
+        name.toString() :
+        name?.toLowerCase() :
+      name as string;
     const param = source[paramType] as Record<string, unknown>;
 
     if (injectRoot) {
       return param;
     }
-
     return (param && key) ? param[key] : undefined;
   }
 
