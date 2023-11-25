@@ -2,15 +2,8 @@ import * as express from 'express';
 import supertest from 'supertest';
 import { Container } from 'inversify';
 import { METADATA_KEY } from '../../src/constants';
-import {
-  BaseMiddleware,
-  ControllerMethodMetadata,
-  InversifyExpressServer,
-  ControllerMetadata,
-} from '../../src/index';
-import {
-  controller, httpGet, httpMethod, httpPut, withMiddleware,
-} from '../../src/decorators';
+import { BaseMiddleware, ControllerMethodMetadata, InversifyExpressServer, ControllerMetadata } from '../../src/index';
+import { controller, httpGet, httpMethod, httpPut, withMiddleware } from '../../src/decorators';
 import { cleanUpMetadata } from '../../src/utils';
 import assert from 'assert';
 

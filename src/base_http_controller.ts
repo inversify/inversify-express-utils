@@ -68,11 +68,11 @@ export class BaseHttpController {
   ): JsonResult<T> {
     return new JsonResult(content, statusCode);
   }
-  
+
   protected stream(
-      readableStream: Readable,
-      contentType: string,
-      statusCode: number = StatusCodes.OK
+    readableStream: Readable,
+    contentType: string,
+    statusCode: number = StatusCodes.OK
   ): StreamResult {
     return new StreamResult(readableStream, contentType, statusCode);
   }
