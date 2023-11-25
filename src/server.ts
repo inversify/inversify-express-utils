@@ -6,7 +6,6 @@ import { BaseMiddleware, Controller } from './index';
 import { getControllersFromMetadata, getControllersFromContainer, getControllerMetadata, getControllerMethodMetadata, getControllerParameterMetadata, instanceOfIHttpActionResult } from './utils';
 import { TYPE, METADATA_KEY, DEFAULT_ROUTING_ROOT_PATH, PARAMETER_TYPE, DUPLICATED_CONTROLLER_NAME, } from './constants';
 import { HttpResponseMessage } from './httpResponseMessage';
-import { StreamContent } from './content/streamContent';
 
 import type { AuthProvider, ConfigFunction, ControllerHandler, ControllerMethodMetadata, ExtractedParameters, HttpContext, Middleware, ParameterMetadata, Principal, RoutingConfig } from './interfaces';
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -57,7 +56,7 @@ export class InversifyExpressServer {
   /**
    * Sets the configuration function to be applied to the application.
    * Note that the config function is not actually executed until a call to
-   * InversifyExpressServer.build().
+   * InversifyExpresServer.build().
    *
    * This method is chainable.
    *
@@ -71,7 +70,7 @@ export class InversifyExpressServer {
   /**
    * Sets the error handler configuration function to be applied to the application.
    * Note that the error config function is not actually executed until a call to
-   * InversifyExpressServer.build().
+   * InversifyExpresServer.build().
    *
    * This method is chainable.
    *
@@ -136,7 +135,7 @@ export class InversifyExpressServer {
       }
 
       this._container.bind(TYPE.Controller)
-        .to(constructor as new (...args: Array<never>) => unknown)
+        .to(constructor as new (...args: never[]) => unknown)
         .whenTargetNamed(name);
     });
 
@@ -155,12 +154,12 @@ export class InversifyExpressServer {
       );
 
       if (controllerMetadata && methodMetadata) {
-        const controllerMiddleware = this.resolveMiddleware(
+        const controllerMiddleware = this.resolveMiddlewere(
           ...controllerMetadata.middleware,
         );
 
         methodMetadata.forEach((metadata: ControllerMethodMetadata) => {
-          let paramList: Array<ParameterMetadata> = [];
+          let paramList: ParameterMetadata[] = [];
           if (parameterMetadata) {
             paramList = parameterMetadata[metadata.key] || [];
           }
@@ -170,7 +169,7 @@ export class InversifyExpressServer {
             paramList,
           );
 
-          const routeMiddleware = this.resolveMiddleware(
+          const routeMiddleware = this.resolveMiddlewere(
             ...metadata.middleware
           );
           this._router[metadata.method](
@@ -186,9 +185,9 @@ export class InversifyExpressServer {
     this._app.use(this._routingConfig.rootPath, this._router);
   }
 
-  private resolveMiddleware(
-    ...middleware: Array<Middleware>
-  ): Array<express.RequestHandler> {
+  private resolveMiddlewere(
+    ...middleware: Middleware[]
+  ): RequestHandler[] {
     return middleware.map(middlewareItem => {
       if (!this._container.isBound(middlewareItem)) {
         return middlewareItem as express.RequestHandler;
@@ -237,15 +236,10 @@ export class InversifyExpressServer {
     if (message.content !== undefined) {
       this.copyHeadersTo(message.content.headers, res);
 
-      res.status(message.statusCode);
-
-      if (message.content instanceof StreamContent) {
-        (await message.content.readAsync()).pipe(res);
-      } {
+      res.status(message.statusCode)
         // If the content is a number, ensure we change it to a string, else our content is
         // treated as a statusCode rather than as the content of the Response
-        res.send(await message.content.readAsync());
-      }
+        .send(await message.content.readAsync());
     } else {
       res.sendStatus(message.statusCode);
     }
@@ -254,7 +248,7 @@ export class InversifyExpressServer {
   private handlerFactory(
     controllerName: string,
     key: string,
-    parameterMetadata: Array<ParameterMetadata>,
+    parameterMetadata: ParameterMetadata[],
   ): RequestHandler {
     return async (
       req: Request,
@@ -306,7 +300,7 @@ export class InversifyExpressServer {
   ): Promise<HttpContext> {
     const principal = await this._getCurrentUser(req, res, next);
     return {
-      // We use a childContainer for each request, so we can be
+      // We use a childContainer for each request so we can be
       // sure that the binding is unique for each HTTP request
       container: this._container.createChild(),
       request: req,
@@ -336,9 +330,9 @@ export class InversifyExpressServer {
     req: Request,
     res: Response,
     next: NextFunction,
-    params: Array<ParameterMetadata>,
+    params: ParameterMetadata[],
   ): ExtractedParameters {
-    const args: Array<unknown> = [];
+    const args: unknown[] = [];
     if (!params || !params.length) {
       return [req, res, next];
     }
