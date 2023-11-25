@@ -1,12 +1,11 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { INTERNAL_SERVER_ERROR } from "http-status-codes";
-import { interfaces } from "../interfaces";
-import { BaseHttpController } from "../base_http_controller";
+import { StatusCodes } from 'http-status-codes';
+import { HttpResponseMessage } from '../httpResponseMessage';
+import type { IHttpActionResult } from '../interfaces';
 
-export default class InternalServerErrorResult implements interfaces.IHttpActionResult {
-    constructor(private apiController: BaseHttpController) {}
-
-    public async executeAsync() {
-        return new HttpResponseMessage(INTERNAL_SERVER_ERROR);
-    }
+export class InternalServerErrorResult implements IHttpActionResult {
+  public async executeAsync(): Promise<HttpResponseMessage> {
+    return Promise.resolve(
+      new HttpResponseMessage(StatusCodes.INTERNAL_SERVER_ERROR)
+    );
+  }
 }

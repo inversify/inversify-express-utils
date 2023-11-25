@@ -1,75 +1,107 @@
-import * as express from "express";
-import { interfaces as inversifyInterfaces } from "inversify";
-import { PARAMETER_TYPE } from "./constants";
-import { HttpResponseMessage } from "./httpResponseMessage";
+import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
+import { interfaces as inversifyInterfaces } from 'inversify';
+import { HTTP_VERBS_ENUM, PARAMETER_TYPE } from './constants';
+import { HttpResponseMessage } from './httpResponseMessage';
 
-namespace interfaces {
+type Prototype<T> = {
+  [P in keyof T]: T[P] extends NewableFunction ? T[P] : T[P] | undefined;
+} & {
+  constructor: NewableFunction;
+};
 
-    export type Middleware = (inversifyInterfaces.ServiceIdentifier<any> | express.RequestHandler);
-
-    export interface ControllerMetadata {
-        path: string;
-        middleware: Middleware[];
-        target: any;
-    }
-
-    export interface ControllerMethodMetadata extends ControllerMetadata {
-        method: string;
-        key: string;
-    }
-
-    export interface ControllerParameterMetadata {
-        [methodName: string]: ParameterMetadata[];
-    }
-
-    export interface ParameterMetadata {
-        parameterName?: string;
-        injectRoot: boolean;
-        index: number;
-        type: PARAMETER_TYPE;
-    }
-
-    export interface Controller { }
-
-    export interface HandlerDecorator {
-        (target: any, key: string, value: any): void;
-    }
-
-    export interface ConfigFunction {
-        (app: express.Application): void;
-    }
-
-    export interface RoutingConfig {
-        rootPath: string;
-    }
-
-    export interface Principal {
-        details: any;
-        isAuthenticated(): Promise<boolean>;
-        // Allows content-based auth
-        isResourceOwner(resourceId: any): Promise<boolean>;
-        // Allows role-based auth
-        isInRole(role: string): Promise<boolean>;
-    }
-
-    export interface AuthProvider {
-        getUser(
-            req: express.Request,
-            res: express.Response,
-            next: express.NextFunction
-        ): Promise<Principal>;
-    }
-
-    export interface HttpContext {
-        request: express.Request;
-        response: express.Response;
-        container: inversifyInterfaces.Container;
-        user: Principal;
-    }
-
-    export interface IHttpActionResult {
-        executeAsync(): Promise<HttpResponseMessage>;
-    }
+interface ConstructorFunction<T = Record<string, unknown>> {
+  new(...args: Array<unknown>): T;
+  prototype: Prototype<T>;
 }
 
-export { interfaces };
+export type DecoratorTarget<T = unknown> =
+  ConstructorFunction<T> | Prototype<T>;
+
+export type Middleware = (string | symbol | RequestHandler);
+
+
+export type ControllerHandler = (...params: Array<unknown>) => unknown;
+export type Controller = Record<string, ControllerHandler>;
+
+export interface ControllerMetadata {
+  middleware: Array<Middleware>;
+  path: string;
+  target: DecoratorTarget;
+}
+
+export interface ControllerMethodMetadata extends ControllerMetadata {
+  key: string;
+  method: keyof typeof HTTP_VERBS_ENUM;
+}
+
+export interface ControllerParameterMetadata {
+  [methodName: string]: Array<ParameterMetadata>;
+}
+
+export interface ParameterMetadata {
+  index: number;
+  injectRoot: boolean;
+  parameterName?: string | symbol | undefined;
+  type: PARAMETER_TYPE;
+}
+
+export type ExtractedParameters =
+  | Array<ParameterMetadata>
+  | [Request, Response, NextFunction]
+  | Array<unknown>
+
+export type HandlerDecorator = (
+  target: DecoratorTarget,
+  key: string,
+  value: unknown
+) => void;
+
+export type ConfigFunction = (app: Application) => void;
+
+export interface RoutingConfig {
+  rootPath: string;
+}
+
+export interface Principal<T = unknown> {
+  details: T;
+  isAuthenticated(): Promise<boolean>;
+  // Allows role-based auth
+  isInRole(role: string): Promise<boolean>;
+  // Allows content-based auth
+  isResourceOwner(resourceId: unknown): Promise<boolean>;
+}
+
+export interface AuthProvider {
+  getUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Principal>;
+}
+
+export interface HttpContext<T = unknown> {
+  container: inversifyInterfaces.Container;
+  request: Request;
+  response: Response;
+  user: Principal<T>;
+}
+
+export interface IHttpActionResult {
+  executeAsync(): Promise<HttpResponseMessage>;
+}
+
+export interface RouteDetails {
+  args?: Array<string>;
+  route: string;
+}
+
+export interface RouteInfo {
+  controller: string;
+  endpoints: Array<RouteDetails>;
+}
+
+export interface RawMetadata {
+  controllerMetadata: ControllerMetadata,
+  methodMetadata: Array<ControllerMethodMetadata>,
+  parameterMetadata: ControllerParameterMetadata,
+}

@@ -1,15 +1,14 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { BAD_REQUEST } from "http-status-codes";
-import { interfaces } from "../interfaces";
-import { BaseHttpController } from "../base_http_controller";
-import { StringContent } from "../content/stringContent";
+import { StatusCodes } from 'http-status-codes';
+import { HttpResponseMessage } from '../httpResponseMessage';
+import { StringContent } from '../content/stringContent';
+import type { IHttpActionResult } from '../interfaces';
 
-export default class BadRequestErrorMessageResult implements interfaces.IHttpActionResult {
-    constructor(private message: string, private apiController: BaseHttpController) {}
+export class BadRequestErrorMessageResult implements IHttpActionResult {
+  constructor(private message: string) { }
 
-    public async executeAsync() {
-        const response = new HttpResponseMessage(BAD_REQUEST);
-        response.content = new StringContent(this.message);
-        return response;
-    }
+  public async executeAsync(): Promise<HttpResponseMessage> {
+    const response = new HttpResponseMessage(StatusCodes.BAD_REQUEST);
+    response.content = new StringContent(this.message);
+    return Promise.resolve(response);
+  }
 }

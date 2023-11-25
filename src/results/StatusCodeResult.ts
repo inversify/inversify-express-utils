@@ -1,11 +1,12 @@
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { interfaces } from "../interfaces";
-import { BaseHttpController } from "../base_http_controller";
+import { HttpResponseMessage } from '../httpResponseMessage';
+import type { IHttpActionResult } from '../interfaces';
 
-export default class StatusCodeResult implements interfaces.IHttpActionResult {
-    constructor(private statusCode: number, private apiController: BaseHttpController) {}
+export class StatusCodeResult implements IHttpActionResult {
+  constructor(private statusCode: number) { }
 
-    public async executeAsync() {
-        return new HttpResponseMessage(this.statusCode);
-    }
+  public async executeAsync(): Promise<HttpResponseMessage> {
+    return Promise.resolve(
+      new HttpResponseMessage(this.statusCode)
+    );
+  }
 }

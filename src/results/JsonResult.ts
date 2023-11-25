@@ -1,19 +1,18 @@
-import { interfaces } from "../interfaces";
-import { HttpResponseMessage } from "../httpResponseMessage";
-import { JsonContent } from "../content/jsonContent";
-import { BaseHttpController } from "../base_http_controller";
+import { JsonContent } from '../content/jsonContent';
+import { HttpResponseMessage } from '../httpResponseMessage';
+import type { IHttpActionResult } from '../interfaces';
 
-export default class JsonResult implements interfaces.IHttpActionResult {
-
+export class JsonResult<
+  T extends Record<string, unknown>
+> implements IHttpActionResult {
   constructor(
-    public readonly json: any,
-    public readonly statusCode: number,
-    private apiController: BaseHttpController) {}
+    public readonly json: T | T[],
+    public readonly statusCode: number
+  ) { }
 
-  public async executeAsync() {
+  public async executeAsync(): Promise<HttpResponseMessage> {
     const response = new HttpResponseMessage(this.statusCode);
-    response.content = new JsonContent(this.json);
-    return response;
+    response.content = new JsonContent<T>(this.json);
+    return Promise.resolve(response);
   }
-
 }

@@ -1,0 +1,26 @@
+{
+  "collectCoverage": true,
+  "coverageDirectory": "<rootDir>/coverage",
+  "coverageReporters": [
+    "html",
+    "json",
+    "text"
+  ],
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "setupFilesAfterEnv": [
+    "<rootDir>/test/helpers/jest.setup.ts"
+  ],
+  "testEnvironment": "node",
+  "testPathIgnorePatterns": [
+    "node_modules"
+  ],
+  "testRegex": ".test.ts$",
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  }
+}

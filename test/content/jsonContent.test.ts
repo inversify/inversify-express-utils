@@ -1,23 +1,22 @@
-import { expect } from "chai";
-import { JsonContent } from "../../src/content/jsonContent";
+import { JsonContent } from '../../src/content/jsonContent';
 
-describe("JsonContent", () => {
-  it("should have application/json as the default media type", () => {
+describe('JsonContent', () => {
+  it('should have application/json as the default media type', () => {
     const content = new JsonContent({});
-    expect(content.headers["content-type"]).to.equal("application/json");
+    expect(content.headers['content-type']).toBe('application/json');
   });
 
-  it("should respond with the stringified version of the object", (done) => {
+  it('should respond with the original object', done => {
     const mockObject = {
-      type: "fake",
+      count: 6,
       success: true,
-      count: 6
+      type: 'fake'
     };
 
     const content = new JsonContent(mockObject);
 
-    content.readAsStringAsync().then((value) => {
-      expect(value).to.equal(JSON.stringify(mockObject));
+    void content.readAsync().then(value => {
+      expect(value).toBe(mockObject);
       done();
     });
   });

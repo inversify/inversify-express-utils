@@ -44,7 +44,7 @@ export class FooController implements interfaces.Controller {
     constructor( @inject("FooService") private fooService: FooService ) {}
 
     @httpGet("/")
-    private index(req: express.Request, res: express.Response, next: express.NextFunction): string {
+    private index(@request() req: express.Request, @response() res: express.Response, @next() next: express.NextFunction): string {
         return this.fooService.get(req.query.id);
     }
 
@@ -281,7 +281,7 @@ Binds a method parameter to the user principal obtained from the AuthProvider.
 
 The `BaseHttpController` is a base class that provides a significant amount of helper functions in order to aid writing testable controllers.  When returning a response from a method defined on one of these controllers, you may use the `response` object available on the `httpContext` property described in the next section, or you may return an `HttpResponseMessage`, or you may return an object that implements the IHttpActionResult interface.
 
-The benefit of the latter two methods are that since your controller is no longer directly coupled to requiring an httpContext to send a response, unit testing controllers becomes extraordinarily simple as you no longer need to mock the entire response object, you can simply run assertions on the returned value.  This API also allows us to make future improvements in this area and add in functionality that exists in similar frameworks (.NET WebAPI) such as media formatters, content negotation, etc.
+The benefit of the latter two methods is that since your controller is no longer directly coupled to requiring an httpContext to send a response, unit testing controllers becomes extraordinarily simple as you no longer need to mock the entire response object, you can simply run assertions on the returned value.  This API also allows us to make future improvements in this area and add in functionality that exists in similar frameworks (.NET WebAPI) such as media formatters, content negotation, etc.
 
 ```ts
 import { injectable, inject } from "inversify";
@@ -441,7 +441,7 @@ const server = new InversifyExpressServer(
 
 We need to implement the `AuthProvider` interface.
 
-The `AuthProvider` allow us to get an user (`Principal`):
+The `AuthProvider` allow us to get a user (`Principal`):
 
 ```ts
 import { injectable, inject } from "inversify";
@@ -471,21 +471,21 @@ class CustomAuthProvider implements interfaces.AuthProvider {
 We also need to implement the Principal interface.
 The `Principal` interface allow us to:
 
-- Access the details of an user
+- Access the details of a user
 - Check if it has access to certain resource
 - Check if it is authenticated
-- Check if it is in an user role
+- Check if it is in a user role
 
 ```ts
-class Principal implements interfaces.Principal {
-    public details: any;
-    public constructor(details: any) {
+class Principal implements interfaces.Principal<T = unknown> {
+    public details: T;
+    public constructor(details: T) {
         this.details = details;
     }
     public isAuthenticated(): Promise<boolean> {
         return Promise.resolve(true);
     }
-    public isResourceOwner(resourceId: any): Promise<boolean> {
+    public isResourceOwner(resourceId: unknown): Promise<boolean> {
         return Promise.resolve(resourceId === 1111);
     }
     public isInRole(role: string): Promise<boolean> {
@@ -516,7 +516,7 @@ class UserDetailsController extends BaseHttpController {
 ## BaseMiddleware
 
 Extending `BaseMiddleware` allow us to inject dependencies
-and to be access the current `HttpContext` in Express middleware function.
+and to access the current `HttpContext` in Express middleware function.
 
 ```ts
 import { BaseMiddleware } from "inversify-express-utils";
@@ -555,7 +555,6 @@ container.bind<LoggerMiddleware>(TYPES.LoggerMiddleware)
 We can then inject `TYPES.LoggerMiddleware` into one of our controllers.
 
 ```ts
-@injectable()
 @controller("/")
 class UserDetailsController extends BaseHttpController {
 
@@ -570,10 +569,6 @@ class UserDetailsController extends BaseHttpController {
         }
     }
 }
-
-container.bind<interfaces.Controller>(TYPE.Controller)
-         .to(UserDetailsController)
-         .whenTargetNamed("UserDetailsController");
 ```
 
 ### Request-scope services

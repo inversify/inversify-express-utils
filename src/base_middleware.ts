@@ -1,20 +1,22 @@
-import * as express from "express";
-import { injectable, interfaces as inversifyInterfaces } from "inversify";
-import { interfaces } from "./interfaces";
+import type { NextFunction, Request, Response } from 'express';
+import { injectable, interfaces as inversifyInterfaces } from 'inversify';
+import type { HttpContext } from './interfaces';
 
 @injectable()
 export abstract class BaseMiddleware implements BaseMiddleware {
-    // httpContext is initialized when the middleware is invoked
-    // see resolveMidleware in server.ts for more details
-    protected readonly httpContext: interfaces.HttpContext;
+  // httpContext is initialized when the middleware is invoked
+  // see resolveMidleware in server.ts for more details
+  public httpContext!: HttpContext;
 
-    protected bind<T>(serviceIdentifier: inversifyInterfaces.ServiceIdentifier<T>): inversifyInterfaces.BindingToSyntax<T> {
-        return this.httpContext.container.bind(serviceIdentifier);
-    }
+  protected bind<T>(
+    serviceIdentifier: inversifyInterfaces.ServiceIdentifier<T>,
+  ): inversifyInterfaces.BindingToSyntax<T> {
+    return this.httpContext.container.bind(serviceIdentifier);
+  }
 
-    public abstract handler(
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-    ): void;
+  public abstract handler(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void;
 }
