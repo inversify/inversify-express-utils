@@ -314,6 +314,7 @@ On the BaseHttpController, we provide a litany of helper methods to ease returni
 * InternalServerError
 * NotFoundResult
 * JsonResult
+* StreamResult
 
 ```ts
 import { injectable, inject } from "inversify";
@@ -377,6 +378,33 @@ describe("ExampleController", () => {
 });
 ```
 *This example uses [Mocha](https://mochajs.org) and [Chai](http://www.chaijs.com) as a unit testing framework*
+
+### StreamResult
+
+In some cases, you'll want to proxy data stream from remote resource in response.
+This can be done by using the `stream` helper method provided by `BaseHttpController`.
+Useful in cases when you need to return large data.
+
+```ts
+import { inject } from "inversify";
+import {
+    controller, httpGet, BaseHttpController
+} from "inversify-express-utils";
+import TYPES from "../constants";
+import { FileServiceInterface } from "../interfaces";
+
+@controller("/cats")
+export class CatController extends BaseHttpController {
+    @inject(TYPES.FileService) private fileService: FileServiceInterface;
+
+    @httpGet("/image")
+    public async getCatImage() {
+        const readableStream = this.fileService.getFileStream("cat.jpeg");
+
+        return this.stream(content, "image/jpeg", 200);
+    }
+}
+```
 
 ## HttpContext
 

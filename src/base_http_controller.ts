@@ -1,9 +1,10 @@
 import { injectable } from 'inversify';
-import { URL } from 'url';
+import { URL } from 'node:url';
+import { Readable } from 'stream';
 import { StatusCodes } from 'http-status-codes';
 import { injectHttpContext } from './decorators';
 import { HttpResponseMessage } from './httpResponseMessage';
-import { CreatedNegotiatedContentResult, ConflictResult, OkNegotiatedContentResult, OkResult, BadRequestErrorMessageResult, BadRequestResult, ExceptionResult, InternalServerErrorResult, NotFoundResult, RedirectResult, ResponseMessageResult, StatusCodeResult, JsonResult, } from './results';
+import { CreatedNegotiatedContentResult, ConflictResult, OkNegotiatedContentResult, OkResult, BadRequestErrorMessageResult, BadRequestResult, ExceptionResult, InternalServerErrorResult, NotFoundResult, RedirectResult, ResponseMessageResult, StatusCodeResult, JsonResult, StreamResult } from './results';
 import type { HttpContext } from './interfaces';
 
 @injectable()
@@ -66,5 +67,13 @@ export class BaseHttpController {
     statusCode: number = StatusCodes.OK
   ): JsonResult<T> {
     return new JsonResult(content, statusCode);
+  }
+  
+  protected stream(
+      readableStream: Readable,
+      contentType: string,
+      statusCode: number = StatusCodes.OK
+  ): StreamResult {
+    return new StreamResult(readableStream, contentType, statusCode);
   }
 }

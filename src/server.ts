@@ -154,7 +154,7 @@ export class InversifyExpressServer {
       );
 
       if (controllerMetadata && methodMetadata) {
-        const controllerMiddleware = this.resolveMidleware(
+        const controllerMiddleware = this.resolveMiddlewere(
           ...controllerMetadata.middleware,
         );
 
@@ -169,7 +169,9 @@ export class InversifyExpressServer {
             paramList,
           );
 
-          const routeMiddleware = this.resolveMidleware(...metadata.middleware);
+          const routeMiddleware = this.resolveMiddlewere(
+            ...metadata.middleware
+          );
           this._router[metadata.method](
             `${controllerMetadata.path}${metadata.path}`,
             ...controllerMiddleware,
@@ -183,7 +185,7 @@ export class InversifyExpressServer {
     this._app.use(this._routingConfig.rootPath, this._router);
   }
 
-  private resolveMidleware(
+  private resolveMiddlewere(
     ...middleware: Middleware[]
   ): RequestHandler[] {
     return middleware.map(middlewareItem => {

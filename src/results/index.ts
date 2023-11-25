@@ -11,3 +11,4 @@ export * from './ResponseMessageResult';
 export * from './ConflictResult';
 export * from './StatusCodeResult';
 export * from './JsonResult';
+export * from './StreamResult';
