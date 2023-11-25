@@ -10,7 +10,7 @@ type Prototype<T> = {
 };
 
 interface ConstructorFunction<T = Record<string, unknown>> {
-  new(...args: Array<unknown>): T;
+  new(...args: unknown[]): T;
   prototype: Prototype<T>;
 }
 
@@ -20,14 +20,14 @@ export type DecoratorTarget<T = unknown> =
 export type Middleware = (string | symbol | RequestHandler);
 
 export interface MiddlewareMetaData {
-  [identifier: string]: Array<Middleware>;
+  [identifier: string]: Middleware[];
 }
 
-export type ControllerHandler = (...params: Array<unknown>) => unknown;
+export type ControllerHandler = (...params: unknown[]) => unknown;
 export type Controller = Record<string, ControllerHandler>;
 
 export interface ControllerMetadata {
-  middleware: Array<Middleware>;
+  middleware: Middleware[];
   path: string;
   target: DecoratorTarget;
 }
@@ -38,20 +38,20 @@ export interface ControllerMethodMetadata extends ControllerMetadata {
 }
 
 export interface ControllerParameterMetadata {
-  [methodName: string]: Array<ParameterMetadata>;
+  [methodName: string]: ParameterMetadata[];
 }
 
 export interface ParameterMetadata {
   index: number;
   injectRoot: boolean;
-  parameterName?: string | undefined;
+  parameterName?: string | symbol | undefined;
   type: PARAMETER_TYPE;
 }
 
 export type ExtractedParameters =
-  | Array<ParameterMetadata>
+  | ParameterMetadata[]
   | [Request, Response, NextFunction]
-  | Array<unknown>
+  | unknown[]
 
 export type HandlerDecorator = (
   target: DecoratorTarget,
@@ -94,17 +94,17 @@ export interface IHttpActionResult {
 }
 
 export interface RouteDetails {
-  args?: Array<string>;
+  args?: string[];
   route: string;
 }
 
 export interface RouteInfo {
   controller: string;
-  endpoints: Array<RouteDetails>;
+  endpoints: RouteDetails[];
 }
 
 export interface RawMetadata {
   controllerMetadata: ControllerMetadata,
-  methodMetadata: Array<ControllerMethodMetadata>,
+  methodMetadata: ControllerMethodMetadata[],
   parameterMetadata: ControllerParameterMetadata,
 }

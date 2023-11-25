@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "outDir": "../es6"
+    "outDir": "../es",
+    "target": "ES2015"
   },
-  "extends": "../tsconfig.json",
-  "include": [
-    "./**/*.ts"
-  ]
+  "extends": "../tsconfig.json"
 }

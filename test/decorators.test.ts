@@ -51,7 +51,7 @@ describe('Unit Test: Controller Decorators', () => {
     const methodMetadata = Reflect.getMetadata(
       METADATA_KEY.controllerMethod,
       TestController,
-    ) as Array<ControllerMethodMetadata>;
+    ) as ControllerMethodMetadata[];
 
     expect(methodMetadata.length).toEqual(3);
 
@@ -101,7 +101,7 @@ describe('Unit Test: Controller Decorators', () => {
     expect(methodMetadataList['test'] && true).toEqual(true);
 
     const paramaterMetadataList:
-      Array<ParameterMetadata> | undefined = methodMetadataList[methodName];
+      ParameterMetadata[] | undefined = methodMetadataList[methodName];
     expect(paramaterMetadataList?.length).toEqual(2);
 
     const paramaterMetadata: ParameterMetadata | undefined =

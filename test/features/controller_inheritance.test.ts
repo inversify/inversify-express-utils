@@ -2,7 +2,7 @@ import { Container, injectable } from 'inversify';
 import supertest from 'supertest';
 import { json, urlencoded } from 'express';
 import { InversifyExpressServer } from '../../src/server';
-import { controller, httpGet, requestParam, httpDelete, httpPost, httpPut, requestBody, } from '../../src/decorators';
+import { controller, httpGet, requestParam, httpDelete, httpPost, httpPut, requestBody, httpOptions, } from '../../src/decorators';
 import { cleanUpMetadata } from '../../src/utils';
 
 type ResponseBody = { args: string, status: number };
@@ -55,6 +55,14 @@ function getDemoServer() {
     ) {
       return { status: `BASE DELETE! ${id}` };
     }
+
+    @httpOptions('/:id')
+    public options(
+      @requestParam('id') id: string
+    ) {
+      return { status: `BASE OPTIONS! ${id}` };
+    }
+
   }
 
   @controller('/api/v1/movies')
@@ -186,6 +194,21 @@ describe('Derived controller', () => {
         expect(r.status).toEqual(`BASE DELETE! ${id}`);
         done();
       });
+  });
+
+  it('Can access methods decorated with @httpOptions from parent', (done) => {
+
+    const server = getDemoServer();
+    const id = 5;
+
+    void supertest(server).options(`/api/v1/movies/${id}`)
+      .expect(200)
+      .then(res => {
+        const r = res.body as ResponseBody;
+        expect(r.status).toEqual(`BASE OPTIONS! ${id}`);
+        done();
+      });
+
   });
 
   it('Derived controller can have its own methods', done => {

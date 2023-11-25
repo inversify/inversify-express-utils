@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import express, { Application, NextFunction, Request, RequestHandler, Response, Router } from 'express';
 import { interfaces } from 'inversify';
 import { BaseMiddleware, Controller } from './index';
@@ -133,7 +135,7 @@ export class InversifyExpressServer {
       }
 
       this._container.bind(TYPE.Controller)
-        .to(constructor as new (...args: Array<never>) => unknown)
+        .to(constructor as new (...args: never[]) => unknown)
         .whenTargetNamed(name);
     });
 
@@ -157,15 +159,16 @@ export class InversifyExpressServer {
         );
 
         methodMetadata.forEach((metadata: ControllerMethodMetadata) => {
-          let paramList: Array<ParameterMetadata> = [];
+          let paramList: ParameterMetadata[] = [];
           if (parameterMetadata) {
             paramList = parameterMetadata[metadata.key] || [];
           }
-          const handler: express.RequestHandler = this.handlerFactory(
+          const handler: RequestHandler = this.handlerFactory(
             (controllerMetadata.target as { name: string }).name,
             metadata.key,
             paramList,
           );
+
           const routeMiddleware = this.resolveMidleware(...metadata.middleware);
           this._router[metadata.method](
             `${controllerMetadata.path}${metadata.path}`,
@@ -181,8 +184,8 @@ export class InversifyExpressServer {
   }
 
   private resolveMidleware(
-    ...middleware: Array<Middleware>
-  ): Array<express.RequestHandler> {
+    ...middleware: Middleware[]
+  ): RequestHandler[] {
     return middleware.map(middlewareItem => {
       if (!this._container.isBound(middlewareItem)) {
         return middlewareItem as express.RequestHandler;
@@ -243,8 +246,8 @@ export class InversifyExpressServer {
   private handlerFactory(
     controllerName: string,
     key: string,
-    parameterMetadata: Array<ParameterMetadata>,
-  ): express.RequestHandler {
+    parameterMetadata: ParameterMetadata[],
+  ): RequestHandler {
     return async (
       req: Request,
       res: Response,
@@ -325,9 +328,9 @@ export class InversifyExpressServer {
     req: Request,
     res: Response,
     next: NextFunction,
-    params: Array<ParameterMetadata>,
+    params: ParameterMetadata[],
   ): ExtractedParameters {
-    const args: Array<unknown> = [];
+    const args: unknown[] = [];
     if (!params || !params.length) {
       return [req, res, next];
     }
@@ -384,15 +387,18 @@ export class InversifyExpressServer {
     source: Request,
     paramType: 'params' | 'query' | 'headers' | 'cookies',
     injectRoot: boolean,
-    name?: string,
-  ): Record<string, unknown> | unknown | undefined {
-    const key = paramType === 'headers' ? name?.toLowerCase() : name;
+    name?: string | symbol,
+  ): unknown {
+    const key = paramType === 'headers' ?
+      typeof name === 'symbol' ?
+        name.toString() :
+        name?.toLowerCase() :
+      name as string;
     const param = source[paramType] as Record<string, unknown>;
 
     if (injectRoot) {
       return param;
     }
-
     return (param && key) ? param[key] : undefined;
   }
 
