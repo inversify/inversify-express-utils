@@ -1,11 +1,11 @@
 import { interfaces } from 'inversify';
 import { METADATA_KEY, NO_CONTROLLERS_FOUND, TYPE } from './constants';
-import type { Controller, ControllerMetadata, ControllerMethodMetadata, ControllerParameterMetadata, DecoratorTarget, IHttpActionResult } from './interfaces';
+import type { Controller, ControllerMetadata, ControllerMethodMetadata, ControllerParameterMetadata, DecoratorTarget, IHttpActionResult, Middleware, MiddlewareMetaData } from './interfaces';
 
 export function getControllersFromContainer(
   container: interfaces.Container,
   forceControllers: boolean,
-): Array<Controller> {
+): Controller[] {
   if (container.isBound(TYPE.Controller)) {
     return container.getAll<Controller>(TYPE.Controller);
   } if (forceControllers) {
@@ -15,19 +15,28 @@ export function getControllersFromContainer(
   }
 }
 
-export function getControllersFromMetadata(): Array<DecoratorTarget> {
-  const arrayOfControllerMetadata: Array<ControllerMetadata> =
+export function getControllersFromMetadata(): DecoratorTarget[] {
+  const arrayOfControllerMetadata: ControllerMetadata[] =
     Reflect.getMetadata(
       METADATA_KEY.controller,
       Reflect,
-    ) as Array<ControllerMetadata> || [];
+    ) as ControllerMetadata[] || [];
   return arrayOfControllerMetadata.map(metadata => metadata.target);
+}
+
+export function getMiddlewareMetadata(constructor: DecoratorTarget, key: string)
+  : Middleware[] {
+  const middlewareMetadata = Reflect.getMetadata(
+    METADATA_KEY.middleware,
+    constructor
+  ) as MiddlewareMetaData || {};
+  return middlewareMetadata[key] || [];
 }
 
 export function getControllerMetadata(
   constructor: NewableFunction
 ): ControllerMetadata {
-  const controllerMetadata: ControllerMetadata = Reflect.getOwnMetadata(
+  const controllerMetadata: ControllerMetadata = Reflect.getMetadata(
     METADATA_KEY.controller,
     constructor,
   ) as ControllerMetadata;
@@ -36,16 +45,16 @@ export function getControllerMetadata(
 
 export function getControllerMethodMetadata(
   constructor: NewableFunction,
-): Array<ControllerMethodMetadata> {
+): ControllerMethodMetadata[] {
   const methodMetadata = Reflect.getOwnMetadata(
     METADATA_KEY.controllerMethod,
     constructor,
-  ) as Array<ControllerMethodMetadata>;
+  ) as ControllerMethodMetadata[];
 
   const genericMetadata = Reflect.getMetadata(
     METADATA_KEY.controllerMethod,
     Reflect.getPrototypeOf(constructor) as NewableFunction,
-  ) as Array<ControllerMethodMetadata>;
+  ) as ControllerMethodMetadata[];
 
   if (genericMetadata !== undefined && methodMetadata !== undefined) {
     return methodMetadata.concat(genericMetadata);
@@ -89,4 +98,17 @@ export function instanceOfIHttpActionResult(
 ): value is IHttpActionResult {
   return value != null &&
     typeof (value as IHttpActionResult).executeAsync === 'function';
+}
+
+export function getOrCreateMetadata<T>(
+  key: string,
+  target: object,
+  defaultValue: T
+): T {
+  if (!Reflect.hasMetadata(key, target)) {
+    Reflect.defineMetadata(key, defaultValue, target);
+    return defaultValue;
+  }
+
+  return Reflect.getMetadata(key, target) as T;
 }

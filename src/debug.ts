@@ -6,7 +6,7 @@ import type { RouteDetails, RouteInfo, RawMetadata } from './interfaces';
 
 export function getRouteInfo(
   container: inversifyInterfaces.Container,
-): Array<RouteInfo> {
+): RouteInfo[] {
   const raw = getRawMetadata(container);
 
   return raw.map(r => {
@@ -17,7 +17,7 @@ export function getRouteInfo(
       const controllerPath = r.controllerMetadata.path;
       const actionPath = m.path;
       const paramMetadata = r.parameterMetadata;
-      let args: Array<string> | undefined;
+      let args: (string | undefined)[] | undefined = undefined;
 
       if (paramMetadata !== undefined) {
         const paramMetadataForKey = paramMetadata[m.key] || undefined;
@@ -66,7 +66,7 @@ export function getRouteInfo(
       };
 
       if (args) {
-        details.args = args;
+        details.args = args as string[];
       }
 
       return details;
@@ -81,7 +81,7 @@ export function getRouteInfo(
 
 export function getRawMetadata(
   container: inversifyInterfaces.Container
-): Array<RawMetadata> {
+): RawMetadata[] {
   const controllers = getControllersFromContainer(container, true);
 
   return controllers.map(controller => {
