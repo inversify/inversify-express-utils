@@ -23,8 +23,7 @@
     "sourceType": "module"
   },
   "plugins": [
-    "@typescript-eslint",
-    "typescript-sort-keys"
+    "@typescript-eslint"
   ],
   "rules": {
     // Javscript Specific Rules That Are Applied To Typescript Too
@@ -58,6 +57,12 @@
     "@typescript-eslint/explicit-function-return-type": 2,
     "@typescript-eslint/no-explicit-any": 2,
     "@typescript-eslint/no-inferrable-types": 2,
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": false
+      }
+    ],
     "@typescript-eslint/no-non-null-assertion": 2,
     "@typescript-eslint/no-unsafe-call": 2,
     "@typescript-eslint/no-unsafe-member-access": 2,

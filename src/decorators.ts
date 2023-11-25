@@ -1,6 +1,6 @@
 import { inject, injectable, decorate } from 'inversify';
 import { TYPE, METADATA_KEY, PARAMETER_TYPE, HTTP_VERBS_ENUM, } from './constants';
-import type { Controller, DecoratorTarget, Middleware, ControllerMetadata, HandlerDecorator, ControllerMethodMetadata, ControllerParameterMetadata, ParameterMetadata } from './interfaces';
+import type { DecoratorTarget, Middleware, ControllerMetadata, HandlerDecorator, ControllerMethodMetadata, ControllerParameterMetadata, ParameterMetadata } from './interfaces';
 
 
 export const injectHttpContext = inject(TYPE.HttpContext);
@@ -161,15 +161,18 @@ export const principal: () => ParameterDecorator =
 
 function paramDecoratorFactory(
   parameterType: PARAMETER_TYPE,
-): (name?: string) => ParameterDecorator {
-  return (name?: string): ParameterDecorator =>
+): (name?: string | symbol) => ParameterDecorator {
+  return (name?: string | symbol): ParameterDecorator =>
     params(parameterType, name);
 }
 
-export function params(type: PARAMETER_TYPE, parameterName?: string) {
+export function params(
+  type: PARAMETER_TYPE,
+  parameterName?: string | symbol
+) {
   return (
-    target: unknown | Controller,
-    methodName: string | symbol,
+    target: object,
+    methodName: string | symbol | undefined,
     index: number
   ): void => {
     let metadataList: ControllerParameterMetadata = {};
@@ -183,14 +186,14 @@ export function params(type: PARAMETER_TYPE, parameterName?: string) {
     if (
       !Reflect.hasOwnMetadata(
         METADATA_KEY.controllerParameter,
-        (target as Controller).constructor
+        (target).constructor
       )
     ) {
       parameterMetadataList.unshift(parameterMetadata);
     } else {
       metadataList = Reflect.getOwnMetadata(
         METADATA_KEY.controllerParameter,
-        (target as Controller).constructor,
+        (target).constructor,
       ) as ControllerParameterMetadata;
       if (metadataList[methodName as string]) {
         parameterMetadataList = metadataList[methodName as string] || [];
@@ -201,7 +204,7 @@ export function params(type: PARAMETER_TYPE, parameterName?: string) {
     Reflect.defineMetadata(
       METADATA_KEY.controllerParameter,
       metadataList,
-      (target as Controller).constructor
+      (target).constructor
     );
   };
 }

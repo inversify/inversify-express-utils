@@ -31,10 +31,9 @@
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ES5",
+    "strictNullChecks": true,
     "types": [
       "node",
-      "reflect-metadata",
       "jest"
     ],
     "typeRoots": [
