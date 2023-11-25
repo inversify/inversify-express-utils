@@ -186,14 +186,14 @@ export function params(
     if (
       !Reflect.hasOwnMetadata(
         METADATA_KEY.controllerParameter,
-        (target).constructor
+        target.constructor
       )
     ) {
       parameterMetadataList.unshift(parameterMetadata);
     } else {
       metadataList = Reflect.getOwnMetadata(
         METADATA_KEY.controllerParameter,
-        (target).constructor,
+        target.constructor,
       ) as ControllerParameterMetadata;
       if (metadataList[methodName as string]) {
         parameterMetadataList = metadataList[methodName as string] || [];
@@ -204,7 +204,7 @@ export function params(
     Reflect.defineMetadata(
       METADATA_KEY.controllerParameter,
       metadataList,
-      (target).constructor
+      target.constructor
     );
   };
 }
