@@ -41,7 +41,7 @@ export interface ControllerParameterMetadata {
 export interface ParameterMetadata {
   index: number;
   injectRoot: boolean;
-  parameterName?: string | undefined;
+  parameterName?: string | symbol | undefined;
   type: PARAMETER_TYPE;
 }
 

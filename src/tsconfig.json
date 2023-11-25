@@ -1,12 +1,13 @@
 {
-  "include": [
-    "./**/*.ts"
-  ],
-  "extends": "../tsconfig.json",
   "compilerOptions": {
     "composite": true,
     "declaration": true,
     "outDir": "../lib",
-    "rootDir": "."
+    "rootDir": ".",
+    "target": "ES2015"
   },
+  "extends": "../tsconfig.json",
+  "include": [
+    "./**/*.ts"
+  ]
 }
