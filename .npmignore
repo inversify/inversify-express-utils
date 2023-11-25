@@ -19,3 +19,5 @@ wallaby.js
 .gitignore
 .vscode
 type_definitions
+.eslintrc.json
+.github/

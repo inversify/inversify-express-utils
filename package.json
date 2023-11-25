@@ -61,5 +61,5 @@
     "postupdate": "git diff-files --quiet package-lock.json || npm test"
   },
   "types": "./lib/index.d.ts",
-  "version": "6.4.3"
+  "version": "6.4.5"
 }
