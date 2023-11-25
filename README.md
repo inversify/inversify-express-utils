@@ -636,22 +636,58 @@ class Service {
 The `BaseMiddleware.bind()` method will bind the `TYPES.TraceIdValue` if it hasn't been bound yet or re-bind if it has
 already been bound.
 
-### Dealing with CORS
+### Middleware decorators
+You can use the `@withMiddleware()` decorator to register middleware on controllers and handlers. For example: 
+```typescript
+function authenticate() {
+    return withMiddleware(
+        (req, res, next) => {
+            if (req.user === undefined) {
+                res.status(401).json({ errors: [ 'You must be logged in to access this resource.' ] })
+            }
+            next()
+        }
+    )
+}
 
-If you access a route from a browser and experience a CORS problem, in other words, your browser stops at the
-OPTIONS request, you need to add a route for that method too. You need to write a method in your controller class to 
-handle the same route but for OPTIONS method, it can have empty body and no parameters though.
+function authorizeRole(role: string) {
+    return withMiddleware(
+        (req, res, next) => {
+            if (!req.user.roles.includes(role)) {
+                res.status(403).json({ errors: [ 'Get out.' ] })
+            }
+            next()
+         }
+    )
+}
 
-```ts
-@controller("/api/example")
-class ExampleController extends BaseHttpController {
-    @httpGet("/:id")
-    public get(req: Request, res: Response) {
-        return {};
+@controller('/api/user')
+@authenticate()
+class UserController {
+
+    @httpGet('/admin/:id')
+    @authorizeRole('ADMIN')
+    public getById(@requestParam('id') id: string) {
+        ...
     }
+}
+```
+You can also decorate controllers and handlers with middleware using BaseMiddleware identitifers: 
+```typescript
+class AuthenticationMiddleware extends BaseMiddleware {
+    handler(req, res, next) {
+        if (req.user === undefined) {
+            res.status(401).json({ errors: [ 'User is not logged in.' ] })
+        }
+    }
+}
 
-    @httpOptions("/:id")
-    public options() { }
+container.bind<BaseMiddleware>("AuthMiddleware").to(AuthenticationMiddleware)
+
+@controller('/api/users')
+@withMiddleware("AuthMiddleware")
+class UserController {
+    ...
 }
 ```
 

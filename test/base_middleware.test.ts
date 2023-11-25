@@ -57,7 +57,7 @@ describe('BaseMiddleware', () => {
       name: string;
     }
 
-    const logEntries: Array<string> = [];
+    const logEntries: string[] = [];
 
     @injectable()
     class LoggerMiddleware extends BaseMiddleware {

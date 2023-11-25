@@ -135,7 +135,7 @@ export class InversifyExpressServer {
       }
 
       this._container.bind(TYPE.Controller)
-        .to(constructor as new (...args: Array<never>) => unknown)
+        .to(constructor as new (...args: never[]) => unknown)
         .whenTargetNamed(name);
     });
 
@@ -159,7 +159,7 @@ export class InversifyExpressServer {
         );
 
         methodMetadata.forEach((metadata: ControllerMethodMetadata) => {
-          let paramList: Array<ParameterMetadata> = [];
+          let paramList: ParameterMetadata[] = [];
           if (parameterMetadata) {
             paramList = parameterMetadata[metadata.key] || [];
           }
@@ -184,8 +184,8 @@ export class InversifyExpressServer {
   }
 
   private resolveMidleware(
-    ...middleware: Array<Middleware>
-  ): Array<express.RequestHandler> {
+    ...middleware: Middleware[]
+  ): RequestHandler[] {
     return middleware.map(middlewareItem => {
       if (!this._container.isBound(middlewareItem)) {
         return middlewareItem as express.RequestHandler;
@@ -246,7 +246,7 @@ export class InversifyExpressServer {
   private handlerFactory(
     controllerName: string,
     key: string,
-    parameterMetadata: Array<ParameterMetadata>,
+    parameterMetadata: ParameterMetadata[],
   ): RequestHandler {
     return async (
       req: Request,
@@ -328,9 +328,9 @@ export class InversifyExpressServer {
     req: Request,
     res: Response,
     next: NextFunction,
-    params: Array<ParameterMetadata>,
+    params: ParameterMetadata[],
   ): ExtractedParameters {
-    const args: Array<unknown> = [];
+    const args: unknown[] = [];
     if (!params || !params.length) {
       return [req, res, next];
     }
