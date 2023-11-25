@@ -5,7 +5,7 @@ import type { DecoratorTarget, Middleware, ControllerMetadata, HandlerDecorator,
 
 export const injectHttpContext = inject(TYPE.HttpContext);
 
-export function controller(path: string, ...middleware: Array<Middleware>) {
+export function controller(path: string, ...middleware: Middleware[]) {
   return (target: NewableFunction): void => {
     const currentMetadata: ControllerMetadata = {
       middleware,
@@ -39,57 +39,64 @@ export function controller(path: string, ...middleware: Array<Middleware>) {
 
 export function all(
   path: string,
-  ...middleware: Array<Middleware>
+  ...middleware: Middleware[]
 ): HandlerDecorator {
   return httpMethod('all', path, ...middleware);
 }
 
 export function httpGet(
   path: string,
-  ...middleware: Array<Middleware>
+  ...middleware: Middleware[]
 ): HandlerDecorator {
   return httpMethod('get', path, ...middleware);
 }
 
 export function httpPost(
   path: string,
-  ...middleware: Array<Middleware>
+  ...middleware: Middleware[]
 ): HandlerDecorator {
   return httpMethod('post', path, ...middleware);
 }
 
 export function httpPut(
   path: string,
-  ...middleware: Array<Middleware>
+  ...middleware: Middleware[]
 ): HandlerDecorator {
   return httpMethod('put', path, ...middleware);
 }
 
 export function httpPatch(
   path: string,
-  ...middleware: Array<Middleware>
+  ...middleware: Middleware[]
 ): HandlerDecorator {
   return httpMethod('patch', path, ...middleware);
 }
 
 export function httpHead(
   path: string,
-  ...middleware: Array<Middleware>
+  ...middleware: Middleware[]
 ): HandlerDecorator {
   return httpMethod('head', path, ...middleware);
 }
 
 export function httpDelete(
   path: string,
-  ...middleware: Array<Middleware>
+  ...middleware: Middleware[]
 ): HandlerDecorator {
   return httpMethod('delete', path, ...middleware);
+}
+
+export function httpOptions(
+  path: string,
+  ...middleware: Middleware[]
+): HandlerDecorator {
+  return httpMethod('options', path, ...middleware);
 }
 
 export function httpMethod(
   method: keyof typeof HTTP_VERBS_ENUM,
   path: string,
-  ...middleware: Array<Middleware>
+  ...middleware: Middleware[]
 ): HandlerDecorator {
   return (target: DecoratorTarget, key: string): void => {
     const metadata: ControllerMethodMetadata = {
