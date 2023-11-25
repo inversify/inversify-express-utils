@@ -52,7 +52,6 @@
       }
     ],
     // Typescript Specific Rules From This Point On
-    "typescript-sort-keys/interface": 2,
     "typescript-sort-keys/string-enum": 0,
     "@typescript-eslint/explicit-function-return-type": 2,
     "@typescript-eslint/no-explicit-any": 2,
