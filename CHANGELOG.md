@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [6.4.7]
+
+### Fixed
+- Updated `inversify` and `express` dependencies to be peer dependnecies as stated in the docs.
+
 ## [6.4.4]
 
 ### Added
