@@ -273,6 +273,7 @@ export class InversifyExpressServer {
           const httpResponseMessage = await value.executeAsync();
           await this.handleHttpResponseMessage(httpResponseMessage, res);
         } else if (value instanceof Function) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           value();
         } else if (!res.headersSent) {
           if (value === undefined) {
