@@ -17,7 +17,7 @@
     "@typescript-eslint/eslint-plugin": "8.11.0",
     "@typescript-eslint/parser": "8.11.0",
     "async": "3.2.6",
-    "cookie-parser": "1.4.6",
+    "cookie-parser": "1.4.7",
     "eslint": "8.57.0",
     "eslint-plugin-import": "2.31.0",
     "jest": "29.7.0",
