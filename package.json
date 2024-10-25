@@ -61,5 +61,5 @@
     "update": "updates --update --minor && (git diff-files --quiet package.json || (rimraf package-lock.json node_modules && npm install))",
     "postupdate": "git diff-files --quiet package-lock.json || npm test"
   },
-  "version": "6.4.6"
+  "version": "6.4.7"
 }
