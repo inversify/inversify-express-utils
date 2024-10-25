@@ -6,28 +6,28 @@
   "dependencies": {
     "express": "4.18.2",
     "http-status-codes": "2.3.0",
-    "inversify": "6.0.2"
+    "inversify": "6.0.3"
   },
   "description": "Some utilities for the development of express applications with Inversify",
   "devDependencies": {
     "@types/async": "3.2.24",
-    "@types/cookie-parser": "1.4.6",
+    "@types/cookie-parser": "1.4.7",
     "@types/express": "4.17.21",
-    "@types/jest": "29.5.10",
+    "@types/jest": "29.5.14",
     "@types/node": "20.10.0",
-    "@types/supertest": "2.0.16",
-    "@typescript-eslint/eslint-plugin": "6.12.0",
-    "@typescript-eslint/parser": "6.12.0",
-    "async": "3.2.5",
+    "@types/supertest": "6.0.2",
+    "@typescript-eslint/eslint-plugin": "8.11.0",
+    "@typescript-eslint/parser": "8.11.0",
+    "async": "3.2.6",
     "cookie-parser": "1.4.6",
-    "eslint": "8.54.0",
-    "eslint-plugin-import": "2.29.0",
+    "eslint": "8.57.0",
+    "eslint-plugin-import": "2.31.0",
     "jest": "29.7.0",
     "publish-please": "5.5.2",
-    "reflect-metadata": "0.1.13",
+    "reflect-metadata": "0.2.2",
     "supertest": "6.3.3",
     "ts-jest": "29.1.1",
-    "typescript": "5.3.2",
+    "typescript": "5.6.3",
     "updates": "15.0.4"
   },
   "homepage": "https://github.com/inversify/inversify-express-utils#readme",
@@ -55,10 +55,9 @@
     "test:watch": "jest --watch",
     "pretest": "eslint ./",
     "publish-please": "publish-please",
-    "prepublish": "publish-please guard",
+    "prepublish": "npm run build && publish-please guard",
     "update": "updates --update --minor && (git diff-files --quiet package.json || (rimraf package-lock.json node_modules && npm install))",
     "postupdate": "git diff-files --quiet package-lock.json || npm test"
   },
-  "types": "./lib/index.d.ts",
-  "version": "6.4.5"
+  "version": "6.4.6"
 }

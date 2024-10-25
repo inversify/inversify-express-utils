@@ -271,10 +271,10 @@ describe('BaseMiddleware', () => {
 function run(
   parallelRuns: number,
   test: (executionId: number) => PromiseLike<unknown>,
-  done: (error?: Error | null | undefined) => void,
+  done: (error?: Error | null) => void,
 ) {
   const testTaskNo = (id: number) =>
-    (cb: (err?: Error | null | undefined) => void) => {
+    (cb: (err?: Error | null) => void) => {
       test(id).then(cb as (value: unknown) => void | PromiseLike<void>, cb);
     };
 
