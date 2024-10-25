@@ -11,7 +11,7 @@
     "url": "git+https://github.com/inversify/inversify-express-utils.git"
   },
   "scripts": {
-    "build": "npm run clean && npm run build:lib && npm run build:es && npm run build:es6",
+    "build": "npm run build:lib && npm run build:es && npm run build:es6",
     "build:lib": "tsc -p src/tsconfig.json",
     "build:es": "tsc -p src/tsconfig-es.json",
     "build:es6": "tsc -p src/tsconfig-es6.json",
