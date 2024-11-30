@@ -1,6 +1,6 @@
 {
   "name": "inversify-express-utils",
-  "version": "6.4.7",
+  "version": "6.4.8",
   "author": "Cody Simms",
   "description": "Some utilities for the development of express applications with Inversify",
   "license": "MIT",
