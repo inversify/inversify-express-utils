@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [6.4.8]
+
+### Fixed
+
 -   Fixed can't set headers after they are sent (#255 / #412)
 
 ## [6.4.7]
