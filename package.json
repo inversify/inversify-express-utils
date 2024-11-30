@@ -61,6 +61,6 @@
   },
   "peerDependencies": {
     "express": "^4.21.1",
-    "inversify": "^6.1.0"
+    "inversify": "^6.0.3"
   }
 }
