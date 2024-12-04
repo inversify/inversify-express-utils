@@ -12,12 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+-   Fixed wrong emited typescript delclaration files (#1668).
 
 ## [6.4.8]
 
 ### Fixed
 
--   Fixed can't set headers after they are sent (#255 / #412)
+-   Fixed can't set headers after they are sent (#255 / #412).
 
 ## [6.4.7]
 
@@ -31,8 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
--   Update dependencies (`minimist`, `json5`, `@babel/traverse`, `tough-cookie`, `ansi-regex`, `cookiejar`, `express`, `decode-uri-component`)
+-   Update dependencies (`minimist`, `json5`, `@babel/traverse`, `tough-cookie`, `ansi-regex`, `cookiejar`, `express`, `decode-uri-component`).
 
 ### Fixed
 
--   Change JsonContent to return object rather than string (#379 / #378)
+-   Change JsonContent to return object rather than string (#379 / #378).

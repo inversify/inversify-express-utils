@@ -3,7 +3,11 @@ import { TYPE, METADATA_KEY, PARAMETER_TYPE, HTTP_VERBS_ENUM, } from './constant
 import type { DecoratorTarget, Middleware, ControllerMetadata, HandlerDecorator, ControllerMethodMetadata, ControllerParameterMetadata, ParameterMetadata, MiddlewareMetaData } from './interfaces';
 import { getMiddlewareMetadata, getOrCreateMetadata } from './utils';
 
-export const injectHttpContext = inject(TYPE.HttpContext);
+export const injectHttpContext: <T = unknown>(
+  target: DecoratorTarget,
+  targetKey?: string | symbol,
+  indexOrPropertyDescriptor?: number | TypedPropertyDescriptor<T>
+) => void = inject(TYPE.HttpContext);
 
 function defineMiddlewareMetadata(
   target: DecoratorTarget,
