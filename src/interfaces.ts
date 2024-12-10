@@ -24,7 +24,7 @@ export interface MiddlewareMetaData {
 }
 
 export type ControllerHandler = (...params: unknown[]) => unknown;
-export type Controller = Record<string, ControllerHandler>;
+export interface Controller {}
 
 export interface ControllerMetadata {
   middleware: Middleware[];
