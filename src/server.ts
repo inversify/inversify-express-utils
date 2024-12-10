@@ -261,7 +261,7 @@ export class InversifyExpressServer {
 
                 // invoke controller's action
                 const value = await (
-                    httpContext.container.getNamed<Controller>(TYPE.Controller, controllerName)[
+                    httpContext.container.getNamed<Record<string, ControllerHandler>>(TYPE.Controller, controllerName)[
                         key
                     ] as ControllerHandler
                 )(...args);
