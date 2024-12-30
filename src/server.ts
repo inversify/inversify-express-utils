@@ -206,10 +206,10 @@ export class InversifyExpressServer {
             const middlewareInstance = this._container.get<MiddlewareInstance>(middlewareItem);
 
             if (middlewareInstance instanceof BaseMiddleware) {
-                return (req: Request, res: Response, next: NextFunction): void => {
+                return (req: Request, res: Response, next: NextFunction): void | Promise<void> => {
                     const mReq = this._container.get<BaseMiddleware>(middlewareItem);
                     mReq.httpContext = this._getHttpContext(req);
-                    void mReq.handler(req, res, next);
+                    return mReq.handler(req, res, next);
                 };
             }
 
