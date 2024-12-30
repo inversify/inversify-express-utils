@@ -18,5 +18,5 @@ export abstract class BaseMiddleware implements BaseMiddleware {
     req: Request,
     res: Response,
     next: NextFunction
-  ): void;
+  ): void | Promise<void>;
 }

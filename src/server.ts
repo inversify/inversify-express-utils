@@ -209,7 +209,7 @@ export class InversifyExpressServer {
                 return (req: Request, res: Response, next: NextFunction): void => {
                     const mReq = this._container.get<BaseMiddleware>(middlewareItem);
                     mReq.httpContext = this._getHttpContext(req);
-                    mReq.handler(req, res, next);
+                    void mReq.handler(req, res, next);
                 };
             }
 
