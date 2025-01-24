@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "outDir": "../es",
-    "target": "ES2015"
-  },
-  "extends": "../tsconfig.json"
-}
