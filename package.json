@@ -4,8 +4,14 @@
   "author": "Cody Simms",
   "description": "Some utilities for the development of express applications with Inversify",
   "license": "MIT",
-  "main": "lib/index.js",
-  "module": "es/index.js",
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib/esm/index.js",
+      "require": "./lib/cjs/index.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/inversify/inversify-express-utils.git"
