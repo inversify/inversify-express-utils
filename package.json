@@ -11,20 +11,17 @@
     "url": "git+https://github.com/inversify/inversify-express-utils.git"
   },
   "scripts": {
-    "build": "npm run build:lib && npm run build:es && npm run build:es6",
-    "build:lib": "tsc -p src/tsconfig.json",
-    "build:es": "tsc -p src/tsconfig-es.json",
-    "build:es6": "tsc -p src/tsconfig-es6.json",
-    "clean": "rm -r es es6 lib",
-    "eslint:fix": "eslint --fix ./",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc --build tsconfig.cjs.json && node ./scripts/writeCommonJsPackageJson.mjs ./lib/cjs",
+    "build:esm": "rollup -c ./rollup.config.mjs && node ./scripts/writeEsmPackageJson.mjs ./lib/esm",
+    "build:clean": "rimraf lib",
+    "format": "prettier --write ./src/**/*.ts",
+    "lint": "eslint ./src",
+    "prebuild": "npm run build:clean",
+    "prepublish": "npm run build",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch",
-    "pretest": "eslint ./",
-    "publish-please": "publish-please",
-    "prepublish": "npm run build && publish-please guard",
-    "update": "updates --update --minor && (git diff-files --quiet package.json || (rimraf package-lock.json node_modules && npm install))",
-    "postupdate": "git diff-files --quiet package-lock.json || npm test"
+    "test:watch": "jest --watch"
   },
   "bugs": {
     "url": "https://github.com/inversify/inversify-express-utils/issues"
@@ -39,28 +36,35 @@
     "http-status-codes": "2.3.0"
   },
   "devDependencies": {
-    "@types/async": "3.2.24",
+    "@eslint/js": "9.18.0",
+    "@jest/globals": "29.7.0",
+    "@rollup/plugin-terser": "0.4.4",
+    "@rollup/plugin-typescript": "12.1.2",
     "@types/cookie-parser": "1.4.7",
     "@types/express": "^4.17.21",
-    "@types/jest": "29.5.14",
-    "@types/node": "20.17.1",
+    "@types/node": "22.10.7",
     "@types/supertest": "6.0.2",
-    "@typescript-eslint/eslint-plugin": "8.11.0",
-    "@typescript-eslint/parser": "8.11.0",
-    "async": "3.2.6",
+    "@typescript-eslint/eslint-plugin": "8.20.0",
+    "@typescript-eslint/parser": "8.20.0",
     "cookie-parser": "1.4.7",
-    "eslint": "9.12.0",
-    "eslint-plugin-import": "2.31.0",
+    "eslint": "9.18.0",
+    "eslint-config-prettier": "10.0.1",
+    "eslint-plugin-prettier": "5.2.2",
+    "eslint-plugin-simple-import-sort": "12.1.1",
     "jest": "29.7.0",
-    "publish-please": "5.5.2",
+    "prettier": "3.4.2",
     "reflect-metadata": "0.2.2",
+    "rimraf": "6.0.1",
+    "rollup-plugin-dts": "6.1.1",
     "supertest": "6.3.4",
+    "ts-loader": "9.5.2",
     "ts-jest": "29.2.5",
     "typescript": "5.6.3",
-    "updates": "15.3.1"
+    "typescript-eslint": "8.20.0"
   },
   "peerDependencies": {
     "express": "^4.21.1",
-    "inversify": "^6.0.3"
+    "inversify": "^6.0.3",
+    "reflect-metadata": "~0.2.2"
   }
 }

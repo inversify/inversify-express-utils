@@ -1,42 +1,47 @@
 import type { OutgoingHttpHeaders } from 'node:http';
+
+import { StatusCodes } from 'http-status-codes';
+
 import { HttpContent } from './content/httpContent';
+
+const MAX_STATUS_CODE: number = 999;
 
 export class HttpResponseMessage {
   private _content!: HttpContent;
 
   private _headers: OutgoingHttpHeaders = {};
 
-  public get headers(): OutgoingHttpHeaders {
-    return this._headers;
-  }
+  private _statusCode!: number;
 
-  public set headers(headers: OutgoingHttpHeaders) {
-    this._headers = headers;
+  constructor(statusCode: number = StatusCodes.OK) {
+    this.statusCode = statusCode;
   }
 
   public get content(): HttpContent {
     return this._content;
   }
 
-  public set content(value: HttpContent) {
-    this._content = value;
+  public get headers(): OutgoingHttpHeaders {
+    return this._headers;
   }
-
-  private _statusCode!: number;
 
   public get statusCode(): number {
     return this._statusCode;
   }
 
+  public set content(value: HttpContent) {
+    this._content = value;
+  }
+
+  public set headers(headers: OutgoingHttpHeaders) {
+    this._headers = headers;
+  }
+
   public set statusCode(code: number) {
-    if (code < 0 || code > 999) {
-      throw new Error(`${code} is not a valid status code`);
+    if (code < 0 || code > MAX_STATUS_CODE) {
+      throw new Error(`${code.toString()} is not a valid status code`);
     }
 
     this._statusCode = code;
-  }
-
-  constructor(statusCode = 200) {
-    this.statusCode = statusCode;
   }
 }

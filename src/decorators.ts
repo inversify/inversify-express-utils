@@ -1,12 +1,27 @@
-import { inject, injectable, decorate } from 'inversify';
-import { TYPE, METADATA_KEY, PARAMETER_TYPE, HTTP_VERBS_ENUM, } from './constants';
-import type { DecoratorTarget, Middleware, ControllerMetadata, HandlerDecorator, ControllerMethodMetadata, ControllerParameterMetadata, ParameterMetadata, MiddlewareMetaData } from './interfaces';
+import { decorate, inject, injectable } from 'inversify';
+
+import {
+  HTTP_VERBS_ENUM,
+  METADATA_KEY,
+  PARAMETER_TYPE,
+  TYPE,
+} from './constants';
+import type {
+  ControllerMetadata,
+  ControllerMethodMetadata,
+  ControllerParameterMetadata,
+  DecoratorTarget,
+  HandlerDecorator,
+  Middleware,
+  MiddlewareMetaData,
+  ParameterMetadata,
+} from './interfaces';
 import { getMiddlewareMetadata, getOrCreateMetadata } from './utils';
 
 export const injectHttpContext: <T = unknown>(
   target: DecoratorTarget,
   targetKey?: string | symbol,
-  indexOrPropertyDescriptor?: number | TypedPropertyDescriptor<T>
+  indexOrPropertyDescriptor?: number | TypedPropertyDescriptor<T>,
 ) => void = inject(TYPE.HttpContext);
 
 function defineMiddlewareMetadata(
@@ -16,7 +31,8 @@ function defineMiddlewareMetadata(
 ): void {
   // We register decorated middleware meteadata in a map, e.g. { "controller": [ middleware ] }
   const middlewareMap: MiddlewareMetaData = getOrCreateMetadata(
-    METADATA_KEY.middleware, target,
+    METADATA_KEY.middleware,
+    target,
     {},
   );
 
@@ -31,16 +47,12 @@ function defineMiddlewareMetadata(
 export function withMiddleware(...middleware: Middleware[]) {
   return function (
     target: DecoratorTarget | NewableFunction,
-    methodName?: string
+    methodName?: string,
   ): void {
-    if (methodName) {
+    if (methodName !== undefined) {
       defineMiddlewareMetadata(target, methodName, ...middleware);
     } else if (isNewableFunction(target)) {
-      defineMiddlewareMetadata(
-        target.constructor,
-        target.name,
-        ...middleware
-      );
+      defineMiddlewareMetadata(target.constructor, target.name, ...middleware);
     }
   };
 }
@@ -52,9 +64,9 @@ function isNewableFunction(target: unknown): target is NewableFunction {
 export function controller(path: string, ...middleware: Middleware[]) {
   return (target: NewableFunction): void => {
     // Get the list of middleware registered with @middleware() decorators
-    const decoratedMiddleware = getMiddlewareMetadata(
+    const decoratedMiddleware: Middleware[] = getMiddlewareMetadata(
       target.constructor,
-      target.name
+      target.name,
     );
 
     const currentMetadata: ControllerMetadata = {
@@ -72,18 +84,17 @@ export function controller(path: string, ...middleware: Middleware[]) {
     // We attach metadata to the Reflect object itself to avoid
     // declaring additional globals. Also, the Reflect is available
     // in both node and web browsers.
-    const previousMetadata: ControllerMetadata[] = Reflect.getMetadata(
-      METADATA_KEY.controller,
-      Reflect,
-    ) as ControllerMetadata[] || [];
+    const previousMetadata: ControllerMetadata[] =
+      (Reflect.getMetadata(METADATA_KEY.controller, Reflect) as
+        | ControllerMetadata[]
+        | undefined) ?? [];
 
-    const newMetadata = [currentMetadata, ...previousMetadata];
+    const newMetadata: ControllerMetadata[] = [
+      currentMetadata,
+      ...previousMetadata,
+    ];
 
-    Reflect.defineMetadata(
-      METADATA_KEY.controller,
-      newMetadata,
-      Reflect,
-    );
+    Reflect.defineMetadata(METADATA_KEY.controller, newMetadata, Reflect);
   };
 }
 
@@ -91,65 +102,68 @@ export function all(
   path: string,
   ...middleware: Middleware[]
 ): HandlerDecorator {
-  return httpMethod('all', path, ...middleware);
+  return httpMethod(HTTP_VERBS_ENUM.all, path, ...middleware);
 }
 
 export function httpGet(
   path: string,
   ...middleware: Middleware[]
 ): HandlerDecorator {
-  return httpMethod('get', path, ...middleware);
+  return httpMethod(HTTP_VERBS_ENUM.get, path, ...middleware);
 }
 
 export function httpPost(
   path: string,
   ...middleware: Middleware[]
 ): HandlerDecorator {
-  return httpMethod('post', path, ...middleware);
+  return httpMethod(HTTP_VERBS_ENUM.post, path, ...middleware);
 }
 
 export function httpPut(
   path: string,
   ...middleware: Middleware[]
 ): HandlerDecorator {
-  return httpMethod('put', path, ...middleware);
+  return httpMethod(HTTP_VERBS_ENUM.put, path, ...middleware);
 }
 
 export function httpPatch(
   path: string,
   ...middleware: Middleware[]
 ): HandlerDecorator {
-  return httpMethod('patch', path, ...middleware);
+  return httpMethod(HTTP_VERBS_ENUM.patch, path, ...middleware);
 }
 
 export function httpHead(
   path: string,
   ...middleware: Middleware[]
 ): HandlerDecorator {
-  return httpMethod('head', path, ...middleware);
+  return httpMethod(HTTP_VERBS_ENUM.head, path, ...middleware);
 }
 
 export function httpDelete(
   path: string,
   ...middleware: Middleware[]
 ): HandlerDecorator {
-  return httpMethod('delete', path, ...middleware);
+  return httpMethod(HTTP_VERBS_ENUM.delete, path, ...middleware);
 }
 
 export function httpOptions(
   path: string,
   ...middleware: Middleware[]
 ): HandlerDecorator {
-  return httpMethod('options', path, ...middleware);
+  return httpMethod(HTTP_VERBS_ENUM.options, path, ...middleware);
 }
 
 export function httpMethod(
-  method: keyof typeof HTTP_VERBS_ENUM,
+  method: HTTP_VERBS_ENUM,
   path: string,
   ...middleware: Middleware[]
 ): HandlerDecorator {
   return (target: DecoratorTarget, key: string): void => {
-    const decoratedMiddleware = getMiddlewareMetadata(target, key);
+    const decoratedMiddleware: Middleware[] = getMiddlewareMetadata(
+      target,
+      key,
+    );
 
     const metadata: ControllerMethodMetadata = {
       key,
@@ -162,15 +176,12 @@ export function httpMethod(
     let metadataList: ControllerMethodMetadata[] = [];
 
     if (
-      !Reflect.hasOwnMetadata(
-        METADATA_KEY.controllerMethod,
-        target.constructor
-      )
+      !Reflect.hasOwnMetadata(METADATA_KEY.controllerMethod, target.constructor)
     ) {
       Reflect.defineMetadata(
         METADATA_KEY.controllerMethod,
         metadataList,
-        target.constructor
+        target.constructor,
       );
     } else {
       metadataList = Reflect.getOwnMetadata(
@@ -183,40 +194,37 @@ export function httpMethod(
   };
 }
 
-export const request: () => ParameterDecorator =
-  paramDecoratorFactory(PARAMETER_TYPE.REQUEST);
+export const request: () => ParameterDecorator = paramDecoratorFactory(
+  PARAMETER_TYPE.REQUEST,
+);
 
-export const response: () => ParameterDecorator =
-  paramDecoratorFactory(PARAMETER_TYPE.RESPONSE);
+export const response: () => ParameterDecorator = paramDecoratorFactory(
+  PARAMETER_TYPE.RESPONSE,
+);
 
 export const requestParam: (paramName?: string) => ParameterDecorator =
-  paramDecoratorFactory(
-    PARAMETER_TYPE.PARAMS
-  );
+  paramDecoratorFactory(PARAMETER_TYPE.PARAMS);
 
 export const queryParam: (queryParamName?: string) => ParameterDecorator =
-  paramDecoratorFactory(
-    PARAMETER_TYPE.QUERY
-  );
+  paramDecoratorFactory(PARAMETER_TYPE.QUERY);
 
-export const requestBody: () => ParameterDecorator =
-  paramDecoratorFactory(PARAMETER_TYPE.BODY);
+export const requestBody: () => ParameterDecorator = paramDecoratorFactory(
+  PARAMETER_TYPE.BODY,
+);
 
 export const requestHeaders: (headerName?: string) => ParameterDecorator =
-  paramDecoratorFactory(
-    PARAMETER_TYPE.HEADERS
-  );
+  paramDecoratorFactory(PARAMETER_TYPE.HEADERS);
 
 export const cookies: (cookieName?: string) => ParameterDecorator =
-  paramDecoratorFactory(
-    PARAMETER_TYPE.COOKIES
-  );
+  paramDecoratorFactory(PARAMETER_TYPE.COOKIES);
 
-export const next: () => ParameterDecorator =
-  paramDecoratorFactory(PARAMETER_TYPE.NEXT);
+export const next: () => ParameterDecorator = paramDecoratorFactory(
+  PARAMETER_TYPE.NEXT,
+);
 
-export const principal: () => ParameterDecorator =
-  paramDecoratorFactory(PARAMETER_TYPE.PRINCIPAL);
+export const principal: () => ParameterDecorator = paramDecoratorFactory(
+  PARAMETER_TYPE.PRINCIPAL,
+);
 
 function paramDecoratorFactory(
   parameterType: PARAMETER_TYPE,
@@ -225,14 +233,11 @@ function paramDecoratorFactory(
     params(parameterType, name);
 }
 
-export function params(
-  type: PARAMETER_TYPE,
-  parameterName?: string | symbol
-) {
+export function params(type: PARAMETER_TYPE, parameterName?: string | symbol) {
   return (
     target: object,
     methodName: string | symbol | undefined,
-    index: number
+    index: number,
   ): void => {
     let metadataList: ControllerParameterMetadata = {};
     let parameterMetadataList: ParameterMetadata[] = [];
@@ -245,7 +250,7 @@ export function params(
     if (
       !Reflect.hasOwnMetadata(
         METADATA_KEY.controllerParameter,
-        target.constructor
+        target.constructor,
       )
     ) {
       parameterMetadataList.unshift(parameterMetadata);
@@ -263,7 +268,7 @@ export function params(
     Reflect.defineMetadata(
       METADATA_KEY.controllerParameter,
       metadataList,
-      target.constructor
+      target.constructor,
     );
   };
 }

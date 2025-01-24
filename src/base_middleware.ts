@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { injectable, interfaces as inversifyInterfaces } from 'inversify';
+
 import type { HttpContext } from './interfaces';
 
 @injectable()
@@ -17,6 +18,6 @@ export abstract class BaseMiddleware implements BaseMiddleware {
   public abstract handler(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): void;
 }

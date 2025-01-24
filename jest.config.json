@@ -13,7 +13,7 @@
   ],
   "rootDir": ".",
   "setupFilesAfterEnv": [
-    "<rootDir>/test/helpers/jest.setup.ts"
+    "<rootDir>/src/test/helpers/jest.setup.ts"
   ],
   "testEnvironment": "node",
   "testPathIgnorePatterns": [

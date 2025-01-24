@@ -1,15 +1,24 @@
-import { Container, injectable, inject } from 'inversify';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { beforeEach, describe, expect, it } from '@jest/globals';
+import { Container, inject, injectable } from 'inversify';
 import supertest from 'supertest';
-import { InversifyExpressServer, controller, httpGet, BaseHttpController, Principal, AuthProvider, } from '../src/index';
-import { cleanUpMetadata } from '../src/utils';
+
+import {
+  AuthProvider,
+  BaseHttpController,
+  controller,
+  httpGet,
+  InversifyExpressServer,
+  Principal,
+} from '../index';
+import { cleanUpMetadata } from '../utils';
 
 describe('AuthProvider', () => {
-  beforeEach(done => {
+  beforeEach(() => {
     cleanUpMetadata();
-    done();
   });
 
-  it('Should be able to access current user via HttpContext', done => {
+  it('Should be able to access current user via HttpContext', async () => {
     interface SomeDependency {
       name: string;
     }
@@ -20,15 +29,15 @@ describe('AuthProvider', () => {
         this.details = details;
       }
 
-      public isAuthenticated() {
+      public async isAuthenticated() {
         return Promise.resolve<boolean>(true);
       }
 
-      public isResourceOwner(resourceId: unknown) {
+      public async isResourceOwner(resourceId: unknown) {
         return Promise.resolve<boolean>(resourceId === 1111);
       }
 
-      public isInRole(role: string) {
+      public async isInRole(role: string) {
         return Promise.resolve<boolean>(role === 'admin');
       }
     }
@@ -38,8 +47,8 @@ describe('AuthProvider', () => {
       @inject('SomeDependency')
       private readonly _someDependency!: SomeDependency;
 
-      public getUser() {
-        const principal = new PrincipalClass({
+      public async getUser() {
+        const principal: PrincipalClass = new PrincipalClass({
           email: `${this._someDependency.name}@test.com`,
         });
         return Promise.resolve(principal);
@@ -57,23 +66,29 @@ describe('AuthProvider', () => {
 
       @httpGet('/')
       public async getTest() {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (this.httpContext.user !== null) {
-          const { email } = this.httpContext.user.details as { email: string };
-          const { name } = this._someDependency;
-          const isAuthenticated = await this.httpContext.user.isAuthenticated();
+          const { email }: { email: string } = this.httpContext.user
+            .details as { email: string };
+          const { name }: SomeDependency = this._someDependency;
+          const isAuthenticated: boolean =
+            await this.httpContext.user.isAuthenticated();
+
           expect(isAuthenticated).toEqual(true);
+
           return `${email} & ${name}`;
         }
         return null;
       }
     }
 
-    const container = new Container();
+    const container: Container = new Container();
 
-    container.bind<SomeDependency>('SomeDependency')
+    container
+      .bind<SomeDependency>('SomeDependency')
       .toConstantValue({ name: 'SomeDependency!' });
 
-    const server = new InversifyExpressServer(
+    const server: InversifyExpressServer = new InversifyExpressServer(
       container,
       null,
       null,
@@ -81,8 +96,8 @@ describe('AuthProvider', () => {
       CustomAuthProvider,
     );
 
-    void supertest(server.build())
+    await supertest(server.build())
       .get('/')
-      .expect(200, 'SomeDependency!@test.com & SomeDependency!', done);
+      .expect(200, 'SomeDependency!@test.com & SomeDependency!');
   });
 });
