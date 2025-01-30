@@ -1,5 +1,4 @@
 import type { OutgoingHttpHeaders } from 'node:http';
-import type { Readable } from 'node:stream';
 
 export abstract class HttpContent {
   private readonly _headers: OutgoingHttpHeaders = {};
@@ -8,7 +7,5 @@ export abstract class HttpContent {
     return this._headers;
   }
 
-  public abstract readAsync(): Promise<
-    string | Record<string, unknown> | Record<string, unknown>[] | Readable
-  >;
+  public abstract readAsync(): Promise<unknown>;
 }

@@ -2,11 +2,9 @@ import { JsonContent } from '../content/jsonContent';
 import { HttpResponseMessage } from '../httpResponseMessage';
 import type { IHttpActionResult } from '../interfaces';
 
-export class JsonResult<T extends Record<string, unknown>>
-  implements IHttpActionResult
-{
+export class JsonResult implements IHttpActionResult {
   constructor(
-    public readonly json: T | T[],
+    public readonly json: unknown,
     public readonly statusCode: number,
   ) {}
 
@@ -14,7 +12,7 @@ export class JsonResult<T extends Record<string, unknown>>
     const response: HttpResponseMessage = new HttpResponseMessage(
       this.statusCode,
     );
-    response.content = new JsonContent<T>(this.json);
+    response.content = new JsonContent(this.json);
 
     return response;
   }
