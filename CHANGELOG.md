@@ -11,14 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Updated `BaseMiddleware.handler` to allow async handlers.
+- Updated `Middleware` to allow include any `ServiceIdentifier`.
 
 ### Fixed
 
 ## [6.4.10]
-
-### Added
-
-### Changed
 
 ### Fixed
 -   Fixed `Controller` without wrong constraints (#417).

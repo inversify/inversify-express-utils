@@ -25,7 +25,7 @@ export type DecoratorTarget<T = unknown> =
   | ConstructorFunction<T>
   | Prototype<T>;
 
-export type Middleware = string | symbol | RequestHandler;
+export type Middleware = inversifyInterfaces.ServiceIdentifier | RequestHandler;
 
 export interface MiddlewareMetaData {
   [identifier: string]: Middleware[];
