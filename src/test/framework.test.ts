@@ -4,6 +4,7 @@ import express, {
   Application,
   NextFunction,
   Request,
+  RequestHandler,
   Response,
   Router,
 } from 'express';
@@ -31,7 +32,7 @@ describe('Unit Test: InversifyExpressServer', () => {
   });
 
   it('should call the configFn before the errorConfigFn', () => {
-    const middleware: Middleware = (
+    const middleware: Middleware & RequestHandler = (
       _req: Request,
       _res: Response,
       _next: NextFunction,
