@@ -4,7 +4,7 @@ import { JsonContent } from '../../content/jsonContent';
 
 describe('JsonContent', () => {
   it('should have application/json as the default media type', () => {
-    const content: JsonContent<Record<string, unknown>> = new JsonContent({});
+    const content: JsonContent = new JsonContent({});
     expect(content.headers['content-type']).toBe('application/json');
   });
 

@@ -41,9 +41,7 @@ describe('ActionResults', () => {
         await actionResult.executeAsync();
 
       expect(responseMessage.statusCode).toBe(StatusCodes.OK);
-      expect(await responseMessage.content.readAsync()).toBe(
-        JSON.stringify(content),
-      );
+      expect(await responseMessage.content.readAsync()).toStrictEqual(content);
     });
   });
 

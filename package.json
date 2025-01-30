@@ -52,6 +52,7 @@
     "@types/supertest": "6.0.2",
     "@typescript-eslint/eslint-plugin": "8.20.0",
     "@typescript-eslint/parser": "8.20.0",
+    "body-parser": "1.20.3",
     "cookie-parser": "1.4.7",
     "eslint": "9.18.0",
     "eslint-config-prettier": "10.0.1",

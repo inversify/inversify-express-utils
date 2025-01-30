@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
+import { JsonContent } from '../content/jsonContent';
 import { StringContent } from '../content/stringContent';
 import { HttpResponseMessage } from '../httpResponseMessage';
 import type { IHttpActionResult } from '../interfaces';
@@ -11,7 +12,12 @@ export class OkNegotiatedContentResult<T> implements IHttpActionResult {
     const response: HttpResponseMessage = new HttpResponseMessage(
       StatusCodes.OK,
     );
-    response.content = new StringContent(JSON.stringify(this.content));
+
+    if (typeof this.content === 'string') {
+      response.content = new StringContent(this.content);
+    } else {
+      response.content = new JsonContent(this.content);
+    }
 
     return response;
   }

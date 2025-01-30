@@ -12,8 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated `BaseMiddleware.handler` to allow async handlers.
 - Updated `Middleware` to allow include any `ServiceIdentifier`.
+- Updated `JsonContent` with no generic.
 
 ### Fixed
+- Updated `BaseController.ok` to no longer return `text/plain` responses when non string content is passed.
 
 ## [6.4.10]
 
