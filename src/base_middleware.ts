@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { injectable, interfaces as inversifyInterfaces } from 'inversify';
+
 import type { HttpContext } from './interfaces';
 
 @injectable()

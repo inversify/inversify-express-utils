@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/typedef */
+/* eslint-disable @typescript-eslint/naming-convention */
 export const TYPE = {
   AuthProvider: Symbol.for('AuthProvider'),
   Controller: Symbol.for('Controller'),
@@ -21,27 +23,28 @@ export enum PARAMETER_TYPE {
   HEADERS,
   COOKIES,
   NEXT,
-  PRINCIPAL
+  PRINCIPAL,
 }
 
 export enum HTTP_VERBS_ENUM {
-  all = 'ALL',
-  connect = 'CONNECT',
-  delete = 'DELETE',
-  get = 'GET',
-  head = 'HEAD',
-  options = 'OPTIONS',
-  patch = 'PATCH',
-  post = 'POST',
-  propfind = 'PROPFIND',
-  put = 'PUT',
-  trace = 'TRACE',
+  all = 'all',
+  connect = 'connect',
+  delete = 'delete',
+  get = 'get',
+  head = 'head',
+  options = 'options',
+  patch = 'patch',
+  post = 'post',
+  propfind = 'propfind',
+  put = 'put',
+  trace = 'trace',
 }
 
-export const DUPLICATED_CONTROLLER_NAME = (name: string): string => `Two controllers cannot have the same name: ${name}`;
+export const DUPLICATED_CONTROLLER_NAME: (name: string) => string = (
+  name: string,
+): string => `Two controllers cannot have the same name: ${name}`;
 
-export const NO_CONTROLLERS_FOUND = 'No controllers' +
-  'have been found! Please ensure that you have register' +
-  'at least one Controller.';
+export const NO_CONTROLLERS_FOUND: string =
+  'No controllers have been found! Please ensure that you have register at least one Controller.';
 
-export const DEFAULT_ROUTING_ROOT_PATH = '/';
+export const DEFAULT_ROUTING_ROOT_PATH: string = '/';

@@ -1,15 +1,26 @@
+import { beforeEach, describe, expect, it } from '@jest/globals';
 import { Container } from 'inversify';
-import { cleanUpMetadata } from '../src/utils';
-import { InversifyExpressServer, controller, httpGet, requestParam, httpPost, httpDelete, getRouteInfo, BaseHttpController } from '../src/index';
+
+import { BaseHttpController } from '../base_http_controller';
+import { getRouteInfo } from '../debug';
+import {
+  controller,
+  httpDelete,
+  httpGet,
+  httpPost,
+  requestParam,
+} from '../decorators';
+import { RouteInfo } from '../interfaces';
+import { InversifyExpressServer } from '../server';
+import { cleanUpMetadata } from '../utils';
 
 describe('Debug utils', () => {
-  beforeEach(done => {
+  beforeEach(() => {
     cleanUpMetadata();
-    done();
   });
 
   it('should be able to get router info', () => {
-    const container = new Container();
+    const container: Container = new Container();
 
     @controller('/api/user')
     class UserController extends BaseHttpController {
@@ -24,7 +35,7 @@ describe('Debug utils', () => {
       }
 
       @httpDelete('/:id')
-      public delete(@requestParam('id') id: string) {
+      public delete(@requestParam('id') _id: string) {
         return {};
       }
     }
@@ -42,20 +53,23 @@ describe('Debug utils', () => {
       }
 
       @httpDelete('/:id')
-      public delete(@requestParam('id') id: string) {
+      public delete(@requestParam('id') _id: string) {
         return {};
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/typedef
     const TYPES = {
       OrderController: OrderController.name,
       UserController: UserController.name,
     };
 
-    const server = new InversifyExpressServer(container);
+    const server: InversifyExpressServer = new InversifyExpressServer(
+      container,
+    );
     server.build();
 
-    const routeInfo = getRouteInfo(container);
+    const routeInfo: RouteInfo[] = getRouteInfo(container);
 
     expect(routeInfo[0]?.controller).toBe(TYPES.OrderController);
     expect(routeInfo[0]?.endpoints[0]?.route).toBe('GET /api/order/');
@@ -64,7 +78,7 @@ describe('Debug utils', () => {
     expect(routeInfo[0]?.endpoints[1]?.args).toBeUndefined();
     expect(routeInfo[0]?.endpoints[2]?.route).toBe('DELETE /api/order/:id');
 
-    const arg1 = routeInfo[0]?.endpoints[2]?.args;
+    const arg1: string[] | undefined = routeInfo[0]?.endpoints[2]?.args;
     if (arg1 !== undefined) {
       expect(arg1[0]).toBe('@requestParam id');
     } else {
@@ -78,7 +92,7 @@ describe('Debug utils', () => {
     expect(routeInfo[1]?.endpoints[1]?.args).toBeUndefined();
     expect(routeInfo[1]?.endpoints[2]?.route).toBe('DELETE /api/user/:id');
 
-    const arg2 = routeInfo[1]?.endpoints[2]?.args;
+    const arg2: string[] | undefined = routeInfo[1]?.endpoints[2]?.args;
     if (arg2 !== undefined) {
       expect(arg2[0]).toBe('@requestParam id');
     } else {
@@ -87,7 +101,7 @@ describe('Debug utils', () => {
   });
 
   it('should be able to handle missig parameter metadata', () => {
-    const container = new Container();
+    const container: Container = new Container();
 
     @controller('/api/order')
     class OrderController extends BaseHttpController {
@@ -102,14 +116,17 @@ describe('Debug utils', () => {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/typedef
     const TYPES = {
       OrderController: OrderController.name,
     };
 
-    const server = new InversifyExpressServer(container);
+    const server: InversifyExpressServer = new InversifyExpressServer(
+      container,
+    );
     server.build();
 
-    const routeInfo = getRouteInfo(container);
+    const routeInfo: RouteInfo[] = getRouteInfo(container);
 
     expect(routeInfo[0]?.controller).toBe(TYPES.OrderController);
     expect(routeInfo[0]?.endpoints[0]?.route).toBe('GET /api/order/');

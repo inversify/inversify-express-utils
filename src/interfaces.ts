@@ -1,5 +1,12 @@
-import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
+import type {
+  Application,
+  NextFunction,
+  Request,
+  RequestHandler,
+  Response,
+} from 'express';
 import { interfaces as inversifyInterfaces } from 'inversify';
+
 import { HTTP_VERBS_ENUM, PARAMETER_TYPE } from './constants';
 import { HttpResponseMessage } from './httpResponseMessage';
 
@@ -10,20 +17,22 @@ type Prototype<T> = {
 };
 
 interface ConstructorFunction<T = Record<string, unknown>> {
-  new(...args: unknown[]): T;
   prototype: Prototype<T>;
+  new (...args: unknown[]): T;
 }
 
 export type DecoratorTarget<T = unknown> =
-  ConstructorFunction<T> | Prototype<T>;
+  | ConstructorFunction<T>
+  | Prototype<T>;
 
-export type Middleware = (string | symbol | RequestHandler);
+export type Middleware = string | symbol | RequestHandler;
 
 export interface MiddlewareMetaData {
   [identifier: string]: Middleware[];
 }
 
 export type ControllerHandler = (...params: unknown[]) => unknown;
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-empty-interface
 export interface Controller {}
 
 export interface ControllerMetadata {
@@ -34,7 +43,7 @@ export interface ControllerMetadata {
 
 export interface ControllerMethodMetadata extends ControllerMetadata {
   key: string;
-  method: keyof typeof HTTP_VERBS_ENUM;
+  method: HTTP_VERBS_ENUM;
 }
 
 export interface ControllerParameterMetadata {
@@ -51,12 +60,12 @@ export interface ParameterMetadata {
 export type ExtractedParameters =
   | ParameterMetadata[]
   | [Request, Response, NextFunction]
-  | unknown[]
+  | unknown[];
 
 export type HandlerDecorator = (
   target: DecoratorTarget,
   key: string,
-  value: unknown
+  value: unknown,
 ) => void;
 
 export type ConfigFunction = (app: Application) => void;
@@ -75,11 +84,7 @@ export interface Principal<T = unknown> {
 }
 
 export interface AuthProvider {
-  getUser(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Principal>;
+  getUser(req: Request, res: Response, next: NextFunction): Promise<Principal>;
 }
 
 export interface HttpContext<T = unknown> {
@@ -89,6 +94,7 @@ export interface HttpContext<T = unknown> {
   user: Principal<T>;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface IHttpActionResult {
   executeAsync(): Promise<HttpResponseMessage>;
 }
@@ -104,7 +110,7 @@ export interface RouteInfo {
 }
 
 export interface RawMetadata {
-  controllerMetadata: ControllerMetadata,
-  methodMetadata: ControllerMethodMetadata[],
-  parameterMetadata: ControllerParameterMetadata,
+  controllerMetadata: ControllerMetadata;
+  methodMetadata: ControllerMethodMetadata[];
+  parameterMetadata: ControllerParameterMetadata;
 }

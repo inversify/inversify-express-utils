@@ -1,11 +1,28 @@
-import { injectable } from 'inversify';
+import { Readable } from 'node:stream';
 import { URL } from 'node:url';
-import { Readable } from 'stream';
+
 import { StatusCodes } from 'http-status-codes';
+import { injectable } from 'inversify';
+
 import { injectHttpContext } from './decorators';
 import { HttpResponseMessage } from './httpResponseMessage';
-import { CreatedNegotiatedContentResult, ConflictResult, OkNegotiatedContentResult, OkResult, BadRequestErrorMessageResult, BadRequestResult, ExceptionResult, InternalServerErrorResult, NotFoundResult, RedirectResult, ResponseMessageResult, StatusCodeResult, JsonResult, StreamResult } from './results';
 import type { HttpContext } from './interfaces';
+import {
+  BadRequestErrorMessageResult,
+  BadRequestResult,
+  ConflictResult,
+  CreatedNegotiatedContentResult,
+  ExceptionResult,
+  InternalServerErrorResult,
+  JsonResult,
+  NotFoundResult,
+  OkNegotiatedContentResult,
+  OkResult,
+  RedirectResult,
+  ResponseMessageResult,
+  StatusCodeResult,
+  StreamResult,
+} from './results';
 
 @injectable()
 export class BaseHttpController {
@@ -13,7 +30,7 @@ export class BaseHttpController {
 
   protected created<T>(
     location: string | URL,
-    content: T
+    content: T,
   ): CreatedNegotiatedContentResult<T> {
     return new CreatedNegotiatedContentResult(location, content);
   }
@@ -53,7 +70,7 @@ export class BaseHttpController {
   }
 
   protected responseMessage(
-    message: HttpResponseMessage
+    message: HttpResponseMessage,
   ): ResponseMessageResult {
     return new ResponseMessageResult(message);
   }
@@ -64,7 +81,7 @@ export class BaseHttpController {
 
   protected json<T extends Record<string, unknown>>(
     content: T | T[],
-    statusCode: number = StatusCodes.OK
+    statusCode: number = StatusCodes.OK,
   ): JsonResult<T> {
     return new JsonResult(content, statusCode);
   }
@@ -72,7 +89,7 @@ export class BaseHttpController {
   protected stream(
     readableStream: Readable,
     contentType: string,
-    statusCode: number = StatusCodes.OK
+    statusCode: number = StatusCodes.OK,
   ): StreamResult {
     return new StreamResult(readableStream, contentType, statusCode);
   }

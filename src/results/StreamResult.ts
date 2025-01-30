@@ -1,22 +1,23 @@
-import { Readable } from 'stream';
-import { IHttpActionResult } from '../interfaces';
-import { HttpResponseMessage } from '../httpResponseMessage';
-import { StreamContent } from '../content/streamContent';
+import { Readable } from 'node:stream';
 
+import { StreamContent } from '../content/streamContent';
+import { HttpResponseMessage } from '../httpResponseMessage';
+import { IHttpActionResult } from '../interfaces';
 
 export class StreamResult implements IHttpActionResult {
   constructor(
     public readableStream: Readable,
     public contentType: string,
-    public readonly statusCode: number
-  ) { }
+    public readonly statusCode: number,
+  ) {}
 
   public async executeAsync(): Promise<HttpResponseMessage> {
-    const response = new HttpResponseMessage(this.statusCode);
-    response.content = new StreamContent(
-      this.readableStream,
-      this.contentType,
+    const response: HttpResponseMessage = new HttpResponseMessage(
+      this.statusCode,
     );
-    return Promise.resolve(response);
+
+    response.content = new StreamContent(this.readableStream, this.contentType);
+
+    return response;
   }
 }
