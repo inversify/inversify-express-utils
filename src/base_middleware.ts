@@ -18,6 +18,6 @@ export abstract class BaseMiddleware implements BaseMiddleware {
   public abstract handler(
     req: Request,
     res: Response,
-    next: NextFunction,
-  ): void;
+    next: NextFunction
+  ): void | Promise<void>;
 }

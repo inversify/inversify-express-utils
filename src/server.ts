@@ -265,11 +265,16 @@ export class InversifyExpressServer {
         this._container.get<MiddlewareInstance>(middlewareItem);
 
       if (middlewareInstance instanceof BaseMiddleware) {
-        return (req: Request, res: Response, next: NextFunction): void => {
+        return (
+          req: Request,
+          res: Response,
+          next: NextFunction,
+        ): void | Promise<void> => {
           const mReq: BaseMiddleware =
             this._container.get<BaseMiddleware>(middlewareItem);
           mReq.httpContext = this._getHttpContext(req);
-          mReq.handler(req, res, next);
+
+          return mReq.handler(req, res, next);
         };
       }
 
