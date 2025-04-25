@@ -72,6 +72,10 @@ export function getControllerMethodMetadata(
   ) as ControllerMethodMetadata[];
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (genericMetadata === undefined && methodMetadata === undefined) {
+    return [];
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (genericMetadata !== undefined && methodMetadata !== undefined) {
     return methodMetadata.concat(genericMetadata);
   }
