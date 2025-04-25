@@ -134,4 +134,28 @@ describe('Debug utils', () => {
     expect(routeInfo[0]?.endpoints[1]?.route).toBe('POST /api/order/');
     expect(routeInfo[0]?.endpoints[1]?.args).toBeUndefined();
   });
+
+  it('should handle controllers without methods', () => {
+    const container: Container = new Container();
+
+    @controller('/api/empty')
+    class EmptyController extends BaseHttpController {
+      // empty Controller
+    }
+
+    // eslint-disable-next-line @typescript-eslint/typedef
+    const TYPES = {
+      EmptyController: EmptyController.name,
+    };
+
+    const server: InversifyExpressServer = new InversifyExpressServer(
+      container,
+    );
+    server.build();
+
+    const routeInfo: RouteInfo[] = getRouteInfo(container);
+
+    expect(routeInfo[0]?.controller).toBe(TYPES.EmptyController);
+    expect(routeInfo[0]?.endpoints).toEqual([]);
+  });
 });
