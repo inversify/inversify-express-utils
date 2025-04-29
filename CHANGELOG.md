@@ -13,39 +13,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Added explicit check for when both `genericMetadata` and `methodMetadata` are `undefined` in the `getControllerMethodMetadata` function, preventing potential errors when no metadata is available.
+
 ## [6.5.0]
 
 ### Added
 
 ### Changed
+
 - Updated `BaseMiddleware.handler` to allow async handlers.
 - Updated `Middleware` to allow include any `ServiceIdentifier`.
 - Updated `JsonContent` with no generic.
 
 ### Fixed
+
 - Updated `BaseController.ok` to no longer return `text/plain` responses when non string content is passed.
 
 ## [6.4.10]
 
 ### Fixed
--   Fixed `Controller` without wrong constraints (#417).
+
+- Fixed `Controller` without wrong constraints (#417).
 
 ## [6.4.9]
 
 ### Fixed
--   Fixed wrong emited typescript delclaration files (#1668).
+
+- Fixed wrong emited typescript delclaration files (#1668).
 
 ## [6.4.8]
 
 ### Fixed
 
--   Fixed can't set headers after they are sent (#255 / #412).
+- Fixed can't set headers after they are sent (#255 / #412).
 
 ## [6.4.7]
 
 ### Fixed
 
--   Updated `inversify` and `express` dependencies to be peer dependnecies as stated in the docs.
+- Updated `inversify` and `express` dependencies to be peer dependnecies as stated in the docs.
 
 ## [6.4.4]
 
@@ -53,8 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
--   Update dependencies (`minimist`, `json5`, `@babel/traverse`, `tough-cookie`, `ansi-regex`, `cookiejar`, `express`, `decode-uri-component`).
+- Update dependencies (`minimist`, `json5`, `@babel/traverse`, `tough-cookie`, `ansi-regex`, `cookiejar`, `express`, `decode-uri-component`).
 
 ### Fixed
 
--   Change JsonContent to return object rather than string (#379 / #378).
+- Change JsonContent to return object rather than string (#379 / #378).
